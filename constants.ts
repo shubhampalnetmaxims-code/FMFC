@@ -57,11 +57,26 @@ export const COMMUNITIES_DATA: Community[] = [
         ],
         posts: [
              {
+                id: 10,
+                user: gymBro,
+                communityId: 1,
+                channelId: 101,
+                video: 'https://videos.pexels.com/video-files/4753648/4753648-hd.mp4',
+                likes: 950,
+                commentCount: 2,
+                comments: [
+                    { user: alex, text: 'Those pull-ups are clean! 🔥' },
+                    { user: fitLife, text: 'Form is everything. Great work!' }
+                ],
+                description: "Working on that back strength with some weighted pull-ups. The challenge is real, but so are the results. Who's with me on this grind? #pullupchallenge",
+                hashtags: ['#pullups', '#backday', '#calisthenics', '#gymmotivation'],
+            },
+             {
                 id: 9,
                 user: adminUser,
                 communityId: 1,
                 channelId: 101,
-                image: 'https://picsum.photos/id/145/600/400',
+                image: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=600&auto=format&fit=crop',
                 likes: 1100,
                 commentCount: 3,
                 comments: [
@@ -77,7 +92,7 @@ export const COMMUNITIES_DATA: Community[] = [
                 user: cardio,
                 communityId: 1,
                 channelId: 101,
-                image: 'https://picsum.photos/id/838/600/400',
+                image: 'https://images.unsplash.com/photo-1517836357463-d257692635c3?q=80&w=600&auto=format&fit=crop',
                 likes: 720,
                 commentCount: 2,
                 comments: [
@@ -92,7 +107,7 @@ export const COMMUNITIES_DATA: Community[] = [
                 user: gymBro,
                 communityId: 1,
                 channelId: 101,
-                image: 'https://picsum.photos/id/1084/600/400',
+                image: 'https://images.unsplash.com/photo-1599058917212-d750089bc07e?q=80&w=600&auto=format&fit=crop',
                 likes: 541,
                 commentCount: 2,
                 comments: [
@@ -107,7 +122,7 @@ export const COMMUNITIES_DATA: Community[] = [
                 user: alex,
                 communityId: 1,
                 channelId: 101,
-                image: 'https://picsum.photos/id/1060/600/400',
+                image: 'https://images.unsplash.com/photo-1581009137042-c552e485697a?q=80&w=600&auto=format&fit=crop',
                 likes: 1256,
                 commentCount: 2,
                 comments: [
@@ -122,12 +137,15 @@ export const COMMUNITIES_DATA: Community[] = [
                 user: cardio,
                 communityId: 1,
                 channelId: 101,
-                image: 'https://picsum.photos/id/1043/600/400',
+                image: 'https://images.unsplash.com/photo-1549060279-7e168fcee0c2?q=80&w=600&auto=format&fit=crop',
                 likes: 873,
-                commentCount: 0,
-                comments: [],
-                description: '10k run through the forest trails this morning. Nothing beats the fresh air and the sound of nature.',
-                hashtags: ['#running', '#cardio', '#trailrunning', '#getoutside'],
+                commentCount: 2,
+                comments: [
+                    { user: gymBro, text: 'That looks intense! Major respect.' },
+                    { user: alex, text: 'This is what it\'s all about! Community and competition.' }
+                ],
+                description: 'Throwback to the annual Throwdown event! The energy was insane. Pushing limits and cheering each other on. Can\'t wait for the next one!',
+                hashtags: ['#FitnessEvent', '#Crossfit', '#Competition', '#Community'],
             },
         ],
         chatMessages: [
@@ -147,7 +165,7 @@ export const COMMUNITIES_DATA: Community[] = [
         description: 'A community for bodybuilders and aesthetics enthusiasts. Discuss diet, posing, and workout splits.',
         isPrivate: false,
         adminId: adminUser.id,
-        members: [chef, foodie, mealPrep, jasmine, zenMaster, testUser],
+        members: [chef, foodie, mealPrep, jasmine, zenMaster, testUser, alex, fitLife],
         channels: [
             { id: 201, name: 'progress-pics', type: 'posts' },
             { id: 202, name: 'nutrition-chat', type: 'chat' },
@@ -155,12 +173,43 @@ export const COMMUNITIES_DATA: Community[] = [
             { id: 204, name: 'support', type: 'chat' },
         ],
         posts: [
+            {
+                id: 12,
+                user: alex,
+                communityId: 2,
+                channelId: 201,
+                image: 'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?q=80&w=600&auto=format&fit=crop',
+                likes: 1500,
+                commentCount: 3,
+                comments: [
+                    { user: foodie, text: 'Incredible strength!' },
+                    { user: jasmine, text: 'This is so motivating! 🔥' },
+                    { user: fitLife, text: 'Beast mode activated!' },
+                ],
+                description: 'Took on the rope climb challenge today. It was a test of grip, upper body strength, and sheer will. Feeling accomplished!',
+                hashtags: ['#ropeclimb', '#challengeaccepted', '#functionalfitness', '#gains'],
+            },
+            {
+                id: 11,
+                user: jasmine,
+                communityId: 2,
+                channelId: 201,
+                video: 'https://videos.pexels.com/video-files/3840428/3840428-hd.mp4',
+                likes: 1300,
+                commentCount: 2,
+                comments: [
+                    { user: chef, text: 'Perfect squat form! Killing it.' },
+                    { user: zenMaster, text: 'Inspiring dedication.' },
+                ],
+                description: "Focusing on depth and control in my squats today. It's not about the weight, it's about the quality of each rep. #legdaymotivation",
+                hashtags: ['#squats', '#legday', '#formcheck', '#girlswholift'],
+            },
              {
                 id: 7,
                 user: jasmine,
                 communityId: 2,
                 channelId: 201,
-                image: 'https://picsum.photos/id/433/600/400',
+                image: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=600&auto=format&fit=crop',
                 likes: 1890,
                 commentCount: 2,
                 comments: [
@@ -175,7 +224,7 @@ export const COMMUNITIES_DATA: Community[] = [
                 user: fitLife,
                 communityId: 2,
                 channelId: 201,
-                image: 'https://picsum.photos/id/219/600/400',
+                image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop',
                 likes: 987,
                 commentCount: 2,
                 comments: [
@@ -190,7 +239,7 @@ export const COMMUNITIES_DATA: Community[] = [
                 user: jasmine,
                 communityId: 2,
                 channelId: 201,
-                image: 'https://picsum.photos/id/1015/600/400',
+                image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=600&auto=format&fit=crop',
                 likes: 2345,
                 commentCount: 1,
                 comments: [
@@ -204,7 +253,7 @@ export const COMMUNITIES_DATA: Community[] = [
                 user: chef,
                 communityId: 2,
                 channelId: 201,
-                image: 'https://picsum.photos/id/1080/600/400',
+                image: 'https://images.unsplash.com/photo-1540420773420-28507da66d68?q=80&w=600&auto=format&fit=crop',
                 likes: 3102,
                 commentCount: 3,
                 comments: [
@@ -223,6 +272,88 @@ export const COMMUNITIES_DATA: Community[] = [
             { id: 11, user: testUser, text: "I can't find the protein powder you mentioned in your latest recipe. Is there a good substitute?", timestamp: 'Today 1:12 PM', reactions: [] },
         ],
         files: [DUMMY_FILES[3]],
+    },
+    {
+        id: 3,
+        name: 'FMFC Official',
+        description: 'Forge Your Fitness. The official community for all FMFC app users. Share progress, join challenges, and get support on your journey.',
+        isPrivate: false,
+        adminId: adminUser.id,
+        members: [testUser, adminUser, alex, jasmine, cardio, chef, fitLife, gymBro],
+        channels: [
+            { id: 301, name: 'announcements', type: 'admin-only' },
+            { id: 302, name: 'general-fitness', type: 'posts' },
+            { id: 303, name: 'nutrition-corner', type: 'chat' },
+            { id: 304, name: 'weekly-challenges', type: 'posts' },
+            { id: 305, name: 'members', type: 'members' },
+            { id: 306, name: 'support', type: 'chat' },
+        ],
+        posts: [
+            {
+                id: 20,
+                user: adminUser,
+                communityId: 3,
+                channelId: 301, // announcements
+                image: 'https://images.unsplash.com/photo-1571019614242-c5c5792c6c39?q=80&w=600&auto=format&fit=crop',
+                likes: 120,
+                commentCount: 1,
+                comments: [{ user: testUser, text: 'Awesome news!' }],
+                description: "🎉 Welcome to the official FMFC community! We're thrilled to have you here. Introduce yourself in the #general-fitness channel and let's start forging our fitness together!",
+                hashtags: ['#Welcome', '#FMFC', '#Community'],
+            },
+            {
+                id: 21,
+                user: adminUser,
+                communityId: 3,
+                channelId: 304, // weekly-challenges
+                image: 'https://images.unsplash.com/photo-1605296867304-46d5465a13f1?q=80&w=600&auto=format&fit=crop',
+                likes: 350,
+                commentCount: 2,
+                comments: [
+                    { user: alex, text: 'I am so ready for this!' },
+                    { user: cardio, text: 'Let\'s get it! 🔥' }
+                ],
+                description: "This week's challenge: The #MileHighClub! Run or walk one mile every single day this week. Post your progress pics here. Let's see who can keep the streak alive!",
+                hashtags: ['#WeeklyChallenge', '#Running', '#Cardio', '#FitnessChallenge'],
+            },
+            {
+                id: 22,
+                user: chef,
+                communityId: 3,
+                channelId: 302, // general-fitness
+                image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17025?q=80&w=600&auto=format&fit=crop',
+                likes: 840,
+                commentCount: 2,
+                comments: [
+                    { user: foodie, text: 'Looks amazing! I need that recipe.' },
+                    { user: mealPrep, text: 'Perfect for my meal prep this week!' }
+                ],
+                description: "Fuel your gains with this delicious and simple salmon and veggie bowl. Packed with protein and healthy fats. Check out the #nutrition-corner channel for the full recipe!",
+                hashtags: ['#HealthyEating', '#Nutrition', '#Protein', '#MealPrep'],
+            },
+            {
+                id: 23,
+                user: fitLife,
+                communityId: 3,
+                channelId: 302, // general-fitness
+                video: 'https://videos.pexels.com/video-files/3838442/3838442-hd.mp4',
+                likes: 555,
+                commentCount: 2,
+                comments: [
+                    { user: gymBro, text: 'Great form on those kettlebell swings!' },
+                    { user: jasmine, text: 'Love this combo! Totally trying it.' }
+                ],
+                description: "Quick and effective full-body kettlebell flow to get the heart pumping. Give this a try when you're short on time but want a great workout.",
+                hashtags: ['#KettlebellWorkout', '#FullBody', '#HIIT', '#WorkoutMotivation'],
+            }
+        ],
+        chatMessages: [
+            { id: 20, user: chef, text: 'Hey everyone, just dropped the recipe for the salmon bowl in here. Let me know what you think!', timestamp: 'Today 1:00 PM', reactions: [{ emoji: '👍', user: foodie }] },
+            { id: 21, user: foodie, text: "Thanks, @Protein Chef! It looks incredible.", timestamp: 'Today 1:01 PM', reactions: [] },
+            { id: 22, user: testUser, text: "Hey @Admin User, my app keeps crashing when I try to log a run for the weekly challenge. Any ideas?", timestamp: 'Today 2:30 PM', reactions: [] },
+            { id: 23, user: adminUser, text: `Hi ${testUser.name}, sorry to hear that. I've created a support ticket for you. Can you tell me what device you're using?`, timestamp: 'Today 2:31 PM', reactions: [], toUserId: testUser.id },
+        ],
+        files: [DUMMY_FILES[0], DUMMY_FILES[3]],
     }
 ];
 

@@ -3,10 +3,12 @@ import PostCard from '../components/PostCard';
 import { COMMUNITIES_DATA, USERS_DATA } from '../constants';
 import type { User, Community, Post, ChatMessage, Channel, ChannelType } from '../types';
 import CommunityCard from '../components/CommunityCard';
-import CommunityHubPage from './CommunityHubPage';
+import CommunityHubPage, { CommunityHubFilterType } from './CommunityHubPage';
 import ChannelContentPage from './ChannelContentPage';
 import PremiumModal from '../components/PremiumModal';
 import CreateCommunityPage from './CreateCommunityPage';
+import AddMembersPage from './AddMembersPage';
+import Icon from '../components/Icon';
 
 type SubTab = 'All Feed' | 'My Community' | 'Create Own Community';
 
@@ -19,6 +21,8 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser }) => {
     const [communities, setCommunities] = useState<Community[]>(COMMUNITIES_DATA);
     const [selectedCommunityId, setSelectedCommunityId] = useState<number | null>(null);
     const [selectedChannelId, setSelectedChannelId] = useState<number | null>(null);
+    const [hubActiveFilter, setHubActiveFilter] = useState<CommunityHubFilterType>('feed');
+    const [isAddingMembers, setIsAddingMembers] = useState(false);
     
     const [hasPremium, setHasPremium] = useState(false);
     const [showPremiumModal, setShowPremiumModal] = useState(false);
@@ -29,6 +33,8 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser }) => {
     const handleSelectCommunity = (id: number) => {
         setSelectedCommunityId(id);
         setSelectedChannelId(null);
+        setHubActiveFilter('feed');
+        setIsAddingMembers(false);
     };
 
     const handleSelectChannel = (id: number) => {
@@ -37,11 +43,13 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser }) => {
 
     const handleBackToCommunityHub = () => {
         setSelectedChannelId(null);
+        setHubActiveFilter('channels');
     };
     
     const handleBackToCommunityList = () => {
         setSelectedCommunityId(null);
         setSelectedChannelId(null);
+        setIsAddingMembers(false);
     };
 
     const handleLeaveCommunity = (communityId: number) => {
@@ -206,48 +214,55 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser }) => {
 
 
     const renderMyCommunityContent = () => {
-        if (selectedCommunityId && selectedChannelId) {
-            const community = communities.find(c => c.id === selectedCommunityId)!;
-            return <ChannelContentPage 
-                        community={community} 
-                        channelId={selectedChannelId} 
-                        currentUser={currentUser} 
-                        onBack={handleBackToCommunityHub} 
+        const community = communities.find(c => c.id === selectedCommunityId);
+
+        if (!selectedCommunityId || !community) {
+            return (
+                <div className="p-4 space-y-4">
+                    <h2 className="text-lg font-semibold text-zinc-300 px-2">Your Communities</h2>
+                    {userCommunities.length > 0 ? userCommunities.map(community => (
+                        <CommunityCard
+                            key={community.id}
+                            community={community}
+                            onSelect={() => handleSelectCommunity(community.id)}
+                        />
+                    )) : (
+                        <div className="text-center py-16 text-zinc-500">
+                            <p>You haven't joined any communities yet.</p>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        if (isAddingMembers) {
+            return <AddMembersPage community={community} onBack={() => setIsAddingMembers(false)} />;
+        }
+
+        if (selectedChannelId) {
+            return <ChannelContentPage
+                        community={community}
+                        channelId={selectedChannelId}
+                        currentUser={currentUser}
+                        onBack={handleBackToCommunityHub}
                         onAddPost={(newPost) => handleAddPost(community.id, newPost)}
                         onAddChatMessage={(newMsg) => handleAddOrUpdateChatMessage(community.id, newMsg)}
                     />;
         }
 
-        if (selectedCommunityId) {
-            const community = communities.find(c => c.id === selectedCommunityId)!;
-            return <CommunityHubPage 
-                        community={community} 
-                        currentUser={currentUser}
-                        onSelectChannel={handleSelectChannel} 
-                        onBack={handleBackToCommunityList}
-                        onLeaveCommunity={() => handleLeaveCommunity(community.id)}
-                        onUpdateCommunity={(data) => handleUpdateCommunity(community.id, data)}
-                        onAddChannel={handleAddChannel}
-                        onUpdateChannel={handleUpdateChannel}
-                    />;
-        }
-        
-        return (
-            <div className="p-4 space-y-4">
-                <h2 className="text-lg font-semibold text-zinc-300 px-2">Your Communities</h2>
-                {userCommunities.length > 0 ? userCommunities.map(community => (
-                     <CommunityCard 
-                        key={community.id} 
-                        community={community} 
-                        onSelect={() => handleSelectCommunity(community.id)} 
-                    />
-                )) : (
-                     <div className="text-center py-16 text-zinc-500">
-                        <p>You haven't joined any communities yet.</p>
-                    </div>
-                )}
-            </div>
-        );
+        return <CommunityHubPage
+                    community={community}
+                    currentUser={currentUser}
+                    onSelectChannel={handleSelectChannel}
+                    onBack={handleBackToCommunityList}
+                    onLeaveCommunity={() => handleLeaveCommunity(community.id)}
+                    onUpdateCommunity={(data) => handleUpdateCommunity(community.id, data)}
+                    onAddChannel={handleAddChannel}
+                    onUpdateChannel={handleUpdateChannel}
+                    onAddMembers={() => setIsAddingMembers(true)}
+                    activeFilter={hubActiveFilter}
+                    setActiveFilter={setHubActiveFilter}
+                />;
     };
 
     const renderContent = () => {
@@ -299,7 +314,13 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser }) => {
                 {/* Header */}
                 {showHeaderAndTabs && (
                     <header className="sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-10 p-4 shrink-0">
-                        <h1 className="text-xl font-bold text-zinc-100 uppercase tracking-wider">Community</h1>
+                        <div className="flex justify-between items-center">
+                            <h1 className="text-xl font-bold text-zinc-100 uppercase tracking-wider">Community</h1>
+                            <button className="relative text-zinc-400 hover:text-zinc-200">
+                                <Icon type="bell" className="w-6 h-6" />
+                                <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-zinc-950"></span>
+                            </button>
+                        </div>
                     </header>
                 )}
 

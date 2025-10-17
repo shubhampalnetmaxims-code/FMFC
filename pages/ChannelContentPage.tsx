@@ -91,7 +91,11 @@ const ChannelContentPage: React.FC<ChannelContentPageProps> = ({ community, chan
                      <h1 className="text-sm font-semibold text-zinc-400 uppercase tracking-wider">{community.name}</h1>
                      <p className="text-lg font-bold text-zinc-100">#{selectedChannel.name}</p>
                 </div>
-                <div className="ml-auto flex items-center space-x-2">
+                <div className="ml-auto flex items-center space-x-4">
+                     <button className="relative text-zinc-400 hover:text-zinc-200">
+                        <Icon type="bell" className="w-6 h-6" />
+                        <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-zinc-950"></span>
+                    </button>
                      <button className="text-zinc-400 hover:text-zinc-200"><Icon type="search" className="w-5 h-5"/></button>
                      <button className="text-zinc-400 hover:text-zinc-200"><Icon type="dots-horizontal" /></button>
                 </div>

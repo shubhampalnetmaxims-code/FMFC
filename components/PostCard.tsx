@@ -103,8 +103,13 @@ const PostCard: React.FC<PostCardProps> = ({ post, currentUser, showCommunityNam
                 </div>
             </div>
 
-            {/* Post Image */}
-            <img src={post.image} alt="Post content" className="w-full h-auto" />
+            {/* Post Media */}
+            {post.image && <img src={post.image} alt="Post content" className="w-full h-auto" />}
+            {post.video && (
+                <video src={post.video} controls className="w-full h-auto bg-black">
+                    Your browser does not support the video tag.
+                </video>
+            )}
 
             {/* Post Actions */}
             <div className="p-4 flex items-center space-x-6">

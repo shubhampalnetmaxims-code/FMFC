@@ -1,15 +1,15 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import type { Community, Channel, User, ChannelType } from '../types';
 import Icon from '../components/Icon';
 import MemberListPane from '../components/MemberListPane';
 import MediaGrid from '../components/MediaGrid';
-import AddMembersModal from '../components/AddMembersModal';
 import EditCommunityModal from '../components/EditCommunityModal';
 import EditChannelModal from '../components/EditChannelModal';
 import PostCard from '../components/PostCard';
 import MediaViewerModal from '../components/MediaViewerModal';
 import FileListPane from '../components/FileListPane';
+
+export type CommunityHubFilterType = 'feed' | 'channels' | 'members' | 'files' | 'media';
 
 interface CommunityHubPageProps {
     community: Community;
@@ -20,14 +20,13 @@ interface CommunityHubPageProps {
     onUpdateCommunity: (updatedData: { name: string; description: string; }) => void;
     onAddChannel: (communityId: number, channelName: string, channelType: ChannelType) => void;
     onUpdateChannel: (communityId: number, channelId: number, updatedData: { name: string; type: ChannelType }) => void;
+    onAddMembers: () => void;
+    activeFilter: CommunityHubFilterType;
+    setActiveFilter: (filter: CommunityHubFilterType) => void;
 }
 
-type FilterType = 'feed' | 'channels' | 'members' | 'files' | 'media';
-
-const CommunityHubPage: React.FC<CommunityHubPageProps> = ({ community, currentUser, onSelectChannel, onBack, onLeaveCommunity, onUpdateCommunity, onAddChannel, onUpdateChannel }) => {
-    const [activeFilter, setActiveFilter] = useState<FilterType>('feed');
+const CommunityHubPage: React.FC<CommunityHubPageProps> = ({ community, currentUser, onSelectChannel, onBack, onLeaveCommunity, onUpdateCommunity, onAddChannel, onUpdateChannel, onAddMembers, activeFilter, setActiveFilter }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [isAddMembersModalOpen, setIsAddMembersModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editingChannel, setEditingChannel] = useState<Channel | null>(null);
     const menuRef = useRef<HTMLDivElement>(null);
@@ -217,7 +216,7 @@ const CommunityHubPage: React.FC<CommunityHubPageProps> = ({ community, currentU
                         {isAdmin && (
                             <div className="p-4 border-b border-zinc-800">
                                 <button
-                                    onClick={() => setIsAddMembersModalOpen(true)}
+                                    onClick={onAddMembers}
                                     className="w-full flex items-center justify-center space-x-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors bg-amber-500 hover:bg-amber-600 text-black"
                                 >
                                     <Icon type="user-plus" className="w-5 h-5" />
@@ -229,7 +228,7 @@ const CommunityHubPage: React.FC<CommunityHubPageProps> = ({ community, currentU
                     </div>
                 );
             case 'media':
-                const imageUrls = community.posts.map(p => p.image);
+                const imageUrls = community.posts.map(p => p.image).filter((url): url is string => !!url);
                 return <MediaGrid imageUrls={imageUrls} onImageClick={setViewingImageUrl} />;
             case 'files':
                  return <FileListPane files={community.files || []} />;
@@ -240,12 +239,6 @@ const CommunityHubPage: React.FC<CommunityHubPageProps> = ({ community, currentU
 
     return (
         <div className="flex h-full flex-col">
-            {isAddMembersModalOpen && (
-                <AddMembersModal
-                    community={community}
-                    onClose={() => setIsAddMembersModalOpen(false)}
-                />
-            )}
             {isEditModalOpen && (
                 <EditCommunityModal
                     community={community}
@@ -272,29 +265,35 @@ const CommunityHubPage: React.FC<CommunityHubPageProps> = ({ community, currentU
                     <Icon type="arrow-left" />
                 </button>
                 <h1 className="text-lg font-bold text-zinc-100 uppercase tracking-wider">{community.name}</h1>
-                <div className="ml-auto relative" ref={menuRef}>
-                    <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-zinc-400 hover:text-zinc-200">
-                        <Icon type="dots-horizontal" />
+                <div className="ml-auto flex items-center space-x-4">
+                    <button className="relative text-zinc-400 hover:text-zinc-200">
+                        <Icon type="bell" className="w-6 h-6" />
+                        <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-zinc-950"></span>
                     </button>
-                    {isMenuOpen && (
-                        <div className="absolute right-0 mt-2 w-48 bg-zinc-800 border border-zinc-700 rounded-md shadow-lg z-20">
-                           {isAdmin && (
-                               <button 
-                                    onClick={handleEditClick}
-                                    className="flex items-center space-x-2 w-full text-left px-4 py-2 text-sm text-zinc-200 hover:bg-zinc-700"
+                    <div className="relative" ref={menuRef}>
+                        <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-zinc-400 hover:text-zinc-200">
+                            <Icon type="dots-horizontal" />
+                        </button>
+                        {isMenuOpen && (
+                            <div className="absolute right-0 mt-2 w-48 bg-zinc-800 border border-zinc-700 rounded-md shadow-lg z-20">
+                            {isAdmin && (
+                                <button 
+                                        onClick={handleEditClick}
+                                        className="flex items-center space-x-2 w-full text-left px-4 py-2 text-sm text-zinc-200 hover:bg-zinc-700"
+                                    >
+                                        <Icon type="pencil" className="w-4 h-4"/>
+                                        <span>Edit Community</span>
+                                    </button>
+                            )}
+                                <button 
+                                    onClick={handleLeaveClick}
+                                    className="flex items-center space-x-2 w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-zinc-700"
                                 >
-                                    <Icon type="pencil" className="w-4 h-4"/>
-                                    <span>Edit Community</span>
+                                    <span>Leave Community</span>
                                 </button>
-                           )}
-                            <button 
-                                onClick={handleLeaveClick}
-                                className="flex items-center space-x-2 w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-zinc-700"
-                            >
-                                <span>Leave Community</span>
-                            </button>
-                        </div>
-                    )}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </header>
 

@@ -19,7 +19,8 @@ export interface Post {
   user: User;
   communityId: number;
   channelId: number;
-  image: string;
+  image?: string;
+  video?: string;
   likes: number;
   commentCount: number;
   comments: Comment[];
