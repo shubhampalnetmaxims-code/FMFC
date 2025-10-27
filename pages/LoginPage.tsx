@@ -16,7 +16,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         e.preventDefault();
         setError('');
 
-        if (email.toLowerCase() === 'test@gmail.com' && password === '123456') {
+        if (email.toLowerCase() === 'shubham@gmail.com' && password === '123456') {
             onLogin(TEST_USER);
         } else if (email.toLowerCase() === 'admin@gmail.com' && password === '123456') {
             onLogin(ADMIN_USER);
@@ -75,7 +75,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                         </button>
                     </div>
                      <div className="text-center mt-4 text-xs text-zinc-500">
-                        <p>Use <span className="font-mono text-amber-300">test@gmail.com</span> or <span className="font-mono text-amber-300">admin@gmail.com</span></p>
+                        <p>Use <span className="font-mono text-amber-300">Shubham@gmail.com</span> or <span className="font-mono text-amber-300">admin@gmail.com</span></p>
                         <p>Password: <span className="font-mono text-amber-300">123456</span></p>
                     </div>
                 </form>

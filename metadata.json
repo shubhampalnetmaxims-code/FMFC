@@ -1,5 +1,7 @@
 {
   "name": "FMFC",
   "description": "A social fitness application to connect with a community, track workouts, set goals, and join sessions. This app features a community feed with posts that can be liked, commented on, and shared.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [
+    "camera"
+  ]
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 
-type IconType = 'community' | 'session' | 'goals' | 'workouts' | 'profile' | 'like' | 'like-filled' | 'comment' | 'share' | 'send' | 'hash' | 'users' | 'arrow-left' | 'dots-horizontal' | 'search' | 'lock-closed' | 'emoji' | 'file-document' | 'photo' | 'plus' | 'paper-clip' | 'microphone' | 'video-camera' | 'user-plus' | 'pencil' | 'pin' | 'note' | 'chat-bubble-left-right' | 'download' | 'file-pdf' | 'file-doc' | 'file-xls' | 'bell' | 'fire' | 'menu' | 'cog' | 'logout' | 'x';
+type IconType = 'community' | 'session' | 'goals' | 'workouts' | 'profile' | 'like' | 'like-filled' | 'comment' | 'share' | 'send' | 'hash' | 'users' | 'arrow-left' | 'dots-horizontal' | 'search' | 'lock-closed' | 'emoji' | 'file-document' | 'photo' | 'plus' | 'paper-clip' | 'microphone' | 'video-camera' | 'user-plus' | 'pencil' | 'pin' | 'note' | 'chat-bubble-left-right' | 'download' | 'file-pdf' | 'file-doc' | 'file-xls' | 'bell' | 'fire' | 'menu' | 'cog' | 'logout' | 'x' | 'arrow-right' | 'bolt' | 'barcode' | 'check';
 
 interface IconProps {
   type: IconType;
@@ -74,6 +74,11 @@ const Icon: React.FC<IconProps> = ({ type, className = 'w-6 h-6' }) => {
          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
         </svg>
+    ),
+    'arrow-right': (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+           <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+       </svg>
     ),
     'dots-horizontal': (
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
@@ -198,6 +203,21 @@ const Icon: React.FC<IconProps> = ({ type, className = 'w-6 h-6' }) => {
     x: (
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+    ),
+    bolt: (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
+        </svg>
+    ),
+    barcode: (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5v15m3-15v15m3-15v15m3-15v15M4.5 4.5v15" />
+        </svg>
+    ),
+    check: (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
         </svg>
     ),
   };

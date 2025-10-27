@@ -110,3 +110,36 @@ export interface Community {
   workouts?: Workout[];
   meals?: Meal[];
 }
+
+// --- Nutrition Plan Types ---
+
+export interface FoodItem {
+  name: string;
+  quantity: number;
+  calories: number;
+}
+
+export interface MealEntry {
+  mealTime: string; // 'M1', 'M2', 'Breakfast', etc.
+  items: FoodItem[];
+}
+
+export interface NutritionTotals {
+  energy: number; // Cal
+  carbohydrates: number; // g
+  proteins: number; // g
+  fats: number; // g
+  fibre: number; // g
+  water: number; // mL
+}
+
+export interface NutritionPlan {
+  id: number;
+  name: string;
+  description: string;
+  isTemplate: boolean;
+  isActive: boolean;
+  notes: string;
+  totals: NutritionTotals;
+  content: MealEntry[];
+}
