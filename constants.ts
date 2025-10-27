@@ -76,7 +76,7 @@ export const COMMUNITIES_DATA: Community[] = [
                 user: adminUser,
                 communityId: 1,
                 channelId: 101,
-                image: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=600&auto=format&fit=crop',
+                image: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=600&auto.format&fit=crop',
                 likes: 1100,
                 commentCount: 3,
                 comments: [
@@ -92,7 +92,7 @@ export const COMMUNITIES_DATA: Community[] = [
                 user: cardio,
                 communityId: 1,
                 channelId: 101,
-                image: 'https://images.unsplash.com/photo-1517836357463-d257692635c3?q=80&w=600&auto=format&fit=crop',
+                image: 'https://images.unsplash.com/photo-1517836357463-d257692635c3?q=80&w=600&auto.format&fit=crop',
                 likes: 720,
                 commentCount: 2,
                 comments: [
@@ -107,7 +107,7 @@ export const COMMUNITIES_DATA: Community[] = [
                 user: gymBro,
                 communityId: 1,
                 channelId: 101,
-                image: 'https://images.unsplash.com/photo-1599058917212-d750089bc07e?q=80&w=600&auto=format&fit=crop',
+                image: 'https://images.unsplash.com/photo-1599058917212-d750089bc07e?q=80&w=600&auto.format&fit=crop',
                 likes: 541,
                 commentCount: 2,
                 comments: [
@@ -122,7 +122,7 @@ export const COMMUNITIES_DATA: Community[] = [
                 user: alex,
                 communityId: 1,
                 channelId: 101,
-                image: 'https://images.unsplash.com/photo-1581009137042-c552e485697a?q=80&w=600&auto=format&fit=crop',
+                image: 'https://images.unsplash.com/photo-1581009137042-c552e485697a?q=80&w=600&auto.format&fit=crop',
                 likes: 1256,
                 commentCount: 2,
                 comments: [
@@ -137,7 +137,7 @@ export const COMMUNITIES_DATA: Community[] = [
                 user: cardio,
                 communityId: 1,
                 channelId: 101,
-                image: 'https://images.unsplash.com/photo-1549060279-7e168fcee0c2?q=80&w=600&auto=format&fit=crop',
+                image: 'https://images.unsplash.com/photo-1549060279-7e168fcee0c2?q=80&w=600&auto.format&fit=crop',
                 likes: 873,
                 commentCount: 2,
                 comments: [
@@ -158,6 +158,9 @@ export const COMMUNITIES_DATA: Community[] = [
             { id: 10, user: fitLife, text: "It was the 'Heavy Squat Day' workout.", timestamp: 'Today 11:08 AM', reactions: [], notes: 'User is on iOS v1.2. Follow up on ticket #4351.' },
         ],
         files: DUMMY_FILES,
+        goals: [],
+        workouts: [],
+        meals: [],
     },
     {
         id: 2,
@@ -178,7 +181,7 @@ export const COMMUNITIES_DATA: Community[] = [
                 user: alex,
                 communityId: 2,
                 channelId: 201,
-                image: 'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?q=80&w=600&auto=format&fit=crop',
+                image: 'https://images.unsplash.com/photo-1571902943202-507ec2618e8f?q=80&w=600&auto.format&fit=crop',
                 likes: 1500,
                 commentCount: 3,
                 comments: [
@@ -209,7 +212,7 @@ export const COMMUNITIES_DATA: Community[] = [
                 user: jasmine,
                 communityId: 2,
                 channelId: 201,
-                image: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=600&auto=format&fit=crop',
+                image: 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=600&auto.format&fit=crop',
                 likes: 1890,
                 commentCount: 2,
                 comments: [
@@ -224,7 +227,7 @@ export const COMMUNITIES_DATA: Community[] = [
                 user: fitLife,
                 communityId: 2,
                 channelId: 201,
-                image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop',
+                image: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto.format&fit=crop',
                 likes: 987,
                 commentCount: 2,
                 comments: [
@@ -239,7 +242,7 @@ export const COMMUNITIES_DATA: Community[] = [
                 user: jasmine,
                 communityId: 2,
                 channelId: 201,
-                image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=600&auto=format&fit=crop',
+                image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=600&auto.format&fit=crop',
                 likes: 2345,
                 commentCount: 1,
                 comments: [
@@ -253,7 +256,7 @@ export const COMMUNITIES_DATA: Community[] = [
                 user: chef,
                 communityId: 2,
                 channelId: 201,
-                image: 'https://images.unsplash.com/photo-1540420773420-28507da66d68?q=80&w=600&auto=format&fit=crop',
+                image: 'https://images.unsplash.com/photo-1540420773420-28507da66d68?q=80&w=600&auto.format&fit=crop',
                 likes: 3102,
                 commentCount: 3,
                 comments: [
@@ -272,6 +275,9 @@ export const COMMUNITIES_DATA: Community[] = [
             { id: 11, user: testUser, text: "I can't find the protein powder you mentioned in your latest recipe. Is there a good substitute?", timestamp: 'Today 1:12 PM', reactions: [] },
         ],
         files: [DUMMY_FILES[3]],
+        goals: [],
+        workouts: [],
+        meals: [],
     },
     {
         id: 3,
@@ -294,7 +300,7 @@ export const COMMUNITIES_DATA: Community[] = [
                 user: adminUser,
                 communityId: 3,
                 channelId: 301, // announcements
-                image: 'https://images.unsplash.com/photo-1571019614242-c5c5792c6c39?q=80&w=600&auto=format&fit=crop',
+                image: 'https://images.unsplash.com/photo-1571019614242-c5c5792c6c39?q=80&w=600&auto.format&fit=crop',
                 likes: 120,
                 commentCount: 1,
                 comments: [{ user: testUser, text: 'Awesome news!' }],
@@ -306,7 +312,7 @@ export const COMMUNITIES_DATA: Community[] = [
                 user: adminUser,
                 communityId: 3,
                 channelId: 304, // weekly-challenges
-                image: 'https://images.unsplash.com/photo-1605296867304-46d5465a13f1?q=80&w=600&auto=format&fit=crop',
+                image: 'https://images.unsplash.com/photo-1605296867304-46d5465a13f1?q=80&w=600&auto.format&fit=crop',
                 likes: 350,
                 commentCount: 2,
                 comments: [
@@ -321,7 +327,7 @@ export const COMMUNITIES_DATA: Community[] = [
                 user: chef,
                 communityId: 3,
                 channelId: 302, // general-fitness
-                image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17025?q=80&w=600&auto=format&fit=crop',
+                image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17025?q=80&w=600&auto.format&fit=crop',
                 likes: 840,
                 commentCount: 2,
                 comments: [
@@ -354,6 +360,9 @@ export const COMMUNITIES_DATA: Community[] = [
             { id: 23, user: adminUser, text: `Hi ${testUser.name}, sorry to hear that. I've created a support ticket for you. Can you tell me what device you're using?`, timestamp: 'Today 2:31 PM', reactions: [], toUserId: testUser.id },
         ],
         files: [DUMMY_FILES[0], DUMMY_FILES[3]],
+        goals: [],
+        workouts: [],
+        meals: [],
     }
 ];
 

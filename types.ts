@@ -66,6 +66,35 @@ export interface File {
   type: 'PDF' | 'DOCX' | 'PNG' | 'JPG' | 'XLSX';
 }
 
+export interface Goal {
+  id: number;
+  title: string;
+  description: string;
+  target: string;
+  isCompleted: boolean;
+}
+
+export interface Workout {
+    id: number;
+    name: string;
+    description: string;
+    type: 'Cardio' | 'Strength' | 'Flexibility' | 'HIIT' | 'Other';
+    duration: number; // in minutes
+    videoUrl?: string;
+    imageUrl?: string;
+}
+
+export interface Meal {
+  id: number;
+  name: string;
+  description: string;
+  imageUrl: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fats: number;
+}
+
 export interface Community {
   id: number;
   name: string;
@@ -77,4 +106,7 @@ export interface Community {
   posts: Post[];
   chatMessages: ChatMessage[];
   files?: File[];
+  goals?: Goal[];
+  workouts?: Workout[];
+  meals?: Meal[];
 }

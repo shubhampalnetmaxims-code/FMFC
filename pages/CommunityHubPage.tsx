@@ -9,7 +9,7 @@ import PostCard from '../components/PostCard';
 import MediaViewerModal from '../components/MediaViewerModal';
 import FileListPane from '../components/FileListPane';
 
-export type CommunityHubFilterType = 'feed' | 'channels' | 'members' | 'files' | 'media';
+export type CommunityHubFilterType = 'feed' | 'channels' | 'members' | 'files' | 'media' | 'workouts' | 'goals' | 'meals';
 
 interface CommunityHubPageProps {
     community: Community;
@@ -232,6 +232,24 @@ const CommunityHubPage: React.FC<CommunityHubPageProps> = ({ community, currentU
                 return <MediaGrid imageUrls={imageUrls} onImageClick={setViewingImageUrl} />;
             case 'files':
                  return <FileListPane files={community.files || []} />;
+            case 'workouts':
+                return (
+                    <div className="text-center py-16 text-zinc-500">
+                        <p>No workouts have been shared in this community yet.</p>
+                    </div>
+                );
+            case 'goals':
+                return (
+                    <div className="text-center py-16 text-zinc-500">
+                        <p>No goals have been set for this community yet.</p>
+                    </div>
+                );
+            case 'meals':
+                return (
+                    <div className="text-center py-16 text-zinc-500">
+                        <p>No meals have been shared in this community yet.</p>
+                    </div>
+                );
             default:
                 return null;
         }
@@ -305,6 +323,9 @@ const CommunityHubPage: React.FC<CommunityHubPageProps> = ({ community, currentU
                     <FilterButton label="Members" icon="users" isActive={activeFilter === 'members'} onClick={() => setActiveFilter('members')} />
                     <FilterButton label="Media" icon="photo" isActive={activeFilter === 'media'} onClick={() => setActiveFilter('media')} />
                     <FilterButton label="Files" icon="file-document" isActive={activeFilter === 'files'} onClick={() => setActiveFilter('files')} />
+                    <FilterButton label="Workouts" icon="workouts" isActive={activeFilter === 'workouts'} onClick={() => setActiveFilter('workouts')} />
+                    <FilterButton label="Goals" icon="goals" isActive={activeFilter === 'goals'} onClick={() => setActiveFilter('goals')} />
+                    <FilterButton label="Meals" icon="fire" isActive={activeFilter === 'meals'} onClick={() => setActiveFilter('meals')} />
                 </div>
             </div>
 

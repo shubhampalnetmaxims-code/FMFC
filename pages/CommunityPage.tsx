@@ -14,9 +14,10 @@ type SubTab = 'All Feed' | 'My Community' | 'Create Own Community';
 
 interface CommunityPageProps {
     currentUser: User;
+    onMenuClick: () => void;
 }
 
-const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser }) => {
+const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser, onMenuClick }) => {
     const [activeSubTab, setActiveSubTab] = useState<SubTab>('All Feed');
     const [communities, setCommunities] = useState<Community[]>(COMMUNITIES_DATA);
     const [selectedCommunityId, setSelectedCommunityId] = useState<number | null>(null);
@@ -315,11 +316,18 @@ const CommunityPage: React.FC<CommunityPageProps> = ({ currentUser }) => {
                 {showHeaderAndTabs && (
                     <header className="sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-10 p-4 shrink-0">
                         <div className="flex justify-between items-center">
+                             <div className="w-8">
+                                <button onClick={onMenuClick} className="text-zinc-400 hover:text-zinc-200">
+                                    <Icon type="menu" className="w-6 h-6" />
+                                </button>
+                            </div>
                             <h1 className="text-xl font-bold text-zinc-100 uppercase tracking-wider">Community</h1>
-                            <button className="relative text-zinc-400 hover:text-zinc-200">
-                                <Icon type="bell" className="w-6 h-6" />
-                                <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-zinc-950"></span>
-                            </button>
+                             <div className="w-8">
+                                <button className="relative text-zinc-400 hover:text-zinc-200">
+                                    <Icon type="bell" className="w-6 h-6" />
+                                    <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-zinc-950"></span>
+                                </button>
+                            </div>
                         </div>
                     </header>
                 )}

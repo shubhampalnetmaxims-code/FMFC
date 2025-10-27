@@ -1,6 +1,6 @@
 import React from 'react';
 
-type IconType = 'community' | 'session' | 'goals' | 'workouts' | 'profile' | 'like' | 'like-filled' | 'comment' | 'share' | 'send' | 'hash' | 'users' | 'arrow-left' | 'dots-horizontal' | 'search' | 'lock-closed' | 'emoji' | 'file-document' | 'photo' | 'plus' | 'paper-clip' | 'microphone' | 'video-camera' | 'user-plus' | 'pencil' | 'pin' | 'note' | 'chat-bubble-left-right' | 'download' | 'file-pdf' | 'file-doc' | 'file-xls' | 'bell';
+type IconType = 'community' | 'session' | 'goals' | 'workouts' | 'profile' | 'like' | 'like-filled' | 'comment' | 'share' | 'send' | 'hash' | 'users' | 'arrow-left' | 'dots-horizontal' | 'search' | 'lock-closed' | 'emoji' | 'file-document' | 'photo' | 'plus' | 'paper-clip' | 'microphone' | 'video-camera' | 'user-plus' | 'pencil' | 'pin' | 'note' | 'chat-bubble-left-right' | 'download' | 'file-pdf' | 'file-doc' | 'file-xls' | 'bell' | 'fire' | 'menu' | 'cog' | 'logout' | 'x';
 
 interface IconProps {
   type: IconType;
@@ -170,9 +170,34 @@ const Icon: React.FC<IconProps> = ({ type, className = 'w-6 h-6' }) => {
             <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h4.5m-4.5 0l1.5-1.5m-1.5 1.5l1.5 1.5m4.5-1.5l1.5-1.5m-1.5 1.5l1.5 1.5m-1.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
         </svg>
     ),
+    fire: (
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0112 21 8.25 8.25 0 016.038 7.048 8.287 8.287 0 009 9.6a8.983 8.983 0 013.361-6.867 8.21 8.21 0 00-4.425 6.32A8.25 8.25 0 0018 12a8.25 8.25 0 00-2.638-6.786z" />
+      </svg>
+    ),
     bell: (
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
+        </svg>
+    ),
+    menu: (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+        </svg>
+    ),
+    cog: (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12a7.5 7.5 0 0115 0m-15 0a7.5 7.5 0 1115 0m-15 0H3m18 0h-1.5m-15 0a7.5 7.5 0 1115 0m-15 0H3m18 0h-1.5m-15 0a7.5 7.5 0 1115 0m-15 0H3m18 0h-1.5M12 9.75v1.5m0 3v1.5m0-4.5a3 3 0 013 3h-6a3 3 0 013-3z" />
+        </svg>
+    ),
+    logout: (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+        </svg>
+    ),
+    x: (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
     ),
   };
