@@ -203,3 +203,15 @@ export interface UserMeasurement {
   suprailiac?: number;
   bodyfat?: number;
 }
+
+// --- Goals Page Types ---
+export interface ChallengeTask {
+  id: string;
+  title: string;
+  type: 'auto' | 'manual';
+  frequency: 'daily' | 'weekly';
+  category: 'Nutrition' | 'Activity' | 'Mindfulness' | 'Progress';
+  // 'auto' types have a condition to check for completion
+  autoCheckCondition?: 'photo_front' | 'photo_side' | 'nutrition_plan_complete' | 'note_added' | 'measurement_added';
+  repeatDays?: string[];
+}

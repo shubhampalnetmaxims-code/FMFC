@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import type { User, NutritionPlan, DietIntakeItem, UserPhoto, UserNote, UserMeasurement } from '../types';
 import UnderDevelopmentPage from './UnderDevelopmentPage';
@@ -37,6 +38,8 @@ interface ProfilePageProps {
     onAddPhoto: () => void;
     onEditPhoto: (photo: UserPhoto) => void;
     onDeletePhoto: (photoId: string) => void;
+    checkedNutritionItems: Record<string, Set<string>>;
+    onToggleNutritionItem: (itemId: string, date: Date) => void;
 }
 
 const ProfilePage: React.FC<ProfilePageProps> = ({ 
@@ -60,33 +63,20 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
     onAddPhoto,
     onEditPhoto,
     onDeletePhoto,
+    checkedNutritionItems,
+    onToggleNutritionItem,
 }) => {
     const [activeSubTab, setActiveSubTab] = useState<ProfileSubTab>('Measurements');
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-    const [checkedItems, setCheckedItems] = useState<Record<string, Set<string>>>({});
 
     const activePlan = NUTRITION_PLANS_DATA.find(p => p.isActive && !p.isTemplate);
-    const itemsForDate = additionalDietItems.filter(item => item.date === selectedDate.toISOString().split('T')[0]);
-
-    const handleToggleItem = (date: Date, itemId: string) => {
-        const dateKey = date.toDateString();
-        setCheckedItems(prev => {
-            const newCheckedItems = { ...prev };
-            const itemsForDate = new Set(newCheckedItems[dateKey] || []);
-            if (itemsForDate.has(itemId)) {
-                itemsForDate.delete(itemId);
-            } else {
-                itemsForDate.add(itemId);
-            }
-            newCheckedItems[dateKey] = itemsForDate;
-            return newCheckedItems;
-        });
-    };
+    const dateKey = new Date(selectedDate.getTime() - (selectedDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
+    const itemsForDate = additionalDietItems.filter(item => item.date === dateKey);
 
     const renderContent = () => {
         if (activeSubTab === 'Nutrition') {
-            const checkedItemsForSelectedDate = checkedItems[selectedDate.toDateString()] || new Set<string>();
+            const checkedItemsForSelectedDate = checkedNutritionItems[dateKey] || new Set<string>();
             return (
                 <div className="p-4 space-y-6">
                      {activePlan && <button
@@ -100,11 +90,10 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                         <NutritionTracker
                             plan={activePlan}
                             checkedItems={checkedItemsForSelectedDate}
-                            onToggleItem={(itemId) => handleToggleItem(selectedDate, itemId)}
+                            onToggleItem={(itemId) => onToggleNutritionItem(itemId, selectedDate)}
                             additionalItems={itemsForDate}
                             onEditItem={onEditDietIntake}
                             onDeleteItem={onDeleteDietIntake}
-                            onToggleAdditionalItem={(itemId) => handleToggleItem(selectedDate, itemId)}
                         />
                     ) : (
                          <div className="text-center py-8 text-zinc-500">
@@ -142,7 +131,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                                         <button onClick={() => onEditPhoto(photo)} className="p-2 text-zinc-400 hover:text-amber-400 rounded-full hover:bg-zinc-800 transition-colors" aria-label="Edit photo">
                                             <Icon type="pencil" className="w-5 h-5" />
                                         </button>
-                                        <button onClick={() => onDeletePhoto(photo.id)} className="p-2 text-red-600 hover:text-red-500 rounded-full hover:bg-red-500/10 transition-colors" aria-label="Delete photo">
+                                        <button onClick={() => onDeletePhoto(photo.id)} className="p-2 text-zinc-400 hover:text-amber-400 rounded-full hover:bg-zinc-800 transition-colors" aria-label="Delete photo">
                                             <Icon type="trash" className="w-5 h-5" />
                                         </button>
                                     </div>
@@ -186,7 +175,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                                         <button onClick={() => onEditNote(note)} className="p-2 text-zinc-400 hover:text-amber-400 rounded-full hover:bg-zinc-800 transition-colors" aria-label="Edit note">
                                             <Icon type="pencil" className="w-5 h-5" />
                                         </button>
-                                        <button onClick={() => onDeleteNote(note.id)} className="p-2 text-red-600 hover:text-red-500 rounded-full hover:bg-red-500/10 transition-colors" aria-label="Delete note">
+                                        <button onClick={() => onDeleteNote(note.id)} className="p-2 text-zinc-400 hover:text-amber-400 rounded-full hover:bg-zinc-800 transition-colors" aria-label="Delete note">
                                             <Icon type="trash" className="w-5 h-5" />
                                         </button>
                                     </div>
@@ -232,7 +221,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                                         <button onClick={() => onEditMeasurement(measurement)} className="p-2 text-zinc-600 hover:text-black rounded-full hover:bg-black/10 transition-colors" aria-label="Edit measurements">
                                             <Icon type="pencil" className="w-5 h-5" />
                                         </button>
-                                        <button onClick={() => onDeleteMeasurement(measurement.id)} className="p-2 text-red-600 hover:text-red-500 rounded-full hover:bg-red-500/10 transition-colors" aria-label="Delete measurements">
+                                        <button onClick={() => onDeleteMeasurement(measurement.id)} className="p-2 text-zinc-600 hover:text-black rounded-full hover:bg-black/10 transition-colors" aria-label="Delete measurements">
                                             <Icon type="trash" className="w-5 h-5" />
                                         </button>
                                     </div>

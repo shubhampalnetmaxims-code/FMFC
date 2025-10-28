@@ -10,13 +10,21 @@ interface NutritionTrackerProps {
     additionalItems?: DietIntakeItem[];
     onEditItem?: (item: DietIntakeItem) => void;
     onDeleteItem?: (itemId: string) => void;
-    onToggleAdditionalItem?: (itemId: string) => void;
 }
 
-const NutritionTracker: React.FC<NutritionTrackerProps> = ({ plan, checkedItems, onToggleItem, additionalItems, onEditItem, onDeleteItem, onToggleAdditionalItem }) => {
-    const totalItems = plan.content.flatMap(m => m.items).length;
-    const checkedCount = checkedItems.size;
-    const progress = totalItems > 0 ? (checkedCount / totalItems) * 100 : 0;
+const NutritionTracker: React.FC<NutritionTrackerProps> = ({ plan, checkedItems, onToggleItem, additionalItems, onEditItem, onDeleteItem }) => {
+    const totalPlanItems = plan.content.flatMap(m => m.items);
+    const totalAdditionalItems = additionalItems || [];
+    
+    // Create a stable ID for plan items and a map for easy lookup
+    const planItemsWithIds = totalPlanItems.map(item => ({ ...item, id: `${item.name}-${item.calories}` }));
+    
+    const checkedPlanItemsCount = planItemsWithIds.filter(item => checkedItems.has(item.id)).length;
+    const checkedAdditionalItemsCount = totalAdditionalItems.filter(item => checkedItems.has(item.id)).length;
+    
+    const totalItemsCount = planItemsWithIds.length + totalAdditionalItems.length;
+    const totalCheckedCount = checkedPlanItemsCount + checkedAdditionalItemsCount;
+    const progress = totalItemsCount > 0 ? (totalCheckedCount / totalItemsCount) * 100 : 0;
 
     return (
         <>
@@ -43,7 +51,7 @@ const NutritionTracker: React.FC<NutritionTrackerProps> = ({ plan, checkedItems,
                         </div>
                         <div className="space-y-3">
                             {meal.items.map((item, itemIndex) => {
-                                const itemId = `${meal.mealTime}-${item.name}`;
+                                const itemId = `${item.name}-${item.calories}`;
                                 const isChecked = checkedItems.has(itemId);
                                 return (
                                     <label
@@ -89,7 +97,7 @@ const NutritionTracker: React.FC<NutritionTrackerProps> = ({ plan, checkedItems,
                                             id={item.id}
                                             type="checkbox"
                                             checked={isChecked}
-                                            onChange={() => onToggleAdditionalItem?.(item.id)}
+                                            onChange={() => onToggleItem?.(item.id)}
                                             className="h-5 w-5 rounded bg-zinc-700 border-zinc-600 text-amber-500 focus:ring-amber-500 focus:ring-2 shrink-0"
                                         />
                                         <div
@@ -101,7 +109,7 @@ const NutritionTracker: React.FC<NutritionTrackerProps> = ({ plan, checkedItems,
                                                 {item.energy.toFixed(0)} Cal
                                             </p>
                                         </div>
-                                        <button onClick={() => onDeleteItem?.(item.id)} className="p-2 text-red-600 hover:text-red-500 rounded-full hover:bg-red-500/10 transition-colors shrink-0">
+                                        <button onClick={() => onDeleteItem?.(item.id)} className="p-2 text-zinc-400 hover:text-amber-400 rounded-full hover:bg-zinc-800 transition-colors shrink-0">
                                             <Icon type="trash" className="w-5 h-5" />
                                         </button>
                                     </div>

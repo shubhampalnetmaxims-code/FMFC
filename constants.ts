@@ -1,5 +1,6 @@
 
-import type { NavItemType, Community, User, UserRole, File, NutritionPlan } from './types';
+
+import type { NavItemType, Community, User, UserRole, File, NutritionPlan, ChallengeTask } from './types';
 
 interface NavItem {
     id: NavItemType;
@@ -30,6 +31,14 @@ export const USERS_DATA: User[] = [
     { id: 9, name: 'ZenMaster', avatar: 'https://picsum.photos/id/203/200/200' },
     { id: 10, name: 'Foodie', avatar: 'https://picsum.photos/id/204/200/200' },
     { id: 11, name: 'MealPrepPro', avatar: 'https://picsum.photos/id/206/200/200' },
+];
+
+export const LEADERBOARD_DATA = [
+    { userId: 3, name: 'Alex Fitness', avatar: 'https://picsum.photos/id/1005/200/200', totalPoints: 1280 },
+    { userId: 4, name: 'Yoga Jasmine', avatar: 'https://picsum.photos/id/1011/200/200', totalPoints: 1150 },
+    { userId: 1, name: 'Shubham', avatar: 'https://picsum.photos/id/45/200/200', totalPoints: 0 }, // Current user's points will be calculated dynamically
+    { userId: 5, name: 'Cardio King', avatar: 'https://picsum.photos/id/1025/200/200', totalPoints: 980 },
+    { userId: 7, name: 'GymBro', avatar: 'https://picsum.photos/id/201/200/200', totalPoints: 950 },
 ];
 
 const [testUser, adminUser, alex, jasmine, cardio, chef, gymBro, fitLife, zenMaster, foodie, mealPrep] = USERS_DATA;
@@ -173,6 +182,24 @@ export const NUTRITION_PLANS_DATA: NutritionPlan[] = [
     },
 ];
 
+// --- GOALS / CHALLENGE DATA ---
+export const TASK_POINTS = 10;
+
+export const DAILY_CHALLENGE_TASKS: ChallengeTask[] = [
+    { id: 'meal_plan', title: 'Stick to your meal plan', type: 'auto', frequency: 'daily', category: 'Nutrition', autoCheckCondition: 'nutrition_plan_complete' },
+    { id: 'water', title: 'Drink 1L of water', type: 'manual', frequency: 'daily', category: 'Nutrition' },
+    { id: 'cardio', title: '20 minutes of cardio', type: 'manual', frequency: 'daily', category: 'Activity' },
+    { id: 'log_measurements', title: 'Log daily measurements', type: 'auto', frequency: 'daily', category: 'Progress', autoCheckCondition: 'measurement_added' },
+    { id: 'photo_front', title: 'Take progress photo (front)', type: 'auto', frequency: 'daily', category: 'Progress', autoCheckCondition: 'photo_front' },
+    { id: 'photo_side', title: 'Take progress photo (side)', type: 'auto', frequency: 'daily', category: 'Progress', autoCheckCondition: 'photo_side' },
+];
+
+export const WEEKLY_CHALLENGE_TASKS: ChallengeTask[] = [
+    { id: 'strength_workouts', title: '3 Strength Workouts', type: 'manual', frequency: 'weekly', category: 'Activity', repeatDays: ['Mon', 'Wed', 'Fri'] },
+    { id: 'active_recovery', title: '1 Active Recovery Day', type: 'manual', frequency: 'weekly', category: 'Activity', repeatDays: ['Sun'] },
+    { id: 'meal_prep', title: 'Plan meals for the week', type: 'manual', frequency: 'weekly', category: 'Nutrition', repeatDays: ['Sun'] },
+    { id: 'review_progress', title: 'Review weekly progress', type: 'manual', frequency: 'weekly', category: 'Progress', repeatDays: ['Sat'] },
+];
 
 // --- COMMUNITIES DATA ---
 export const COMMUNITIES_DATA: Community[] = [
