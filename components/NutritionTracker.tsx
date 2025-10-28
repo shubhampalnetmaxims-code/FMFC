@@ -101,7 +101,7 @@ const NutritionTracker: React.FC<NutritionTrackerProps> = ({ plan, checkedItems,
                                                 {item.energy.toFixed(0)} Cal
                                             </p>
                                         </div>
-                                        <button onClick={() => onDeleteItem?.(item.id)} className="p-2 text-zinc-500 hover:text-red-500 transition-colors shrink-0">
+                                        <button onClick={() => onDeleteItem?.(item.id)} className="p-2 text-red-600 hover:text-red-500 rounded-full hover:bg-red-500/10 transition-colors shrink-0">
                                             <Icon type="trash" className="w-5 h-5" />
                                         </button>
                                     </div>

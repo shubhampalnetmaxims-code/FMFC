@@ -99,7 +99,8 @@ const SelectMeasurePage: React.FC<SelectMeasurePageProps> = ({ foodItem, onClose
                      {Object.entries(calculatedNutrients).map(([key, value]) => (
                         <div key={key} className="flex justify-between text-zinc-300">
                             <span className="capitalize text-zinc-400">{key}</span>
-                            <span className="font-medium">{formatNumber(value)}</span>
+                            {/* FIX: Cast value to number as Object.entries infers it as unknown. */}
+                            <span className="font-medium">{formatNumber(value as number)}</span>
                         </div>
                      ))}
                 </div>

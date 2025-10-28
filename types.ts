@@ -1,5 +1,6 @@
 
 
+
 export type UserRole = 'customer' | 'admin';
 
 export interface User {
@@ -178,4 +179,27 @@ export interface UserPhoto {
   type: string;
   date: string;
   description: string;
+}
+
+export interface UserNote {
+  id: string;
+  date: string; // YYYY-MM-DD
+  content: string;
+}
+
+export interface UserMeasurement {
+  id: string;
+  date: string; // YYYY-MM-DD
+  weight?: number;
+  height?: number;
+  chest?: number;
+  waist?: number;
+  hips?: number;
+  neck?: number;
+  thigh?: number;
+  biceps?: number;
+  triceps?: number;
+  subscapular?: number;
+  suprailiac?: number;
+  bodyfat?: number;
 }

@@ -1,13 +1,11 @@
 
-
 import React, { useState } from 'react';
-import type { User, NutritionPlan, DietIntakeItem, UserPhoto } from '../types';
+import type { User, NutritionPlan, DietIntakeItem, UserPhoto, UserNote, UserMeasurement } from '../types';
 import UnderDevelopmentPage from './UnderDevelopmentPage';
 import Icon from '../components/Icon';
 import CalendarModal from '../components/CalendarModal';
 import { NUTRITION_PLANS_DATA } from '../constants';
 import NutritionTracker from '../components/NutritionTracker';
-import AddPhotoPage from './AddPhotoPage';
 
 type ProfileSubTab = 'Nutrition' | 'Photos' | 'Measurements' | 'Notes';
 
@@ -27,19 +25,46 @@ interface ProfilePageProps {
     onEditDietIntake: (item: DietIntakeItem) => void;
     onDeleteDietIntake: (itemId: string) => void;
     additionalDietItems: DietIntakeItem[];
+    userNotes: UserNote[];
+    onAddNote: () => void;
+    onEditNote: (note: UserNote) => void;
+    onDeleteNote: (noteId: string) => void;
+    userMeasurements: UserMeasurement[];
+    onAddMeasurement: (date: Date) => void;
+    onEditMeasurement: (measurement: UserMeasurement) => void;
+    onDeleteMeasurement: (measurementId: string) => void;
+    userPhotos: UserPhoto[];
+    onAddPhoto: () => void;
+    onEditPhoto: (photo: UserPhoto) => void;
+    onDeletePhoto: (photoId: string) => void;
 }
 
-const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser, onNavigate, onMenuClick, onViewPlan, onAddDietIntake, onEditDietIntake, onDeleteDietIntake, additionalDietItems }) => {
-    const [activeSubTab, setActiveSubTab] = useState<ProfileSubTab>('Nutrition');
+const ProfilePage: React.FC<ProfilePageProps> = ({ 
+    currentUser, 
+    onNavigate, 
+    onMenuClick, 
+    onViewPlan, 
+    onAddDietIntake, 
+    onEditDietIntake, 
+    onDeleteDietIntake, 
+    additionalDietItems,
+    userNotes,
+    onAddNote,
+    onEditNote,
+    onDeleteNote,
+    userMeasurements,
+    onAddMeasurement,
+    onEditMeasurement,
+    onDeleteMeasurement,
+    userPhotos,
+    onAddPhoto,
+    onEditPhoto,
+    onDeletePhoto,
+}) => {
+    const [activeSubTab, setActiveSubTab] = useState<ProfileSubTab>('Measurements');
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [checkedItems, setCheckedItems] = useState<Record<string, Set<string>>>({});
-    
-    // Photo management state
-    const [isAddingPhoto, setIsAddingPhoto] = useState(false);
-    const [userPhotos, setUserPhotos] = useState<UserPhoto[]>([]);
-    const [editingPhoto, setEditingPhoto] = useState<UserPhoto | null>(null);
-
 
     const activePlan = NUTRITION_PLANS_DATA.find(p => p.isActive && !p.isTemplate);
     const itemsForDate = additionalDietItems.filter(item => item.date === selectedDate.toISOString().split('T')[0]);
@@ -57,45 +82,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser, onNavigate, onMe
             newCheckedItems[dateKey] = itemsForDate;
             return newCheckedItems;
         });
-    };
-
-    const handleOpenAddPhoto = () => {
-        setEditingPhoto(null);
-        setIsAddingPhoto(true);
-    };
-
-    const handleOpenEditPhoto = (photo: UserPhoto) => {
-        setEditingPhoto(photo);
-        setIsAddingPhoto(true);
-    };
-    
-    const handleClosePhotoPage = () => {
-        setIsAddingPhoto(false);
-        setEditingPhoto(null);
-    };
-
-    const handleSavePhoto = (photoData: { src: string; type: string; date: string; description: string; }) => {
-        if (editingPhoto) {
-            // Update existing photo
-            const updatedPhoto: UserPhoto = { ...editingPhoto, ...photoData };
-            setUserPhotos(prev => prev.map(p => p.id === editingPhoto.id ? updatedPhoto : p)
-                .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-            );
-        } else {
-            // Add new photo
-            const newPhoto: UserPhoto = {
-                id: Date.now().toString(),
-                ...photoData,
-            };
-            setUserPhotos(prev => [newPhoto, ...prev].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
-        }
-        handleClosePhotoPage();
-    };
-
-    const handleDeletePhoto = (photoId: string) => {
-        if (window.confirm("Are you sure you want to delete this photo?")) {
-            setUserPhotos(prev => prev.filter(p => p.id !== photoId));
-        }
     };
 
     const renderContent = () => {
@@ -153,10 +139,10 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser, onNavigate, onMe
                                         </p>
                                     </div>
                                     <div className="flex items-center space-x-2">
-                                        <button onClick={() => handleOpenEditPhoto(photo)} className="p-2 text-zinc-400 hover:text-amber-400 rounded-full hover:bg-zinc-800 transition-colors" aria-label="Edit photo">
+                                        <button onClick={() => onEditPhoto(photo)} className="p-2 text-zinc-400 hover:text-amber-400 rounded-full hover:bg-zinc-800 transition-colors" aria-label="Edit photo">
                                             <Icon type="pencil" className="w-5 h-5" />
                                         </button>
-                                        <button onClick={() => handleDeletePhoto(photo.id)} className="p-2 text-zinc-400 hover:text-red-500 rounded-full hover:bg-zinc-800 transition-colors" aria-label="Delete photo">
+                                        <button onClick={() => onDeletePhoto(photo.id)} className="p-2 text-red-600 hover:text-red-500 rounded-full hover:bg-red-500/10 transition-colors" aria-label="Delete photo">
                                             <Icon type="trash" className="w-5 h-5" />
                                         </button>
                                     </div>
@@ -176,6 +162,103 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser, onNavigate, onMe
                         </div>
                     )}
                 </div>
+            );
+        }
+
+        if (activeSubTab === 'Notes') {
+            return (
+                <div className="p-4 space-y-4">
+                    {userNotes.length > 0 ? (
+                        userNotes.map(note => (
+                            <div key={note.id} className="bg-zinc-900 p-4 rounded-lg border border-zinc-800">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <p className="text-sm text-zinc-400">
+                                            {new Date(note.date + 'T00:00:00').toLocaleDateString('en-US', {
+                                                year: 'numeric',
+                                                month: 'long',
+                                                day: 'numeric',
+                                            })}
+                                        </p>
+                                        <p className="text-zinc-200 mt-2 whitespace-pre-wrap">{note.content}</p>
+                                    </div>
+                                    <div className="flex items-center space-x-2 shrink-0 ml-4">
+                                        <button onClick={() => onEditNote(note)} className="p-2 text-zinc-400 hover:text-amber-400 rounded-full hover:bg-zinc-800 transition-colors" aria-label="Edit note">
+                                            <Icon type="pencil" className="w-5 h-5" />
+                                        </button>
+                                        <button onClick={() => onDeleteNote(note.id)} className="p-2 text-red-600 hover:text-red-500 rounded-full hover:bg-red-500/10 transition-colors" aria-label="Delete note">
+                                            <Icon type="trash" className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="text-center py-16 text-zinc-500">
+                            <p>No notes yet.</p>
+                            <p className="text-sm">Add your first note.</p>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+        
+        if (activeSubTab === 'Measurements') {
+            const measurementsForDate = userMeasurements.filter(m => m.date === selectedDate.toISOString().split('T')[0]);
+            
+            const measurementLabels: { [key: string]: { label: string; unit: string } } = {
+                weight: { label: 'Weight', unit: 'kg' },
+                height: { label: 'Height', unit: 'cm' },
+                chest: { label: 'Chest', unit: 'in' },
+                waist: { label: 'Waist', unit: 'in' },
+                hips: { label: 'Hips', unit: 'in' },
+                neck: { label: 'Neck', unit: 'in' },
+                thigh: { label: 'Thigh', unit: 'in' },
+                biceps: { label: 'Biceps', unit: 'in' },
+                triceps: { label: 'Triceps', unit: 'in' },
+                subscapular: { label: 'Subscapular', unit: 'mm' },
+                suprailiac: { label: 'Suprailiac', unit: 'mm' },
+                bodyfat: { label: 'Body fat', unit: '%' },
+            };
+
+            return (
+                 <div className="p-4 space-y-4">
+                    {measurementsForDate.length > 0 ? (
+                        measurementsForDate.map(measurement => (
+                            <div key={measurement.id} className="bg-[#F3EADF] p-4 rounded-lg text-zinc-800">
+                                <div className="flex justify-between items-center mb-2">
+                                    <h3 className="font-bold text-lg">Measurements</h3>
+                                    <div className="flex items-center space-x-2">
+                                        <button onClick={() => onEditMeasurement(measurement)} className="p-2 text-zinc-600 hover:text-black rounded-full hover:bg-black/10 transition-colors" aria-label="Edit measurements">
+                                            <Icon type="pencil" className="w-5 h-5" />
+                                        </button>
+                                        <button onClick={() => onDeleteMeasurement(measurement.id)} className="p-2 text-red-600 hover:text-red-500 rounded-full hover:bg-red-500/10 transition-colors" aria-label="Delete measurements">
+                                            <Icon type="trash" className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                                    {Object.entries(measurement).map(([key, value]) => {
+                                        if (key === 'id' || key === 'date' || value === null || value === undefined) return null;
+                                        const config = measurementLabels[key];
+                                        if (!config) return null;
+                                        return (
+                                            <div key={key} className="flex justify-between border-b border-zinc-300 py-1">
+                                                <span className="text-sm text-zinc-600">{config.label}</span>
+                                                <span className="font-semibold">{value} {config.unit}</span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+                        ))
+                    ) : (
+                        <div className="text-center py-16 text-zinc-500">
+                            <p>No measurements recorded for this day.</p>
+                            <p className="text-sm mt-1">Add your first measurement entry.</p>
+                        </div>
+                    )}
+                 </div>
             );
         }
         
@@ -215,10 +298,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser, onNavigate, onMe
         setSelectedDate(date);
         setIsCalendarOpen(false);
     };
-
-    if (isAddingPhoto) {
-        return <AddPhotoPage onClose={handleClosePhotoPage} onSave={handleSavePhoto} initialData={editingPhoto} />;
-    }
 
     return (
         <>
@@ -309,16 +388,30 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ currentUser, onNavigate, onMe
                 </div>
 
                 {/* Floating Action Button */}
-                {(activeSubTab === 'Nutrition' || activeSubTab === 'Photos') && (
+                {(activeSubTab === 'Nutrition' || activeSubTab === 'Photos' || activeSubTab === 'Notes' || activeSubTab === 'Measurements') && (
                     <button
-                        onClick={activeSubTab === 'Nutrition' ? onAddDietIntake : handleOpenAddPhoto}
-                        className="absolute bottom-24 right-6 bg-amber-500 hover:bg-amber-600 text-black rounded-full px-4 py-3 shadow-lg transition-transform hover:scale-105 flex items-center space-x-2"
-                        aria-label={activeSubTab === 'Nutrition' ? "Add diet intake" : "Add photo"}
+                        onClick={
+                            activeSubTab === 'Nutrition' ? onAddDietIntake :
+                            activeSubTab === 'Photos' ? onAddPhoto :
+                            activeSubTab === 'Measurements' ? () => onAddMeasurement(selectedDate) :
+                            onAddNote
+                        }
+                        className={`absolute bottom-24 right-6 bg-amber-500 hover:bg-amber-600 text-black shadow-lg transition-transform hover:scale-105 flex items-center justify-center ${
+                            activeSubTab === 'Notes' ? 'rounded-full w-16 h-16' : 'rounded-full px-4 py-3 space-x-2'
+                        }`}
+                        aria-label={
+                            activeSubTab === 'Nutrition' ? "Add diet intake" :
+                            activeSubTab === 'Photos' ? "Add photo" :
+                            activeSubTab === 'Measurements' ? "Add measurement" :
+                            "Add note"
+                        }
                     >
                         <Icon type="plus" className="w-6 h-6" />
-                        <span className="font-semibold text-sm">
-                            {activeSubTab === 'Nutrition' ? 'Add Diet' : 'Add Photo'}
-                        </span>
+                         {(activeSubTab === 'Nutrition' || activeSubTab === 'Photos' || activeSubTab === 'Measurements') && (
+                            <span className="font-semibold text-sm">
+                                {activeSubTab === 'Nutrition' ? 'Add Diet' : activeSubTab === 'Photos' ? 'Add Photo' : 'Add Measurement'}
+                            </span>
+                        )}
                     </button>
                 )}
             </div>
