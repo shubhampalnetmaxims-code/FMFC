@@ -1,13 +1,14 @@
 
 
 
+
 import React, { useState } from 'react';
 import BottomNav from './components/BottomNav';
 import CommunityPage from './pages/CommunityPage';
 import UnderDevelopmentPage from './pages/UnderDevelopmentPage';
 import LoginPage from './pages/LoginPage';
 import { NAV_ITEMS } from './constants';
-import { NavItemType, User, NutritionPlan } from './types';
+import { NavItemType, User, NutritionPlan, DietIntakeItem } from './types';
 import SideMenu from './components/SideMenu';
 import ProfilePage from './pages/ProfilePage';
 import NutritionPage from './pages/NutritionPage';
@@ -21,6 +22,8 @@ const App: React.FC = () => {
     const [currentSecondaryPage, setCurrentSecondaryPage] = useState<string | null>(null);
     const [viewingNutritionPlan, setViewingNutritionPlan] = useState<NutritionPlan | null>(null);
     const [isAddingDietIntake, setIsAddingDietIntake] = useState(false);
+    const [editingDietIntake, setEditingDietIntake] = useState<DietIntakeItem | null>(null);
+    const [additionalDietItems, setAdditionalDietItems] = useState<DietIntakeItem[]>([]);
 
 
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -53,22 +56,46 @@ const App: React.FC = () => {
     }
 
     const handleOpenAddDietIntake = () => {
+        setEditingDietIntake(null);
+        setIsAddingDietIntake(true);
+    };
+
+    const handleOpenEditDietIntake = (item: DietIntakeItem) => {
+        setEditingDietIntake(item);
         setIsAddingDietIntake(true);
     };
 
     const handleCloseAddDietIntake = () => {
         setIsAddingDietIntake(false);
+        setEditingDietIntake(null);
     };
 
-    const handleSaveDietIntake = (data: any) => {
-        console.log("Diet intake saved:", data);
-        // Here you would typically handle the saved data, e.g., send to an API
-        setIsAddingDietIntake(false);
+    const handleSaveDietIntake = (data: DietIntakeItem) => {
+        if (editingDietIntake) {
+             setAdditionalDietItems(prev => prev.map(item => item.id === editingDietIntake.id ? { ...item, ...data } : item));
+        } else {
+             const newItem: DietIntakeItem = {
+                ...data,
+                id: Date.now().toString(),
+            };
+            setAdditionalDietItems(prev => [...prev, newItem]);
+        }
+        handleCloseAddDietIntake();
+    };
+    
+    const handleDeleteDietIntake = (itemId: string) => {
+        if (window.confirm("Are you sure you want to delete this item?")) {
+            setAdditionalDietItems(prev => prev.filter(item => item.id !== itemId));
+        }
     };
 
     const renderPage = () => {
         if (isAddingDietIntake) {
-            return <AddDietIntakePage onClose={handleCloseAddDietIntake} onSave={handleSaveDietIntake} />;
+            return <AddDietIntakePage
+                        onClose={handleCloseAddDietIntake}
+                        onSave={handleSaveDietIntake}
+                        initialData={editingDietIntake}
+                    />;
         }
 
         if (viewingNutritionPlan) {
@@ -91,7 +118,16 @@ const App: React.FC = () => {
             case 'Community':
                 return <CommunityPage currentUser={currentUser!} onMenuClick={toggleMenu} />;
             case 'Profile':
-                return <ProfilePage currentUser={currentUser!} onNavigate={handleSideMenuNavigate} onMenuClick={toggleMenu} onViewPlan={handleViewNutritionPlan} onAddDietIntake={handleOpenAddDietIntake} />;
+                return <ProfilePage
+                            currentUser={currentUser!}
+                            onNavigate={handleSideMenuNavigate}
+                            onMenuClick={toggleMenu}
+                            onViewPlan={handleViewNutritionPlan}
+                            onAddDietIntake={handleOpenAddDietIntake}
+                            onEditDietIntake={handleOpenEditDietIntake}
+                            onDeleteDietIntake={handleDeleteDietIntake}
+                            additionalDietItems={additionalDietItems}
+                        />;
             case 'Session':
             case 'Goals':
             case 'Workouts':

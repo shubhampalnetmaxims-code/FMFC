@@ -135,11 +135,47 @@ export interface NutritionTotals {
 
 export interface NutritionPlan {
   id: number;
-  name: string;
+  name:string;
   description: string;
   isTemplate: boolean;
   isActive: boolean;
   notes: string;
   totals: NutritionTotals;
   content: MealEntry[];
+}
+
+// --- Food Search and Diet Intake Types ---
+export interface FoodMeasure {
+  name: string;
+  grams: number;
+}
+
+export interface FoodSearchItem {
+  id: number;
+  description: string;
+  nutrients_per_100g: NutritionTotals;
+  measures: FoodMeasure[];
+}
+
+export interface DietIntakeItem {
+  id: string;
+  description: string;
+  meal: string;
+  date: string; // YYYY-MM-DD
+  quantity: number;
+  energy: number;
+  carbohydrates: number;
+  proteins: number;
+  fats: number;
+  fibre: number;
+  water: number;
+}
+
+// --- Profile Page Types ---
+export interface UserPhoto {
+  id: string;
+  src: string;
+  type: string;
+  date: string;
+  description: string;
 }
