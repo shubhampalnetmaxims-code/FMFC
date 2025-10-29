@@ -3,7 +3,7 @@ import Icon from './Icon';
 
 interface CreatePostModalProps {
     onClose: () => void;
-    onAddPost: (postData: { description: string, hashtags: string[], image: string }) => void;
+    onAddPost: (postData: { description: string, hashtags: string[], image?: string, video?: string }) => void;
 }
 
 const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onAddPost }) => {
@@ -34,7 +34,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onAddPost })
         onAddPost({
             description,
             hashtags: hashtags.split(' ').filter(Boolean).map(tag => tag.startsWith('#') ? tag : `#${tag}`),
-            image,
+            image: image ?? undefined,
         });
     };
 

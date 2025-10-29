@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
 import type { Community } from '../types';
+import { useToast } from './ToastProvider';
 
 interface EditCommunityModalProps {
     community: Community;
@@ -8,13 +10,14 @@ interface EditCommunityModalProps {
 }
 
 const EditCommunityModal: React.FC<EditCommunityModalProps> = ({ community, onClose, onUpdate }) => {
+    const { addToast } = useToast();
     const [name, setName] = useState(community.name);
     const [description, setDescription] = useState(community.description || '');
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!name.trim()) {
-            alert('Community name cannot be empty.');
+            addToast('Community name cannot be empty.', 'error');
             return;
         }
         onUpdate({ name, description });

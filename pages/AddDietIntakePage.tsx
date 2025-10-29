@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import Icon from '../components/Icon';
 import { DietIntakeItem, FoodSearchItem } from '../types';
@@ -5,11 +6,13 @@ import FoodSearchPage from './FoodSearchPage';
 import SelectMeasurePage from './SelectMeasurePage';
 import BarcodeScannerPage from './BarcodeScannerPage';
 import AiScanFlow from './AiScanFlow';
+import { useToast } from '../components/ToastProvider';
 
 interface AddDietIntakePageProps {
     onClose: () => void;
     onSave: (data: DietIntakeItem) => void;
     initialData?: DietIntakeItem | null;
+    date: Date;
 }
 
 const StyledInput: React.FC<React.InputHTMLAttributes<HTMLInputElement> & { label?: string }> = ({ label, ...props }) => {
@@ -24,7 +27,8 @@ const StyledInput: React.FC<React.InputHTMLAttributes<HTMLInputElement> & { labe
     );
 };
 
-const AddDietIntakePage: React.FC<AddDietIntakePageProps> = ({ onClose, onSave, initialData }) => {
+const AddDietIntakePage: React.FC<AddDietIntakePageProps> = ({ onClose, onSave, initialData, date: propDate }) => {
+    const { addToast } = useToast();
     const [formData, setFormData] = useState({
         description: '',
         meal: '',
@@ -58,8 +62,22 @@ const AddDietIntakePage: React.FC<AddDietIntakePageProps> = ({ onClose, onSave, 
                 fibre: String(initialData.fibre),
                 water: String(initialData.water),
             });
+        } else {
+             setFormData(prev => ({
+                ...prev,
+                description: '',
+                meal: '',
+                energy: '',
+                quantity: '1',
+                carbohydrates: '',
+                proteins: '',
+                fats: '',
+                fibre: '',
+                water: '',
+                date: propDate.toISOString().split('T')[0]
+            }));
         }
-    }, [initialData]);
+    }, [initialData, propDate]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -76,7 +94,7 @@ const AddDietIntakePage: React.FC<AddDietIntakePageProps> = ({ onClose, onSave, 
 
     const handleSave = () => {
         if (!formData.description) {
-            alert('Description is required.');
+            addToast('Description is required.', 'error');
             return;
         }
         const numericFormData = {

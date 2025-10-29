@@ -4,12 +4,14 @@ import { NUTRITION_PLANS_DATA } from '../constants';
 import { NutritionPlan } from '../types';
 import Icon from '../components/Icon';
 import NutritionPlanDetailsPage from './NutritionPlanDetailsPage';
+import { useToast } from '../components/ToastProvider';
 
 interface NutritionPageProps {
     onBack: () => void;
 }
 
 const NutritionPage: React.FC<NutritionPageProps> = ({ onBack }) => {
+    const { addToast } = useToast();
     const [plans, setPlans] = useState(NUTRITION_PLANS_DATA);
     const [selectedPlanId, setSelectedPlanId] = useState<number | null>(null);
 
@@ -22,11 +24,11 @@ const NutritionPage: React.FC<NutritionPageProps> = ({ onBack }) => {
 
     // Note: State management for activating/deactivating is for demonstration.
     const handleDeactivatePlan = (id: number) => {
-        alert("Deactivating plans is not yet implemented.");
+        addToast("Deactivating plans is not yet implemented.", 'info');
     };
     
     const handleActivatePlan = (id: number) => {
-        alert("Activating plans is not yet implemented.");
+        addToast("Activating plans is not yet implemented.", 'info');
     };
 
 
@@ -56,7 +58,7 @@ const NutritionPage: React.FC<NutritionPageProps> = ({ onBack }) => {
                                     <h3 className="text-xl font-bold">{activePlan.name}</h3>
                                     <p className="text-zinc-600 mt-1">{activePlan.description}</p>
                                 </div>
-                                <button onClick={(e) => { e.stopPropagation(); alert('More options coming soon!')}} className="text-zinc-500 hover:text-zinc-800 p-1 -mr-1 -mt-1">
+                                <button onClick={(e) => { e.stopPropagation(); addToast('More options coming soon!', 'info'); }} className="text-zinc-500 hover:text-zinc-800 p-1 -mr-1 -mt-1">
                                     <Icon type="dots-horizontal" className="w-6 h-6"/>
                                 </button>
                             </div>

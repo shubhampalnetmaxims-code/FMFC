@@ -2,6 +2,7 @@
 import React from 'react';
 import type { NutritionPlan } from '../types';
 import Icon from '../components/Icon';
+import { useToast } from '../components/ToastProvider';
 
 interface NutritionPlanDetailsPageProps {
     plan: NutritionPlan;
@@ -9,6 +10,7 @@ interface NutritionPlanDetailsPageProps {
 }
 
 const NutritionPlanDetailsPage: React.FC<NutritionPlanDetailsPageProps> = ({ plan, onBack }) => {
+    const { addToast } = useToast();
 
     const Card: React.FC<{title: string, children: React.ReactNode, hasMenu?: boolean}> = ({title, children, hasMenu}) => (
         <div className="bg-[#F3EADF] p-4 sm:p-6 rounded-2xl shadow-md text-zinc-800">
@@ -86,7 +88,7 @@ const NutritionPlanDetailsPage: React.FC<NutritionPlanDetailsPageProps> = ({ pla
             </main>
 
             <button
-                onClick={() => alert("Adding entries is coming soon!")}
+                onClick={() => addToast("Adding entries is coming soon!", 'info')}
                 className="absolute bottom-6 right-6 bg-[#FACD83] hover:bg-amber-400 text-black rounded-full p-4 shadow-lg transition-transform hover:scale-105 flex items-center space-x-2"
                 aria-label="Add entry"
             >

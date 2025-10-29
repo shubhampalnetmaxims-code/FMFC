@@ -24,7 +24,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ isOpen, onClose, le
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md max-h-[80vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
                 <header className="flex items-center justify-between p-4 border-b border-zinc-800 sticky top-0 bg-zinc-900">
                     <div className="flex items-center space-x-3">
-                        <Icon type="sparkles" className="w-6 h-6 text-amber-400"/>
+                        <Icon type="users" className="w-6 h-6 text-amber-400"/>
                         <h2 className="text-xl font-bold text-white">Leaderboard</h2>
                     </div>
                     <button onClick={onClose} className="text-zinc-400 hover:text-white text-2xl leading-none">&times;</button>

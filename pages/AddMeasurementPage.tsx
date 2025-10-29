@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import Icon from '../components/Icon';
 import { UserMeasurement } from '../types';
 import CalendarModal from '../components/CalendarModal';
+import { useToast } from '../components/ToastProvider';
 
 interface AddMeasurementPageProps {
     onClose: () => void;
@@ -27,7 +28,7 @@ const measurementFields: { key: keyof Omit<UserMeasurement, 'id' | 'date'>; labe
 ];
 
 const AddMeasurementPage: React.FC<AddMeasurementPageProps> = ({ onClose, onSave, initialData, date }) => {
-    
+    const { addToast } = useToast();
     const [formData, setFormData] = useState<Record<string, string>>({});
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const [measurementDate, setMeasurementDate] = useState(() => {
@@ -73,7 +74,7 @@ const AddMeasurementPage: React.FC<AddMeasurementPageProps> = ({ onClose, onSave
         }
 
         if (!hasValue) {
-            alert('Please enter at least one measurement.');
+            addToast('Please enter at least one measurement.', 'error');
             return;
         }
 

@@ -3,14 +3,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Icon from '../components/Icon';
 import { UserPhoto } from '../types';
+import { useToast } from '../components/ToastProvider';
 
 interface AddPhotoPageProps {
     onClose: () => void;
     onSave: (data: { src: string; type: string; date: string; description: string }) => void;
     initialData?: UserPhoto | null;
+    date: Date;
 }
 
-const AddPhotoPage: React.FC<AddPhotoPageProps> = ({ onClose, onSave, initialData }) => {
+const AddPhotoPage: React.FC<AddPhotoPageProps> = ({ onClose, onSave, initialData, date: propDate }) => {
+    const { addToast } = useToast();
     const [imageSrc, setImageSrc] = useState<string | null>(null);
     const [photoType, setPhotoType] = useState('');
     const [description, setDescription] = useState('');
@@ -25,8 +28,13 @@ const AddPhotoPage: React.FC<AddPhotoPageProps> = ({ onClose, onSave, initialDat
             setPhotoType(initialData.type);
             setDescription(initialData.description);
             setPhotoDate(initialData.date);
+        } else {
+            setImageSrc(null);
+            setPhotoType('');
+            setDescription('');
+            setPhotoDate(propDate.toISOString().split('T')[0]);
         }
-    }, [initialData]);
+    }, [initialData, propDate]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
@@ -41,7 +49,7 @@ const AddPhotoPage: React.FC<AddPhotoPageProps> = ({ onClose, onSave, initialDat
 
     const handleSave = () => {
         if (!imageSrc || !photoType) {
-            alert('Please select a photo and a type.');
+            addToast('Please select a photo and a type.', 'error');
             return;
         }
         onSave({

@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import type { Community, Channel, User, ChannelType } from '../types';
 import Icon from '../components/Icon';
@@ -8,6 +9,7 @@ import EditChannelModal from '../components/EditChannelModal';
 import PostCard from '../components/PostCard';
 import MediaViewerModal from '../components/MediaViewerModal';
 import FileListPane from '../components/FileListPane';
+import { useToast } from '../components/ToastProvider';
 
 export type CommunityHubFilterType = 'feed' | 'channels' | 'members' | 'files' | 'media' | 'workouts' | 'goals' | 'meals';
 
@@ -26,6 +28,7 @@ interface CommunityHubPageProps {
 }
 
 const CommunityHubPage: React.FC<CommunityHubPageProps> = ({ community, currentUser, onSelectChannel, onBack, onLeaveCommunity, onUpdateCommunity, onAddChannel, onUpdateChannel, onAddMembers, activeFilter, setActiveFilter }) => {
+    const { addToast } = useToast();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [editingChannel, setEditingChannel] = useState<Channel | null>(null);
@@ -58,7 +61,7 @@ const CommunityHubPage: React.FC<CommunityHubPageProps> = ({ community, currentU
     const handleCreateChannel = (e: React.FormEvent) => {
         e.preventDefault();
         if (!newChannelName.trim()) {
-            alert('Channel name cannot be empty.');
+            addToast('Channel name cannot be empty.', 'error');
             return;
         }
         onAddChannel(community.id, newChannelName, newChannelType);

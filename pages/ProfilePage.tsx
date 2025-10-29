@@ -22,12 +22,12 @@ interface ProfilePageProps {
     onNavigate: (pageName: string) => void;
     onMenuClick: () => void;
     onViewPlan: (plan: NutritionPlan) => void;
-    onAddDietIntake: () => void;
+    onAddDietIntake: (date: Date) => void;
     onEditDietIntake: (item: DietIntakeItem) => void;
     onDeleteDietIntake: (itemId: string) => void;
     additionalDietItems: DietIntakeItem[];
     userNotes: UserNote[];
-    onAddNote: () => void;
+    onAddNote: (date: Date) => void;
     onEditNote: (note: UserNote) => void;
     onDeleteNote: (noteId: string) => void;
     userMeasurements: UserMeasurement[];
@@ -35,7 +35,7 @@ interface ProfilePageProps {
     onEditMeasurement: (measurement: UserMeasurement) => void;
     onDeleteMeasurement: (measurementId: string) => void;
     userPhotos: UserPhoto[];
-    onAddPhoto: () => void;
+    onAddPhoto: (date: Date) => void;
     onEditPhoto: (photo: UserPhoto) => void;
     onDeletePhoto: (photoId: string) => void;
     checkedNutritionItems: Record<string, Set<string>>;
@@ -111,10 +111,11 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
         }
 
         if (activeSubTab === 'Photos') {
+            const photosForDate = userPhotos.filter(photo => photo.date === dateKey);
             return (
                 <div className="p-4 space-y-6">
-                    {userPhotos.length > 0 ? (
-                        userPhotos.map(photo => (
+                    {photosForDate.length > 0 ? (
+                        photosForDate.map(photo => (
                             <div key={photo.id} className="bg-zinc-900 rounded-lg overflow-hidden border border-zinc-800">
                                 <div className="p-4 flex justify-between items-center">
                                     <div>
@@ -146,8 +147,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                         ))
                     ) : (
                         <div className="text-center py-16 text-zinc-500">
-                            <p>No photos yet.</p>
-                            <p className="text-sm">Add your first progress photo.</p>
+                            <p>No photos for this day.</p>
+                            <p className="text-sm">Add your first progress photo for this date.</p>
                         </div>
                     )}
                 </div>
@@ -155,10 +156,11 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
         }
 
         if (activeSubTab === 'Notes') {
+            const notesForDate = userNotes.filter(note => note.date === dateKey);
             return (
                 <div className="p-4 space-y-4">
-                    {userNotes.length > 0 ? (
-                        userNotes.map(note => (
+                    {notesForDate.length > 0 ? (
+                        notesForDate.map(note => (
                             <div key={note.id} className="bg-zinc-900 p-4 rounded-lg border border-zinc-800">
                                 <div className="flex justify-between items-start">
                                     <div>
@@ -184,8 +186,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                         ))
                     ) : (
                         <div className="text-center py-16 text-zinc-500">
-                            <p>No notes yet.</p>
-                            <p className="text-sm">Add your first note.</p>
+                            <p>No notes for this day.</p>
+                            <p className="text-sm">Add your first note for this date.</p>
                         </div>
                     )}
                 </div>
@@ -193,8 +195,28 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
         }
         
         if (activeSubTab === 'Measurements') {
-            const measurementsForDate = userMeasurements.filter(m => m.date === selectedDate.toISOString().split('T')[0]);
+            const selectedDateKey = dateKey;
+            const latestMeasurement = [...userMeasurements]
+                .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+                .find(m => m.date <= selectedDateKey);
             
+            let tagText = '';
+            if (latestMeasurement) {
+                const measurementDate = new Date(latestMeasurement.date);
+                const selectedD = new Date(selectedDate);
+                measurementDate.setUTCHours(0, 0, 0, 0);
+                selectedD.setUTCHours(0, 0, 0, 0);
+
+                const diffTime = selectedD.getTime() - measurementDate.getTime();
+                const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+                
+                if (diffDays === 1) {
+                    tagText = 'Data from yesterday';
+                } else if (diffDays > 1) {
+                    tagText = `Data from ${diffDays} days ago`;
+                }
+            }
+
             const measurementLabels: { [key: string]: { label: string; unit: string } } = {
                 weight: { label: 'Weight', unit: 'kg' },
                 height: { label: 'Height', unit: 'cm' },
@@ -212,39 +234,44 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
 
             return (
                  <div className="p-4 space-y-4">
-                    {measurementsForDate.length > 0 ? (
-                        measurementsForDate.map(measurement => (
-                            <div key={measurement.id} className="bg-[#F3EADF] p-4 rounded-lg text-zinc-800">
-                                <div className="flex justify-between items-center mb-2">
+                    {latestMeasurement ? (
+                        <div key={latestMeasurement.id} className="bg-[#F3EADF] p-4 rounded-lg text-zinc-800">
+                            <div className="flex justify-between items-start mb-2">
+                                <div>
                                     <h3 className="font-bold text-lg">Measurements</h3>
-                                    <div className="flex items-center space-x-2">
-                                        <button onClick={() => onEditMeasurement(measurement)} className="p-2 text-zinc-600 hover:text-black rounded-full hover:bg-black/10 transition-colors" aria-label="Edit measurements">
-                                            <Icon type="pencil" className="w-5 h-5" />
-                                        </button>
-                                        <button onClick={() => onDeleteMeasurement(measurement.id)} className="p-2 text-zinc-600 hover:text-black rounded-full hover:bg-black/10 transition-colors" aria-label="Delete measurements">
-                                            <Icon type="trash" className="w-5 h-5" />
-                                        </button>
-                                    </div>
+                                    {tagText && (
+                                        <div className="text-xs text-zinc-500 font-medium mt-1 bg-zinc-800/10 px-2 py-0.5 rounded-full inline-block">
+                                            {tagText}
+                                        </div>
+                                    )}
                                 </div>
-                                <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-                                    {Object.entries(measurement).map(([key, value]) => {
-                                        if (key === 'id' || key === 'date' || value === null || value === undefined) return null;
-                                        const config = measurementLabels[key];
-                                        if (!config) return null;
-                                        return (
-                                            <div key={key} className="flex justify-between border-b border-zinc-300 py-1">
-                                                <span className="text-sm text-zinc-600">{config.label}</span>
-                                                <span className="font-semibold">{value} {config.unit}</span>
-                                            </div>
-                                        );
-                                    })}
+                                <div className="flex items-center space-x-2">
+                                    <button onClick={() => onAddMeasurement(selectedDate)} className="p-2 text-zinc-600 hover:text-black rounded-full hover:bg-black/10 transition-colors" aria-label="Edit measurements">
+                                        <Icon type="pencil" className="w-5 h-5" />
+                                    </button>
+                                    <button onClick={() => onDeleteMeasurement(latestMeasurement.id)} className="p-2 text-zinc-600 hover:text-black rounded-full hover:bg-black/10 transition-colors" aria-label="Delete measurements">
+                                        <Icon type="trash" className="w-5 h-5" />
+                                    </button>
                                 </div>
                             </div>
-                        ))
+                            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                                {Object.entries(latestMeasurement).map(([key, value]) => {
+                                    if (key === 'id' || key === 'date' || value === null || value === undefined) return null;
+                                    const config = measurementLabels[key];
+                                    if (!config) return null;
+                                    return (
+                                        <div key={key} className="flex justify-between border-b border-zinc-300 py-1">
+                                            <span className="text-sm text-zinc-600">{config.label}</span>
+                                            <span className="font-semibold">{value} {config.unit}</span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
                     ) : (
                         <div className="text-center py-16 text-zinc-500">
-                            <p>No measurements recorded for this day.</p>
-                            <p className="text-sm mt-1">Add your first measurement entry.</p>
+                            <p>No measurements recorded yet.</p>
+                            <p className="text-sm mt-1">Add your first measurement entry to get started.</p>
                         </div>
                     )}
                  </div>
@@ -380,10 +407,10 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                 {(activeSubTab === 'Nutrition' || activeSubTab === 'Photos' || activeSubTab === 'Notes' || activeSubTab === 'Measurements') && (
                     <button
                         onClick={
-                            activeSubTab === 'Nutrition' ? onAddDietIntake :
-                            activeSubTab === 'Photos' ? onAddPhoto :
+                            activeSubTab === 'Nutrition' ? () => onAddDietIntake(selectedDate) :
+                            activeSubTab === 'Photos' ? () => onAddPhoto(selectedDate) :
                             activeSubTab === 'Measurements' ? () => onAddMeasurement(selectedDate) :
-                            onAddNote
+                            () => onAddNote(selectedDate)
                         }
                         className={`absolute bottom-24 right-6 bg-amber-500 hover:bg-amber-600 text-black shadow-lg transition-transform hover:scale-105 flex items-center justify-center ${
                             activeSubTab === 'Notes' ? 'rounded-full w-16 h-16' : 'rounded-full px-4 py-3 space-x-2'

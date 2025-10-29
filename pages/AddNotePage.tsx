@@ -1,14 +1,18 @@
+
 import React, { useState, useEffect } from 'react';
 import Icon from '../components/Icon';
 import { UserNote } from '../types';
+import { useToast } from '../components/ToastProvider';
 
 interface AddNotePageProps {
     onClose: () => void;
     onSave: (data: { date: string; content: string }) => void;
     initialData?: UserNote | null;
+    date: Date;
 }
 
-const AddNotePage: React.FC<AddNotePageProps> = ({ onClose, onSave, initialData }) => {
+const AddNotePage: React.FC<AddNotePageProps> = ({ onClose, onSave, initialData, date: propDate }) => {
+    const { addToast } = useToast();
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
     const [content, setContent] = useState('');
 
@@ -16,12 +20,15 @@ const AddNotePage: React.FC<AddNotePageProps> = ({ onClose, onSave, initialData 
         if (initialData) {
             setDate(initialData.date);
             setContent(initialData.content);
+        } else {
+            setDate(propDate.toISOString().split('T')[0]);
+            setContent('');
         }
-    }, [initialData]);
+    }, [initialData, propDate]);
 
     const handleSave = () => {
         if (!content.trim()) {
-            alert('Note content cannot be empty.');
+            addToast('Note content cannot be empty.', 'error');
             return;
         }
         onSave({ date, content });

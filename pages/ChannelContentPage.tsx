@@ -12,7 +12,7 @@ interface ChannelContentPageProps {
     channelId: number;
     currentUser: User;
     onBack: () => void;
-    onAddPost: (newPostData: Omit<Post, 'id' | 'user' | 'communityId' | 'likes' | 'commentCount' | 'comments'>) => void;
+    onAddPost: (newPostData: Omit<Post, 'id' | 'user' | 'communityId' | 'channelId' | 'likes' | 'commentCount' | 'comments'>) => void;
     onAddChatMessage: (newMsgData: Partial<ChatMessage> & { text: string }) => void;
 }
 
@@ -21,11 +21,8 @@ const ChannelContentPage: React.FC<ChannelContentPageProps> = ({ community, chan
     const selectedChannel = community.channels.find(c => c.id === channelId)!;
     const isAdmin = community.adminId === currentUser.id;
 
-    const handlePostSubmit = (postData: {description: string, hashtags: string[], image: string}) => {
-        onAddPost({
-            ...postData,
-            channelId: selectedChannel.id,
-        });
+    const handlePostSubmit = (postData: {description: string, hashtags: string[], image?: string, video?: string}) => {
+        onAddPost(postData);
         setCreatePostModalOpen(false);
     };
 
@@ -60,7 +57,7 @@ const ChannelContentPage: React.FC<ChannelContentPageProps> = ({ community, chan
                                 onSendMessage={onAddChatMessage}
                            />;
                 }
-                const messagesForChannel = community.chatMessages; // Simplified: assuming one chat log per community
+                const messagesForChannel = community.chatMessages;
                 return <ChatPane 
                             channel={selectedChannel} 
                             messages={messagesForChannel} 

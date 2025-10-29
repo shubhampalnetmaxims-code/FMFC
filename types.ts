@@ -215,3 +215,10 @@ export interface ChallengeTask {
   autoCheckCondition?: 'photo_front' | 'photo_side' | 'nutrition_plan_complete' | 'note_added' | 'measurement_added';
   repeatDays?: string[];
 }
+
+// --- Toast Types ---
+export interface Toast {
+  id: number;
+  message: string;
+  type: 'success' | 'error' | 'warning' | 'info';
+}

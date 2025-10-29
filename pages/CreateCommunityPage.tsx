@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
 import type { User } from '../types';
+import { useToast } from '../components/ToastProvider';
 
 interface CreateCommunityPageProps {
     currentUser: User;
@@ -7,6 +9,7 @@ interface CreateCommunityPageProps {
 }
 
 const CreateCommunityPage: React.FC<CreateCommunityPageProps> = ({ currentUser, onCreateCommunity }) => {
+    const { addToast } = useToast();
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [isPrivate, setIsPrivate] = useState(false);
@@ -14,7 +17,7 @@ const CreateCommunityPage: React.FC<CreateCommunityPageProps> = ({ currentUser, 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!name.trim()) {
-            alert('Community name is required.');
+            addToast('Community name is required.', 'error');
             return;
         }
         onCreateCommunity({ name, description, isPrivate });

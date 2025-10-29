@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
 import type { Channel, ChannelType } from '../types';
+import { useToast } from './ToastProvider';
 
 interface EditChannelModalProps {
     channel: Channel;
@@ -8,13 +10,14 @@ interface EditChannelModalProps {
 }
 
 const EditChannelModal: React.FC<EditChannelModalProps> = ({ channel, onClose, onUpdate }) => {
+    const { addToast } = useToast();
     const [name, setName] = useState(channel.name);
     const [type, setType] = useState<ChannelType>(channel.type);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!name.trim()) {
-            alert('Channel name cannot be empty.');
+            addToast('Channel name cannot be empty.', 'error');
             return;
         }
         onUpdate({ name, type });

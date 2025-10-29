@@ -1,6 +1,8 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../components/Icon';
 import { DietIntakeItem } from '../types';
+import { useToast } from '../components/ToastProvider';
 
 interface AiScanFlowProps {
     onClose: () => void;
@@ -16,6 +18,7 @@ const LOADING_MESSAGES = [
 ];
 
 const AiScanFlow: React.FC<AiScanFlowProps> = ({ onClose, onComplete }) => {
+    const { addToast } = useToast();
     const [step, setStep] = useState<ScanStep>('camera');
     const [imageSrc, setImageSrc] = useState<string | null>(null);
     const [description, setDescription] = useState('');
@@ -36,7 +39,7 @@ const AiScanFlow: React.FC<AiScanFlowProps> = ({ onClose, onComplete }) => {
                 })
                 .catch(err => {
                     console.error("Camera error:", err);
-                    alert('Could not access camera. Please check permissions.');
+                    addToast('Could not access camera. Please check permissions.', 'error');
                     onClose();
                 });
             
@@ -50,7 +53,7 @@ const AiScanFlow: React.FC<AiScanFlowProps> = ({ onClose, onComplete }) => {
                 stream?.getTracks().forEach(track => track.stop());
             };
         }
-    }, [step, onClose]);
+    }, [step, onClose, addToast]);
 
     // Effect for loading animation
     useEffect(() => {
@@ -83,7 +86,7 @@ const AiScanFlow: React.FC<AiScanFlowProps> = ({ onClose, onComplete }) => {
 
     const handleAnalyze = () => {
         if (!description.trim()) {
-            alert('Please describe the food in the image.');
+            addToast('Please describe the food in the image.', 'error');
             return;
         }
         setStep('loading');

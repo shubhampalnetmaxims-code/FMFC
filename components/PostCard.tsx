@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import type { Post, Comment as CommentType, User } from '../types';
 import { COMMUNITIES_DATA } from '../constants';
 import Icon from './Icon';
+import { useToast } from './ToastProvider';
 
 interface PostCardProps {
     post: Post;
@@ -11,6 +12,7 @@ interface PostCardProps {
 }
 
 const PostCard: React.FC<PostCardProps> = ({ post, currentUser, showCommunityName }) => {
+    const { addToast } = useToast();
     // State for likes
     const [isLiked, setIsLiked] = useState(false);
     const [likeCount, setLikeCount] = useState(post.likes);
@@ -54,16 +56,16 @@ const PostCard: React.FC<PostCardProps> = ({ post, currentUser, showCommunityNam
                 console.error('Error sharing post:', error);
                 // As a fallback for some edge cases where share might fail, copy to clipboard
                 await navigator.clipboard.writeText(shareUrl);
-                alert('Sharing failed. Link copied to clipboard!');
+                addToast('Sharing failed. Link copied to clipboard!', 'warning');
             }
         } else {
             // Fallback for browsers that don't support the Web Share API
             try {
                 await navigator.clipboard.writeText(shareUrl);
-                alert('Post link copied to clipboard!');
+                addToast('Post link copied to clipboard!', 'info');
             } catch (err) {
                 console.error('Failed to copy: ', err);
-                alert('Could not copy link to clipboard.');
+                addToast('Could not copy link to clipboard.', 'error');
             }
         }
     };

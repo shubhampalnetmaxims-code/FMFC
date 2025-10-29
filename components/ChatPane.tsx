@@ -1,6 +1,8 @@
+
 import React, { useState } from 'react';
 import type { Channel, ChatMessage, User } from '../types';
 import Icon from './Icon';
+import { useToast } from './ToastProvider';
 
 interface ChatPaneProps {
     channel: Channel;
@@ -10,6 +12,7 @@ interface ChatPaneProps {
 }
 
 const ChatPane: React.FC<ChatPaneProps> = ({ channel, messages, currentUser, onSendMessage }) => {
+    const { addToast } = useToast();
     const [newMessage, setNewMessage] = useState('');
     
     const EMOJIS = ['😊', '❤️', '😂', '👍', '🔥', '🎉', '🙏', '💯'];
@@ -34,7 +37,7 @@ const ChatPane: React.FC<ChatPaneProps> = ({ channel, messages, currentUser, onS
     };
     
     const handleAttachmentShare = (e: React.FormEvent) => {
-        alert("Sharing documents, videos, and audio is not yet implemented.");
+        addToast("Sharing documents, videos, and audio is not yet implemented.", 'info');
     };
 
     return (

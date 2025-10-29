@@ -1,11 +1,16 @@
 
-
 import React, { useState, useMemo, useEffect } from 'react';
 import Icon from '../components/Icon';
 import { DAILY_CHALLENGE_TASKS, WEEKLY_CHALLENGE_TASKS, TEST_USER, TASK_POINTS } from '../constants';
 import { ChallengeTask } from '../types';
 import CongratulationsModal from '../components/CongratulationsModal';
 
+interface LeaderboardUser {
+    userId: number;
+    name: string;
+    avatar: string;
+    totalPoints: number;
+}
 interface GoalsPageProps {
     onMenuClick: () => void;
     completedTasks: Record<string, Set<string>>;
@@ -15,6 +20,9 @@ interface GoalsPageProps {
     onViewLeaderboard: () => void;
     currentUserTotalPoints: number;
     currentUserRank: number;
+    leaderboardData: LeaderboardUser[];
+    onShareAchievement: (data: { streak: number; pointsEarned: number; }) => void;
+    onViewMyStats: () => void;
 }
 
 const GoalItem: React.FC<{
@@ -84,10 +92,11 @@ const GoalItem: React.FC<{
     );
 };
 
-const GoalsPage: React.FC<GoalsPageProps> = ({ onMenuClick, completedTasks, onToggleManualTask, completedWeeklyTasks, onToggleWeeklyTask, onViewLeaderboard, currentUserTotalPoints, currentUserRank }) => {
+const GoalsPage: React.FC<GoalsPageProps> = ({ onMenuClick, completedTasks, onToggleManualTask, completedWeeklyTasks, onToggleWeeklyTask, onViewLeaderboard, currentUserTotalPoints, currentUserRank, leaderboardData, onShareAchievement, onViewMyStats }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [showCongratsModal, setShowCongratsModal] = useState(false);
     const [congratsShownForDate, setCongratsShownForDate] = useState<string | null>(null);
+
 
     const isDateInPast = (date: Date): boolean => {
         const today = new Date();
@@ -126,7 +135,7 @@ const GoalsPage: React.FC<GoalsPageProps> = ({ onMenuClick, completedTasks, onTo
         return date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
     };
 
-    const dayOfWeekShort = currentDate.toLocaleDateString('en-US', { weekday: 'short' }); // Mon, Tue, etc.
+    const dayOfWeekShort = currentDate.toLocaleDateString('en-US', { weekday: 'short' });
     const weeklyTasksForToday = WEEKLY_CHALLENGE_TASKS.filter(task => task.repeatDays?.includes(dayOfWeekShort));
     const tasksForToday = [...DAILY_CHALLENGE_TASKS, ...weeklyTasksForToday];
 
@@ -144,6 +153,28 @@ const GoalsPage: React.FC<GoalsPageProps> = ({ onMenuClick, completedTasks, onTo
     
     const totalPossiblePoints = tasksForToday.length * TASK_POINTS;
     const isLocked = isDateInPast(currentDate);
+    
+    const streak = useMemo(() => {
+        const dailyTaskIds = new Set(DAILY_CHALLENGE_TASKS.map(t => t.id));
+        let streakCount = 0;
+        const checkDate = new Date();
+        
+        while (true) {
+            const currentCheckDateKey = checkDate.toISOString().split('T')[0];
+            const completedOnDate = completedTasks[currentCheckDateKey] || new Set();
+            
+            const allDailyCompleted = [...dailyTaskIds].every(id => completedOnDate.has(id));
+
+            if (allDailyCompleted) {
+                streakCount++;
+                checkDate.setDate(checkDate.getDate() - 1);
+            } else {
+                break;
+            }
+        }
+        return streakCount;
+    }, [completedTasks]);
+
 
      useEffect(() => {
         if (totalPossiblePoints > 0 && completedPoints === totalPossiblePoints && congratsShownForDate !== dateKey) {
@@ -151,6 +182,12 @@ const GoalsPage: React.FC<GoalsPageProps> = ({ onMenuClick, completedTasks, onTo
             setCongratsShownForDate(dateKey);
         }
     }, [completedPoints, totalPossiblePoints, dateKey, congratsShownForDate]);
+    
+    const handleOpenShare = () => {
+        setShowCongratsModal(false);
+        onShareAchievement({ streak, pointsEarned: totalPossiblePoints });
+    };
+
 
     return (
         <>
@@ -164,6 +201,10 @@ const GoalsPage: React.FC<GoalsPageProps> = ({ onMenuClick, completedTasks, onTo
                     totalPoints: currentUserTotalPoints,
                     rank: currentUserRank
                 }}
+                streak={streak}
+                leaderboardData={leaderboardData}
+                onViewLeaderboard={onViewLeaderboard}
+                onShare={handleOpenShare}
             />
             <div className="h-full flex flex-col">
                 <header className="sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-10 p-4 shrink-0">
@@ -176,7 +217,7 @@ const GoalsPage: React.FC<GoalsPageProps> = ({ onMenuClick, completedTasks, onTo
                         <h1 className="text-xl font-bold text-zinc-100 uppercase tracking-wider">Goals</h1>
                         <div className="flex items-center space-x-2">
                              <button onClick={onViewLeaderboard} className="relative text-zinc-400 hover:text-zinc-200">
-                                <Icon type="sparkles" className="w-6 h-6" />
+                                <Icon type="users" className="w-6 h-6" />
                             </button>
                             <button className="relative text-zinc-400 hover:text-zinc-200">
                                 <Icon type="bell" className="w-6 h-6" />
@@ -236,6 +277,22 @@ const GoalsPage: React.FC<GoalsPageProps> = ({ onMenuClick, completedTasks, onTo
                                 </div>
                             )}
                         </div>
+                    </div>
+
+                    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
+                         <h3 className="font-bold text-zinc-200 mb-3 text-lg">Your Progress</h3>
+                         <button onClick={onViewMyStats} className="w-full flex items-center justify-between p-3 rounded-lg bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors">
+                             <div className="flex items-center space-x-3">
+                                <img src={TEST_USER.avatar} alt="You" className="w-10 h-10 rounded-full object-cover" />
+                                <div>
+                                    <p className="font-semibold text-amber-300">Your Rank</p>
+                                    <p className="text-xs text-zinc-400">Total Points: {currentUserTotalPoints.toLocaleString()}</p>
+                                </div>
+                            </div>
+                             <div className="text-right">
+                                <p className="text-2xl font-bold text-white">#{currentUserRank}</p>
+                             </div>
+                         </button>
                     </div>
                 </main>
             </div>
