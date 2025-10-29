@@ -38,6 +38,7 @@ interface ProfilePageProps {
     onAddPhoto: (date: Date) => void;
     onEditPhoto: (photo: UserPhoto) => void;
     onDeletePhoto: (photoId: string) => void;
+    onComparePhotos: () => void;
     checkedNutritionItems: Record<string, Set<string>>;
     onToggleNutritionItem: (itemId: string, date: Date) => void;
 }
@@ -63,10 +64,11 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
     onAddPhoto,
     onEditPhoto,
     onDeletePhoto,
+    onComparePhotos,
     checkedNutritionItems,
     onToggleNutritionItem,
 }) => {
-    const [activeSubTab, setActiveSubTab] = useState<ProfileSubTab>('Measurements');
+    const [activeSubTab, setActiveSubTab] = useState<ProfileSubTab>('Photos');
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
@@ -314,6 +316,52 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
         setSelectedDate(date);
         setIsCalendarOpen(false);
     };
+    
+    const renderFAB = () => {
+        if (activeSubTab === 'Photos') {
+            return (
+                <div className="absolute bottom-24 right-6 flex flex-col items-end space-y-3">
+                     <button
+                        onClick={onComparePhotos}
+                        className="bg-zinc-700 hover:bg-zinc-600 text-amber-300 shadow-lg transition-transform hover:scale-105 flex items-center justify-center rounded-full px-4 py-3 space-x-2"
+                        aria-label="Compare Photos"
+                    >
+                        <Icon type="refresh" className="w-5 h-5" />
+                        <span className="font-semibold text-sm">Compare</span>
+                    </button>
+                    <button
+                        onClick={() => onAddPhoto(selectedDate)}
+                        className="bg-amber-500 hover:bg-amber-600 text-black shadow-lg transition-transform hover:scale-105 flex items-center justify-center rounded-full px-4 py-3 space-x-2"
+                        aria-label="Add photo"
+                    >
+                        <Icon type="plus" className="w-6 h-6" />
+                        <span className="font-semibold text-sm">Add Photo</span>
+                    </button>
+                </div>
+            );
+        }
+
+        const fabConfig = {
+            'Nutrition': { onClick: () => onAddDietIntake(selectedDate), label: 'Add Diet', isCompact: false },
+            'Measurements': { onClick: () => onAddMeasurement(selectedDate), label: 'Add Measurement', isCompact: false },
+            'Notes': { onClick: () => onAddNote(selectedDate), label: 'Add Note', isCompact: true },
+        }[activeSubTab];
+
+        if (!fabConfig) return null;
+
+        return (
+            <button
+                onClick={fabConfig.onClick}
+                className={`absolute bottom-24 right-6 bg-amber-500 hover:bg-amber-600 text-black shadow-lg transition-transform hover:scale-105 flex items-center justify-center ${
+                    fabConfig.isCompact ? 'rounded-full w-16 h-16' : 'rounded-full px-4 py-3 space-x-2'
+                }`}
+                aria-label={fabConfig.label}
+            >
+                <Icon type="plus" className="w-6 h-6" />
+                {!fabConfig.isCompact && <span className="font-semibold text-sm">{fabConfig.label}</span>}
+            </button>
+        );
+    };
 
     return (
         <>
@@ -403,33 +451,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                     {renderContent()}
                 </div>
 
-                {/* Floating Action Button */}
-                {(activeSubTab === 'Nutrition' || activeSubTab === 'Photos' || activeSubTab === 'Notes' || activeSubTab === 'Measurements') && (
-                    <button
-                        onClick={
-                            activeSubTab === 'Nutrition' ? () => onAddDietIntake(selectedDate) :
-                            activeSubTab === 'Photos' ? () => onAddPhoto(selectedDate) :
-                            activeSubTab === 'Measurements' ? () => onAddMeasurement(selectedDate) :
-                            () => onAddNote(selectedDate)
-                        }
-                        className={`absolute bottom-24 right-6 bg-amber-500 hover:bg-amber-600 text-black shadow-lg transition-transform hover:scale-105 flex items-center justify-center ${
-                            activeSubTab === 'Notes' ? 'rounded-full w-16 h-16' : 'rounded-full px-4 py-3 space-x-2'
-                        }`}
-                        aria-label={
-                            activeSubTab === 'Nutrition' ? "Add diet intake" :
-                            activeSubTab === 'Photos' ? "Add photo" :
-                            activeSubTab === 'Measurements' ? "Add measurement" :
-                            "Add note"
-                        }
-                    >
-                        <Icon type="plus" className="w-6 h-6" />
-                         {(activeSubTab === 'Nutrition' || activeSubTab === 'Photos' || activeSubTab === 'Measurements') && (
-                            <span className="font-semibold text-sm">
-                                {activeSubTab === 'Nutrition' ? 'Add Diet' : activeSubTab === 'Photos' ? 'Add Photo' : 'Add Measurement'}
-                            </span>
-                        )}
-                    </button>
-                )}
+                {/* Floating Action Buttons */}
+                {renderFAB()}
             </div>
         </>
     );

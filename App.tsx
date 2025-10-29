@@ -21,6 +21,9 @@ import ShareAchievementPage from './pages/ShareAchievementPage';
 import { CommunityHubFilterType } from './pages/CommunityHubPage';
 import { useToast } from './components/ToastProvider';
 import MyStatsPage from './pages/MyStatsPage';
+import ComparePhotosPage from './pages/ComparePhotosPage';
+import ComparisonResultPage from './pages/ComparisonResultPage';
+import ShareComparisonPage from './pages/ShareComparisonPage';
 
 const App: React.FC = () => {
     const { addToast } = useToast();
@@ -63,55 +66,85 @@ const App: React.FC = () => {
     const [hubActiveFilter, setHubActiveFilter] = useState<CommunityHubFilterType>('feed');
     const [isAddingMembers, setIsAddingMembers] = useState(false);
 
-    // STATE FOR SHARE ACHIEVEMENT FLOW
+    // STATE FOR SHARE FLOWS
     const [sharingAchievementData, setSharingAchievementData] = useState<{
         streak: number;
         pointsEarned: number;
         description: string;
         hashtags: string[];
     } | null>(null);
+     const [sharingComparisonData, setSharingComparisonData] = useState<{
+        image: string;
+        description: string;
+        hashtags: string[];
+    } | null>(null);
+
+    // STATE FOR PHOTO COMPARISON FLOW
+    const [isComparingPhotos, setIsComparingPhotos] = useState(false);
+    const [comparisonResultData, setComparisonResultData] = useState<{
+        fromPhoto: UserPhoto;
+        toPhoto: UserPhoto;
+        description: string;
+    } | null>(null);
 
     useEffect(() => {
         // This runs only once on initial load to create some mock history
         const initializeMockHistory = () => {
-            if (Object.keys(completedTasks).length > 0) return; // Don't run if already populated
+            if (Object.keys(completedTasks).length === 0) {
+                const mockCompleted: Record<string, Set<string>> = {};
+                const today = new Date();
 
-            const mockCompleted: Record<string, Set<string>> = {};
-            const today = new Date();
+                // Go back 5 days to create a streak
+                for (let i = 1; i <= 5; i++) {
+                    const pastDate = new Date(today);
+                    pastDate.setDate(today.getDate() - i);
+                    const dateKey = pastDate.toISOString().split('T')[0];
+                    
+                    const completedTasksForDay = new Set<string>();
+                    DAILY_CHALLENGE_TASKS.forEach(task => completedTasksForDay.add(task.id));
+                    mockCompleted[dateKey] = completedTasksForDay;
+                }
 
-            // Go back 5 days to create a streak
-            for (let i = 1; i <= 5; i++) {
-                const pastDate = new Date(today);
-                pastDate.setDate(today.getDate() - i);
-                const dateKey = pastDate.toISOString().split('T')[0];
-                
-                // Complete all daily tasks for a streak
-                const completedTasksForDay = new Set<string>();
-                DAILY_CHALLENGE_TASKS.forEach(task => completedTasksForDay.add(task.id));
-                mockCompleted[dateKey] = completedTasksForDay;
+                for (let i = 7; i <= 10; i++) {
+                    const pastDate = new Date(today);
+                    pastDate.setDate(today.getDate() - i);
+                    const dateKey = pastDate.toISOString().split('T')[0];
+                    const completedTasksForDay = new Set<string>();
+                    DAILY_CHALLENGE_TASKS.forEach(task => {
+                        if (Math.random() > 0.5) {
+                            completedTasksForDay.add(task.id);
+                        }
+                    });
+                    mockCompleted[dateKey] = completedTasksForDay;
+                }
+                setCompletedTasks(mockCompleted);
             }
 
-            // Add some random tasks for older days (no streak)
-            for (let i = 7; i <= 10; i++) {
-                 const pastDate = new Date(today);
-                pastDate.setDate(today.getDate() - i);
-                const dateKey = pastDate.toISOString().split('T')[0];
-                const completedTasksForDay = new Set<string>();
-                // Complete a random number of tasks
-                DAILY_CHALLENGE_TASKS.forEach(task => {
-                    if (Math.random() > 0.5) {
-                        completedTasksForDay.add(task.id);
-                    }
+            if (userPhotos.length === 0) {
+                const today = new Date();
+                const dates = Array.from({ length: 5 }, (_, i) => {
+                    const d = new Date(today);
+                    d.setDate(today.getDate() - (i * 5));
+                    return d.toISOString().split('T')[0];
                 });
-                 mockCompleted[dateKey] = completedTasksForDay;
+
+                const mockPhotos: UserPhoto[] = [
+                    { id: 'p1', src: 'https://images.unsplash.com/photo-1549476464-373922117584?q=80&w=600&h=800&fit=crop&crop=faces&seed=front1', type: 'Front', date: dates[4], description: 'Starting point, feeling motivated.' },
+                    { id: 'p2', src: 'https://images.unsplash.com/photo-1577221084712-45b044c6dbb6?q=80&w=600&h=800&fit=crop&crop=faces&seed=side1', type: 'Side', date: dates[4], description: 'Side view, first day.' },
+                    { id: 'p3', src: 'https://images.unsplash.com/photo-1549476464-373922117584?q=80&w=600&h=800&fit=crop&crop=faces&seed=front2', type: 'Front', date: dates[2], description: '10 days in, seeing some changes.' },
+                    { id: 'p4', src: 'https://images.unsplash.com/photo-1577221084712-45b044c6dbb6?q=80&w=600&h=800&fit=crop&crop=faces&seed=side2', type: 'Side', date: dates[2], description: 'Side view, posture is better.' },
+                    { id: 'p5', src: 'https://images.unsplash.com/photo-1550345332-09e3ac987658?q=80&w=600&h=800&fit=crop&crop=faces&seed=back1', type: 'Back', date: dates[2], description: 'Back progress.' },
+                    { id: 'p6', src: 'https://images.unsplash.com/photo-1549476464-373922117584?q=80&w=600&h=800&fit=crop&crop=faces&seed=front3', type: 'Front', date: dates[0], description: 'Today! Feeling great.' },
+                    { id: 'p7', src: 'https://images.unsplash.com/photo-1577221084712-45b044c6dbb6?q=80&w=600&h=800&fit=crop&crop=faces&seed=side3', type: 'Side', date: dates[0], description: 'Final side view for comparison.' },
+                ];
+                setUserPhotos(mockPhotos.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
             }
-            setCompletedTasks(mockCompleted);
         };
 
         if (currentUser) {
             initializeMockHistory();
         }
-    }, [currentUser]);
+    }, [currentUser, completedTasks, userPhotos]);
 
 
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -673,16 +706,110 @@ const App: React.FC = () => {
 
     const handleShareAchievementPost = (communityId: number, channelId: number) => {
         if (!sharingAchievementData || !currentUser) return;
-
         const { description, hashtags } = sharingAchievementData;
         const postData = { description, hashtags };
-        
         handleCreatePost(communityId, channelId, postData);
         handleCloseShareAchievement();
     };
 
+    // --- Photo Comparison Handlers ---
+    const handleOpenComparePhotos = () => setIsComparingPhotos(true);
+    const handleCloseComparePhotos = () => setIsComparingPhotos(false);
+    
+    const handleStartComparison = (data: { fromPhoto: UserPhoto; toPhoto: UserPhoto; description: string; }) => {
+        setComparisonResultData(data);
+        setIsComparingPhotos(false);
+    };
+
+    const handleCloseComparisonResult = () => setComparisonResultData(null);
+
+    const handleOpenShareComparison = async (data: { fromPhoto: UserPhoto; toPhoto: UserPhoto; description: string }) => {
+        addToast('Generating your comparison image...', 'info');
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            addToast('Could not generate image.', 'error');
+            return;
+        }
+
+        const loadImage = (src: string): Promise<HTMLImageElement> => new Promise((resolve, reject) => {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = () => resolve(img);
+            img.onerror = reject;
+            img.src = src;
+        });
+
+        try {
+            const [img1, img2] = await Promise.all([loadImage(data.fromPhoto.src), loadImage(data.toPhoto.src)]);
+
+            canvas.width = 1200;
+            canvas.height = 900;
+
+            ctx.fillStyle = '#18181b'; // zinc-900
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.drawImage(img1, 0, 0, 600, 800);
+            ctx.drawImage(img2, 600, 0, 600, 800);
+
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 32px sans-serif';
+            ctx.textAlign = 'center';
+
+            ctx.fillText(`From: ${new Date(data.fromPhoto.date + 'T00:00:00').toLocaleDateString()}`, 300, 850);
+            ctx.fillText(`To: ${new Date(data.toPhoto.date + 'T00:00:00').toLocaleDateString()}`, 900, 850);
+            
+            const compositeImage = canvas.toDataURL('image/jpeg', 0.9);
+
+            setSharingComparisonData({
+                image: compositeImage,
+                description: data.description,
+                hashtags: ['#Progress', '#Transformation', '#FMFC'],
+            });
+            setComparisonResultData(null);
+
+        } catch (error) {
+            console.error("Error creating comparison image:", error);
+            addToast('Failed to load images for comparison.', 'error');
+        }
+    };
+
+    const handleCloseShareComparison = () => setSharingComparisonData(null);
+
+    const handleShareComparisonPost = (communityId: number, channelId: number) => {
+        if (!sharingComparisonData) return;
+        handleCreatePost(communityId, channelId, sharingComparisonData);
+        handleCloseShareComparison();
+    };
+
 
     const renderPage = () => {
+         if (sharingComparisonData) {
+            return <ShareComparisonPage
+                currentUser={currentUser!}
+                shareData={sharingComparisonData}
+                userCommunities={communities.filter(c => c.members.some(m => m.id === currentUser!.id))}
+                onBack={handleCloseShareComparison}
+                onShareToChannel={handleShareComparisonPost}
+            />;
+        }
+
+        if (comparisonResultData) {
+            return <ComparisonResultPage
+                comparisonData={comparisonResultData}
+                onBack={handleCloseComparisonResult}
+                onShare={handleOpenShareComparison}
+            />;
+        }
+
+        if (isComparingPhotos) {
+            return <ComparePhotosPage
+                userPhotos={userPhotos}
+                onBack={handleCloseComparePhotos}
+                onCompare={handleStartComparison}
+            />;
+        }
+
         if (sharingAchievementData) {
             return <ShareAchievementPage
                 currentUser={currentUser!}
@@ -812,6 +939,7 @@ const App: React.FC = () => {
                             onAddPhoto={handleOpenAddPhoto}
                             onEditPhoto={handleOpenEditPhoto}
                             onDeletePhoto={handleDeletePhoto}
+                            onComparePhotos={handleOpenComparePhotos}
                             checkedNutritionItems={checkedNutritionItems}
                             onToggleNutritionItem={handleToggleNutritionItem}
                         />;
