@@ -1,3 +1,4 @@
+
 import React from 'react';
 import Icon from '../components/Icon';
 import { User, Community } from '../types';
@@ -52,7 +53,7 @@ const ShareAchievementPage: React.FC<ShareAchievementPageProps> = ({ currentUser
     );
 
     return (
-        <div className="h-full flex flex-col bg-zinc-950 text-zinc-200">
+        <div className="w-full max-w-lg mx-auto h-full flex flex-col bg-zinc-950 text-zinc-200">
             <header className="flex items-center p-4 shrink-0 border-b border-zinc-800 sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-10">
                 <button onClick={onBack} className="p-2 -ml-2 mr-2 text-zinc-400 hover:text-zinc-200">
                     <Icon type="arrow-left" className="w-6 h-6" />

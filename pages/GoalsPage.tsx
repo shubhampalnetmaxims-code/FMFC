@@ -206,8 +206,8 @@ const GoalsPage: React.FC<GoalsPageProps> = ({ onMenuClick, completedTasks, onTo
                 onViewLeaderboard={onViewLeaderboard}
                 onShare={handleOpenShare}
             />
-            <div className="h-full flex flex-col">
-                <header className="sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-10 p-4 shrink-0">
+            <div className="w-full max-w-lg mx-auto h-full flex flex-col">
+                <header className="sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-20 p-4 shrink-0">
                     <div className="flex justify-between items-center">
                         <div className="w-8">
                             <button onClick={onMenuClick} className="text-zinc-400 hover:text-zinc-200">
@@ -227,72 +227,76 @@ const GoalsPage: React.FC<GoalsPageProps> = ({ onMenuClick, completedTasks, onTo
                     </div>
                 </header>
                 
-                <main className="flex-grow overflow-y-auto p-4 space-y-6">
-                    <div className="flex items-center justify-center space-x-4">
-                        <button onClick={handlePrevDay} className="p-2 rounded-full hover:bg-zinc-800 transition-colors" aria-label="Previous day">
-                            <Icon type="arrow-left" className="w-5 h-5 text-zinc-400"/>
-                        </button>
-                        <div className="text-lg font-semibold text-amber-400 text-center min-w-[200px]">
-                            {formatDate(currentDate)}
-                        </div>
-                        <button onClick={handleNextDay} className="p-2 rounded-full hover:bg-zinc-800 transition-colors" aria-label="Next day">
-                            <Icon type="arrow-right" className="w-5 h-5 text-zinc-400"/>
-                        </button>
-                    </div>
-
-                    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-                        <div className="p-4 border-b border-zinc-800">
-                            <div className="flex justify-between items-center">
-                                <h2 className="text-lg font-bold text-zinc-100">Today's Tasks</h2>
-                                <div className="text-lg font-bold text-amber-300 bg-amber-400/10 px-3 py-1 rounded-full">
-                                    {completedPoints} / {totalPossiblePoints} pts
-                                </div>
+                <main className="flex-grow overflow-y-auto">
+                    <div className="sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-10 p-4 border-b border-zinc-800">
+                        <div className="flex items-center justify-center space-x-4">
+                            <button onClick={handlePrevDay} className="p-2 rounded-full hover:bg-zinc-800 transition-colors" aria-label="Previous day">
+                                <Icon type="arrow-left" className="w-5 h-5 text-zinc-400"/>
+                            </button>
+                            <div className="text-lg font-semibold text-amber-400 text-center min-w-[200px]">
+                                {formatDate(currentDate)}
                             </div>
-                        </div>
-                        <div className="divide-y divide-zinc-800">
-                            {tasksForToday.length > 0 ? (
-                                tasksForToday.map(task => {
-                                    const isCompleted = task.frequency === 'daily'
-                                        ? dailyCompletions.has(task.id)
-                                        : weeklyCompletions.has(task.id);
-                                    
-                                    const onToggle = task.frequency === 'daily'
-                                        ? () => onToggleManualTask(task.id, currentDate)
-                                        : () => onToggleWeeklyTask(task.id, currentDate);
-
-                                    return (
-                                        <GoalItem
-                                            key={task.id}
-                                            task={task}
-                                            isChecked={isCompleted}
-                                            onToggle={onToggle}
-                                            isLocked={isLocked}
-                                        />
-                                    );
-                                })
-                            ) : (
-                                <div className="p-8 text-center text-zinc-500">
-                                    <p>No specific goals for today.</p>
-                                    <p className="text-sm mt-1">Enjoy your rest day!</p>
-                                </div>
-                            )}
+                            <button onClick={handleNextDay} className="p-2 rounded-full hover:bg-zinc-800 transition-colors" aria-label="Next day">
+                                <Icon type="arrow-right" className="w-5 h-5 text-zinc-400"/>
+                            </button>
                         </div>
                     </div>
 
-                    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
-                         <h3 className="font-bold text-zinc-200 mb-3 text-lg">Your Progress</h3>
-                         <button onClick={onViewMyStats} className="w-full flex items-center justify-between p-3 rounded-lg bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors">
-                             <div className="flex items-center space-x-3">
-                                <img src={TEST_USER.avatar} alt="You" className="w-10 h-10 rounded-full object-cover" />
-                                <div>
-                                    <p className="font-semibold text-amber-300">Your Rank</p>
-                                    <p className="text-xs text-zinc-400">Total Points: {currentUserTotalPoints.toLocaleString()}</p>
+                    <div className="p-4 space-y-6">
+                        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
+                            <h3 className="font-bold text-zinc-200 mb-3 text-lg">Your Progress</h3>
+                            <button onClick={onViewMyStats} className="w-full flex items-center justify-between p-3 rounded-lg bg-zinc-800/50 hover:bg-zinc-700/50 transition-colors">
+                                <div className="flex items-center space-x-3">
+                                    <img src={TEST_USER.avatar} alt="You" className="w-10 h-10 rounded-full object-cover" />
+                                    <div>
+                                        <p className="font-semibold text-amber-300">Your Rank</p>
+                                        <p className="text-xs text-zinc-400">Total Points: {currentUserTotalPoints.toLocaleString()}</p>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-2xl font-bold text-white">#{currentUserRank}</p>
+                                </div>
+                            </button>
+                        </div>
+
+                        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+                            <div className="p-4 border-b border-zinc-800">
+                                <div className="flex justify-between items-center">
+                                    <h2 className="text-lg font-bold text-zinc-100">Today's Tasks</h2>
+                                    <div className="text-lg font-bold text-amber-300 bg-amber-400/10 px-3 py-1 rounded-full">
+                                        {completedPoints} / {totalPossiblePoints} pts
+                                    </div>
                                 </div>
                             </div>
-                             <div className="text-right">
-                                <p className="text-2xl font-bold text-white">#{currentUserRank}</p>
-                             </div>
-                         </button>
+                            <div className="divide-y divide-zinc-800">
+                                {tasksForToday.length > 0 ? (
+                                    tasksForToday.map(task => {
+                                        const isCompleted = task.frequency === 'daily'
+                                            ? dailyCompletions.has(task.id)
+                                            : weeklyCompletions.has(task.id);
+                                        
+                                        const onToggle = task.frequency === 'daily'
+                                            ? () => onToggleManualTask(task.id, currentDate)
+                                            : () => onToggleWeeklyTask(task.id, currentDate);
+
+                                        return (
+                                            <GoalItem
+                                                key={task.id}
+                                                task={task}
+                                                isChecked={isCompleted}
+                                                onToggle={onToggle}
+                                                isLocked={isLocked}
+                                            />
+                                        );
+                                    })
+                                ) : (
+                                    <div className="p-8 text-center text-zinc-500">
+                                        <p>No specific goals for today.</p>
+                                        <p className="text-sm mt-1">Enjoy your rest day!</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 </main>
             </div>

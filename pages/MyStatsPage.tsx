@@ -1,5 +1,4 @@
 
-
 import React from 'react';
 import Icon from '../components/Icon';
 import { User, ChallengeTask } from '../types';
@@ -35,7 +34,7 @@ const MyStatsPage: React.FC<MyStatsPageProps> = ({ currentUser, totalPoints, str
     };
 
     return (
-        <div className="h-full flex flex-col bg-zinc-950 text-zinc-200">
+        <div className="w-full max-w-lg mx-auto h-full flex flex-col bg-zinc-950 text-zinc-200">
             <header className="sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-10 flex items-center p-4">
                 <button onClick={onBack} className="mr-4 text-zinc-400 hover:text-zinc-200">
                     <Icon type="arrow-left" />
