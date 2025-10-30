@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../components/Icon';
 import { DietIntakeItem } from '../types';
@@ -148,7 +149,7 @@ const AiScanFlow: React.FC<AiScanFlowProps> = ({ onClose, onComplete }) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-zinc-950 z-[80] flex flex-col font-sans text-zinc-200">
+        <div className="absolute inset-0 bg-zinc-950 z-[80] flex flex-col font-sans text-zinc-200">
              {step !== 'loading' && (
                 <button onClick={onClose} className="absolute top-4 left-4 p-2 z-20 bg-black/30 rounded-full">
                     <Icon type="x" className="w-6 h-6 text-white" />

@@ -992,7 +992,7 @@ const App: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-zinc-950 flex flex-col font-sans">
+        <div className="relative max-w-lg mx-auto h-screen bg-zinc-950 flex flex-col font-sans shadow-2xl overflow-hidden">
              <SideMenu
                 isOpen={isMenuOpen}
                 currentUser={currentUser}
@@ -1000,7 +1000,7 @@ const App: React.FC = () => {
                 onNavigate={handleSideMenuNavigate}
                 onLogout={handleSignOut}
             />
-            <main className="flex-grow pb-20">
+            <main className="flex-grow min-h-0">
                 {renderPage()}
             </main>
             <BottomNav

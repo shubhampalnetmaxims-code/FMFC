@@ -46,7 +46,7 @@ const SelectMeasurePage: React.FC<SelectMeasurePageProps> = ({ foodItem, onClose
     }
 
     return (
-        <div className="fixed inset-0 bg-zinc-950 z-[70] flex flex-col font-sans text-zinc-200">
+        <div className="absolute inset-0 bg-zinc-950 z-[70] flex flex-col font-sans text-zinc-200">
             <header className="flex items-center p-4 shrink-0 border-b border-zinc-800">
                 <button onClick={onClose} className="p-2 -ml-2 mr-2">
                     <Icon type="arrow-left" className="w-6 h-6 text-zinc-400" />

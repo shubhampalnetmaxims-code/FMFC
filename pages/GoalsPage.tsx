@@ -1,4 +1,5 @@
 
+
 import React, { useState, useMemo, useEffect } from 'react';
 import Icon from '../components/Icon';
 import { DAILY_CHALLENGE_TASKS, WEEKLY_CHALLENGE_TASKS, TEST_USER, TASK_POINTS } from '../constants';
@@ -206,7 +207,7 @@ const GoalsPage: React.FC<GoalsPageProps> = ({ onMenuClick, completedTasks, onTo
                 onViewLeaderboard={onViewLeaderboard}
                 onShare={handleOpenShare}
             />
-            <div className="w-full max-w-lg mx-auto h-full flex flex-col">
+            <div className="w-full h-full flex flex-col">
                 <header className="sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-20 p-4 shrink-0">
                     <div className="flex justify-between items-center">
                         <div className="w-8">

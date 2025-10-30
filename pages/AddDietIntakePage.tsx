@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import Icon from '../components/Icon';
 import { DietIntakeItem, FoodSearchItem } from '../types';
@@ -177,7 +178,7 @@ const AddDietIntakePage: React.FC<AddDietIntakePageProps> = ({ onClose, onSave, 
     const isEditMode = !!initialData;
 
     return (
-        <div className="fixed inset-0 bg-zinc-950 z-50 flex flex-col font-sans text-zinc-200">
+        <div className="absolute inset-0 bg-zinc-950 z-50 flex flex-col font-sans text-zinc-200">
             <header className="flex items-center justify-between p-4 shrink-0">
                 <button onClick={onClose} className="p-2">
                     <Icon type="x" className="w-6 h-6 text-zinc-400" />

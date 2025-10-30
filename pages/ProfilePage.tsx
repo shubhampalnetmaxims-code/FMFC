@@ -371,7 +371,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                 selectedDate={selectedDate}
                 onDateSelect={handleDateSelect}
             />
-            <div className="w-full max-w-lg mx-auto h-full flex flex-col relative">
+            <div className="w-full h-full flex flex-col relative">
                 {/* Header */}
                  <header className="p-4 pt-6 space-y-3">
                     <div className="flex items-center justify-between px-2">
@@ -447,7 +447,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                 </div>
 
                 {/* Content */}
-                <div className="flex-grow min-h-0 overflow-y-auto pb-28">
+                <div className="flex-grow min-h-0 overflow-y-auto">
                     {renderContent()}
                 </div>
 

@@ -29,8 +29,8 @@ const BottomNav: React.FC<BottomNavProps> = ({ navItems, activeTab, setActiveTab
     };
     
     return (
-        <footer className="fixed bottom-0 left-0 right-0 bg-black border-t border-zinc-800 shadow-lg">
-            <nav className="flex justify-around items-center h-16 max-w-lg mx-auto">
+        <footer className="w-full bg-black border-t border-zinc-800 shadow-lg shrink-0">
+            <nav className="flex justify-around items-center h-16 w-full">
                 {navItems.map((item) => {
                     const isActive = activeTab === item.id;
                     return (

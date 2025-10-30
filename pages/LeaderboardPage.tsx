@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import Icon from '../components/Icon';
 
@@ -51,7 +52,7 @@ const LeaderboardPage: React.FC<LeaderboardPageProps> = ({ onBack, leaderboardDa
     }
     
     return (
-        <div className="w-full max-w-lg mx-auto h-full flex flex-col bg-zinc-950">
+        <div className="w-full h-full flex flex-col bg-zinc-950">
             <header className="sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-10 p-4 flex items-center">
                  <button onClick={onBack} className="mr-4 text-zinc-400 hover:text-zinc-200">
                     <Icon type="arrow-left" />

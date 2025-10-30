@@ -165,7 +165,7 @@ const CommunityPage: React.FC<CommunityPageProps> = (props) => {
                     onBuy={handleBuyPremium}
                 />
             )}
-            <div className="w-full max-w-lg mx-auto h-full flex flex-col">
+            <div className="w-full h-full flex flex-col">
                 {showHeaderAndTabs && (
                     <header className="sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-10 p-4 shrink-0">
                         <div className="flex justify-between items-center">

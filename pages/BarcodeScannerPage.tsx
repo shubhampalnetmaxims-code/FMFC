@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../components/Icon';
 import { DietIntakeItem } from '../types';
@@ -59,7 +60,7 @@ const BarcodeScannerPage: React.FC<BarcodeScannerPageProps> = ({ onClose, onScan
     }, [onScan]);
 
     return (
-        <div className="fixed inset-0 bg-black z-[80] flex flex-col justify-center items-center text-white">
+        <div className="absolute inset-0 bg-black z-[80] flex flex-col justify-center items-center text-white">
             <video ref={videoRef} autoPlay playsInline muted className="absolute w-full h-full object-cover" />
             <div className="absolute inset-0 bg-black/50" />
             
@@ -81,4 +82,3 @@ const BarcodeScannerPage: React.FC<BarcodeScannerPageProps> = ({ onClose, onScan
 };
 
 export default BarcodeScannerPage;
-    

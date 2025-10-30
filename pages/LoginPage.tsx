@@ -26,7 +26,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     };
 
     return (
-        <div className="min-h-screen bg-zinc-950 flex flex-col justify-center items-center p-4">
+        <div className="max-w-lg mx-auto h-screen bg-zinc-950 flex flex-col justify-center items-center p-4 shadow-2xl">
             <div className="w-full max-w-sm">
                 <div className="text-center mb-8">
                     <div className="inline-block bg-zinc-900 p-4 rounded-full mb-4">
