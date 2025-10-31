@@ -143,7 +143,7 @@ const PostCard: React.FC<PostCardProps> = ({ post, currentUser, showCommunityNam
 
             {/* Post Description */}
             <div className="px-4 pb-4">
-                <p className="text-zinc-300 text-sm mb-2">{post.description}</p>
+                <p className="text-zinc-300 text-sm mb-2 whitespace-pre-wrap">{post.description}</p>
                 <div className="flex flex-wrap gap-x-2">
                     {post.hashtags.map((tag, index) => (
                         <span key={index} className="text-amber-400 text-sm font-semibold cursor-pointer hover:underline">

@@ -1,12 +1,15 @@
 
 
+
+
 import React, { useState, useEffect, useMemo } from 'react';
 import BottomNav from './components/BottomNav';
 import CommunityPage from './pages/CommunityPage';
 import UnderDevelopmentPage from './pages/UnderDevelopmentPage';
 import LoginPage from './pages/LoginPage';
+// FIX: Corrected typo from DAILY_CHallenge_TASKS to DAILY_CHALLENGE_TASKS.
 import { NAV_ITEMS, NUTRITION_PLANS_DATA, LEADERBOARD_DATA, TEST_USER, TASK_POINTS, COMMUNITIES_DATA, USERS_DATA, DAILY_CHALLENGE_TASKS } from './constants';
-import { NavItemType, User, NutritionPlan, DietIntakeItem, UserNote, UserMeasurement, UserPhoto, Community, ChannelType, Post, ChatMessage, Channel } from './types';
+import { NavItemType, User, NutritionPlan, DietIntakeItem, UserNote, UserMeasurement, UserPhoto, Community, ChannelType, Post, ChatMessage, Channel, ChallengeTask } from './types';
 import SideMenu from './components/SideMenu';
 import ProfilePage from './pages/ProfilePage';
 import NutritionPage from './pages/NutritionPage';
@@ -24,6 +27,7 @@ import MyStatsPage from './pages/MyStatsPage';
 import ComparePhotosPage from './pages/ComparePhotosPage';
 import ComparisonResultPage from './pages/ComparisonResultPage';
 import ShareComparisonPage from './pages/ShareComparisonPage';
+import ShareTasksPage from './pages/ShareTasksPage';
 
 const App: React.FC = () => {
     const { addToast } = useToast();
@@ -78,6 +82,12 @@ const App: React.FC = () => {
         description: string;
         hashtags: string[];
     } | null>(null);
+    const [sharingTasksData, setSharingTasksData] = useState<{
+        date: Date;
+        tasks: ChallengeTask[];
+        completedDaily: Set<string>;
+        completedWeekly: Set<string>;
+    } | null>(null);
 
     // STATE FOR PHOTO COMPARISON FLOW
     const [isComparingPhotos, setIsComparingPhotos] = useState(false);
@@ -101,6 +111,7 @@ const App: React.FC = () => {
                     const dateKey = pastDate.toISOString().split('T')[0];
                     
                     const completedTasksForDay = new Set<string>();
+                    // FIX: Corrected typo from DAILY_CHallenge_TASKS to DAILY_CHALLENGE_TASKS.
                     DAILY_CHALLENGE_TASKS.forEach(task => completedTasksForDay.add(task.id));
                     mockCompleted[dateKey] = completedTasksForDay;
                 }
@@ -110,6 +121,7 @@ const App: React.FC = () => {
                     pastDate.setDate(today.getDate() - i);
                     const dateKey = pastDate.toISOString().split('T')[0];
                     const completedTasksForDay = new Set<string>();
+                    // FIX: Corrected typo from DAILY_CHallenge_TASKS to DAILY_CHALLENGE_TASKS.
                     DAILY_CHALLENGE_TASKS.forEach(task => {
                         if (Math.random() > 0.5) {
                             completedTasksForDay.add(task.id);
@@ -517,6 +529,7 @@ const App: React.FC = () => {
 
     const streak = useMemo(() => {
         if (!currentUser) return 0;
+        // FIX: Corrected typo from DAILY_CHallenge_TASKS to DAILY_CHALLENGE_TASKS.
         const dailyTaskIds = new Set(DAILY_CHALLENGE_TASKS.map(t => t.id));
         let streakCount = 0;
         const checkDate = new Date();
@@ -712,6 +725,45 @@ const App: React.FC = () => {
         handleCloseShareAchievement();
     };
 
+    // --- Share Tasks Handlers ---
+    const handleOpenShareTasks = (data: { date: Date; tasks: ChallengeTask[]; completedDaily: Set<string>; completedWeekly: Set<string>; }) => {
+        setSharingTasksData(data);
+    };
+
+    const handleCloseShareTasks = () => {
+        setSharingTasksData(null);
+    };
+
+    const handleShareTasksPost = (communityId: number, channelId: number) => {
+        if (!sharingTasksData || !currentUser) return;
+        const { date, tasks, completedDaily, completedWeekly } = sharingTasksData;
+
+        const formatDate = (d: Date) => d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+        const dailyTasks = tasks.filter(t => t.frequency === 'daily');
+        const weeklyTasks = tasks.filter(t => t.frequency === 'weekly');
+
+        let description = `My Goals for ${formatDate(date)}\n\n`;
+
+        if (dailyTasks.length > 0) {
+            description += "Daily Tasks:\n";
+            description += dailyTasks.map(t => `${completedDaily.has(t.id) ? '✅' : '🔲'} ${t.title}`).join('\n');
+            description += "\n\n";
+        }
+
+        if (weeklyTasks.length > 0) {
+            description += "Weekly Tasks:\n";
+            description += weeklyTasks.map(t => `${completedWeekly.has(t.id) ? '✅' : '🔲'} ${t.title}`).join('\n');
+        }
+        
+        const postData = {
+            description: description.trim(),
+            hashtags: ['#FitnessGoals', '#DailyTasks', '#FMFC'],
+        };
+        handleCreatePost(communityId, channelId, postData);
+        handleCloseShareTasks();
+    };
+
     // --- Photo Comparison Handlers ---
     const handleOpenComparePhotos = () => setIsComparingPhotos(true);
     const handleCloseComparePhotos = () => setIsComparingPhotos(false);
@@ -784,6 +836,16 @@ const App: React.FC = () => {
 
 
     const renderPage = () => {
+        if (sharingTasksData) {
+            return <ShareTasksPage
+                currentUser={currentUser!}
+                shareData={sharingTasksData}
+                userCommunities={communities.filter(c => c.members.some(m => m.id === currentUser!.id))}
+                onBack={handleCloseShareTasks}
+                onShareToChannel={handleShareTasksPost}
+            />;
+        }
+
          if (sharingComparisonData) {
             return <ShareComparisonPage
                 currentUser={currentUser!}
@@ -956,6 +1018,7 @@ const App: React.FC = () => {
                             leaderboardData={leaderboardData}
                             onShareAchievement={handleOpenShareAchievement}
                             onViewMyStats={handleViewMyStats}
+                            onShareTasks={handleOpenShareTasks}
                         />;
             case 'Session':
             case 'Workouts':

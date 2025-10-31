@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useMemo, useEffect } from 'react';
 import Icon from '../components/Icon';
 import { DAILY_CHALLENGE_TASKS, WEEKLY_CHALLENGE_TASKS, TEST_USER, TASK_POINTS } from '../constants';
@@ -24,6 +25,7 @@ interface GoalsPageProps {
     leaderboardData: LeaderboardUser[];
     onShareAchievement: (data: { streak: number; pointsEarned: number; }) => void;
     onViewMyStats: () => void;
+    onShareTasks: (data: { date: Date; tasks: ChallengeTask[]; completedDaily: Set<string>; completedWeekly: Set<string>; }) => void;
 }
 
 const GoalItem: React.FC<{
@@ -93,7 +95,7 @@ const GoalItem: React.FC<{
     );
 };
 
-const GoalsPage: React.FC<GoalsPageProps> = ({ onMenuClick, completedTasks, onToggleManualTask, completedWeeklyTasks, onToggleWeeklyTask, onViewLeaderboard, currentUserTotalPoints, currentUserRank, leaderboardData, onShareAchievement, onViewMyStats }) => {
+const GoalsPage: React.FC<GoalsPageProps> = ({ onMenuClick, completedTasks, onToggleManualTask, completedWeeklyTasks, onToggleWeeklyTask, onViewLeaderboard, currentUserTotalPoints, currentUserRank, leaderboardData, onShareAchievement, onViewMyStats, onShareTasks }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [showCongratsModal, setShowCongratsModal] = useState(false);
     const [congratsShownForDate, setCongratsShownForDate] = useState<string | null>(null);
@@ -217,6 +219,9 @@ const GoalsPage: React.FC<GoalsPageProps> = ({ onMenuClick, completedTasks, onTo
                         </div>
                         <h1 className="text-xl font-bold text-zinc-100 uppercase tracking-wider">Goals</h1>
                         <div className="flex items-center space-x-2">
+                            <button onClick={() => onShareTasks({ date: currentDate, tasks: tasksForToday, completedDaily: dailyCompletions, completedWeekly: weeklyCompletions })} className="relative text-zinc-400 hover:text-zinc-200">
+                                <Icon type="share" className="w-5 h-5" />
+                            </button>
                              <button onClick={onViewLeaderboard} className="relative text-zinc-400 hover:text-zinc-200">
                                 <Icon type="users" className="w-6 h-6" />
                             </button>
