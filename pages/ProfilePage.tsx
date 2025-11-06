@@ -1,11 +1,12 @@
 
 
+
+
 import React, { useState } from 'react';
 import type { User, NutritionPlan, DietIntakeItem, UserPhoto, UserNote, UserMeasurement } from '../types';
 import UnderDevelopmentPage from './UnderDevelopmentPage';
 import Icon from '../components/Icon';
 import CalendarModal from '../components/CalendarModal';
-import { NUTRITION_PLANS_DATA } from '../constants';
 import NutritionTracker from '../components/NutritionTracker';
 
 type ProfileSubTab = 'Nutrition' | 'Photos' | 'Measurements' | 'Notes';
@@ -21,6 +22,7 @@ interface ProfilePageProps {
     currentUser: User;
     onNavigate: (pageName: string) => void;
     onMenuClick: () => void;
+    activePlan: NutritionPlan | undefined;
     onViewPlan: (plan: NutritionPlan) => void;
     onAddDietIntake: (date: Date) => void;
     onEditDietIntake: (item: DietIntakeItem) => void;
@@ -47,6 +49,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
     currentUser, 
     onNavigate, 
     onMenuClick, 
+    activePlan,
     onViewPlan, 
     onAddDietIntake, 
     onEditDietIntake, 
@@ -72,7 +75,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
-    const activePlan = NUTRITION_PLANS_DATA.find(p => p.isActive && !p.isTemplate);
     const dateKey = new Date(selectedDate.getTime() - (selectedDate.getTimezoneOffset() * 60000)).toISOString().split('T')[0];
     const itemsForDate = additionalDietItems.filter(item => item.date === dateKey);
 
@@ -237,21 +239,21 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
             return (
                  <div className="p-4 space-y-4">
                     {latestMeasurement ? (
-                        <div key={latestMeasurement.id} className="bg-[#F3EADF] p-4 rounded-lg text-zinc-800">
+                        <div key={latestMeasurement.id} className="bg-zinc-900 p-4 rounded-lg text-zinc-200 border border-zinc-800">
                             <div className="flex justify-between items-start mb-2">
                                 <div>
                                     <h3 className="font-bold text-lg">Measurements</h3>
                                     {tagText && (
-                                        <div className="text-xs text-zinc-500 font-medium mt-1 bg-zinc-800/10 px-2 py-0.5 rounded-full inline-block">
+                                        <div className="text-xs text-zinc-400 font-medium mt-1 bg-zinc-800/50 px-2 py-0.5 rounded-full inline-block">
                                             {tagText}
                                         </div>
                                     )}
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    <button onClick={() => onAddMeasurement(selectedDate)} className="p-2 text-zinc-600 hover:text-black rounded-full hover:bg-black/10 transition-colors" aria-label="Edit measurements">
+                                    <button onClick={() => onAddMeasurement(selectedDate)} className="p-2 text-zinc-400 hover:text-amber-400 rounded-full hover:bg-zinc-800 transition-colors" aria-label="Edit measurements">
                                         <Icon type="pencil" className="w-5 h-5" />
                                     </button>
-                                    <button onClick={() => onDeleteMeasurement(latestMeasurement.id)} className="p-2 text-zinc-600 hover:text-black rounded-full hover:bg-black/10 transition-colors" aria-label="Delete measurements">
+                                    <button onClick={() => onDeleteMeasurement(latestMeasurement.id)} className="p-2 text-zinc-400 hover:text-amber-400 rounded-full hover:bg-zinc-800 transition-colors" aria-label="Delete measurements">
                                         <Icon type="trash" className="w-5 h-5" />
                                     </button>
                                 </div>
@@ -262,8 +264,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                                     const config = measurementLabels[key];
                                     if (!config) return null;
                                     return (
-                                        <div key={key} className="flex justify-between border-b border-zinc-300 py-1">
-                                            <span className="text-sm text-zinc-600">{config.label}</span>
+                                        <div key={key} className="flex justify-between border-b border-zinc-700 py-1">
+                                            <span className="text-sm text-zinc-400">{config.label}</span>
                                             <span className="font-semibold">{value} {config.unit}</span>
                                         </div>
                                     );
@@ -398,21 +400,23 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                             </button>
                         </div>
                     </div>
-                    <div className="flex items-center justify-center space-x-4">
-                        <button onClick={handlePrevDay} className="p-2 rounded-full hover:bg-zinc-800 transition-colors" aria-label="Previous day">
-                            <Icon type="arrow-left" className="w-5 h-5 text-zinc-400"/>
-                        </button>
-                        <button
-                            onClick={() => setIsCalendarOpen(true)}
-                            className="text-lg font-semibold text-amber-400 min-w-[180px] text-center hover:bg-zinc-800/50 rounded-md py-1 transition-colors"
-                        >
-                            {formatDate(selectedDate)}
-                        </button>
-                        <button onClick={handleNextDay} className="p-2 rounded-full hover:bg-zinc-800 transition-colors" aria-label="Next day">
-                            <Icon type="arrow-right" className="w-5 h-5 text-zinc-400"/>
-                        </button>
-                    </div>
                 </header>
+                
+                {/* Date Navigator */}
+                <div className="flex items-center justify-center space-x-4 px-4 pb-4">
+                    <button onClick={handlePrevDay} className="p-2 rounded-full hover:bg-zinc-800 transition-colors" aria-label="Previous day">
+                        <Icon type="arrow-left" className="w-5 h-5 text-zinc-400"/>
+                    </button>
+                    <button
+                        onClick={() => setIsCalendarOpen(true)}
+                        className="text-lg font-semibold text-amber-400 min-w-[180px] text-center hover:bg-zinc-800/50 rounded-md py-1 transition-colors"
+                    >
+                        {formatDate(selectedDate)}
+                    </button>
+                    <button onClick={handleNextDay} className="p-2 rounded-full hover:bg-zinc-800 transition-colors" aria-label="Next day">
+                        <Icon type="arrow-right" className="w-5 h-5 text-zinc-400"/>
+                    </button>
+                </div>
 
                 {/* Sub-navigation */}
                 <div className="border-b border-zinc-800 px-4">

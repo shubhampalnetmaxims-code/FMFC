@@ -1,5 +1,6 @@
 
 
+
 import type { NavItemType, Community, User, UserRole, File, NutritionPlan, ChallengeTask } from './types';
 
 interface NavItem {
@@ -71,20 +72,20 @@ export const NUTRITION_PLANS_DATA: NutritionPlan[] = [
             {
                 mealTime: "M1",
                 items: [
-                    { name: "Chicken", quantity: 10, calories: 2870 },
+                    { id: '1-0-0', name: "Chicken", quantity: 10, calories: 2870 },
                 ],
             },
             {
                 mealTime: "M2",
                 items: [
-                    { name: "70g Tuna, canned in brine, plain, drained", quantity: 2, calories: 165 },
-                    { name: "Rice, white, Basmati, boiled, undrained", quantity: 7, calories: 9.03 },
+                    { id: '1-1-0', name: "70g Tuna, canned in brine, plain, drained", quantity: 2, calories: 165 },
+                    { id: '1-1-1', name: "Rice, white, Basmati, boiled, undrained", quantity: 7, calories: 9.03 },
                 ],
             },
             {
                 mealTime: "M3",
                 items: [
-                    { name: "250mL Almond and coconut milk blend, sugar-sweetened, fortified Ca and vitamins B1, B2 & B12", quantity: 2, calories: 134 },
+                    { id: '1-2-0', name: "250mL Almond and coconut milk blend, sugar-sweetened, fortified Ca and vitamins B1, B2 & B12", quantity: 2, calories: 134 },
                 ],
             },
         ],
@@ -108,26 +109,26 @@ export const NUTRITION_PLANS_DATA: NutritionPlan[] = [
              {
                 mealTime: "Breakfast",
                 items: [
-                    { name: "Oatmeal with berries and nuts", quantity: 1, calories: 450 },
+                    { id: '101-0-0', name: "Oatmeal with berries and nuts", quantity: 1, calories: 450 },
                 ],
             },
             {
                 mealTime: "Lunch",
                 items: [
-                    { name: "Grilled Chicken Salad with vinaigrette", quantity: 1, calories: 600 },
+                    { id: '101-1-0', name: "Grilled Chicken Salad with vinaigrette", quantity: 1, calories: 600 },
                 ],
             },
             {
                 mealTime: "Dinner",
                 items: [
-                    { name: "Salmon with Quinoa and Steamed Broccoli", quantity: 1, calories: 750 },
+                    { id: '101-2-0', name: "Salmon with Quinoa and Steamed Broccoli", quantity: 1, calories: 750 },
                 ],
             },
             {
                 mealTime: "Snacks",
                 items: [
-                    { name: "Greek Yogurt", quantity: 1, calories: 200 },
-                    { name: "Apple with Peanut Butter", quantity: 1, calories: 200 },
+                    { id: '101-3-0', name: "Greek Yogurt", quantity: 1, calories: 200 },
+                    { id: '101-3-1', name: "Apple with Peanut Butter", quantity: 1, calories: 200 },
                 ],
             },
         ],
@@ -151,31 +152,31 @@ export const NUTRITION_PLANS_DATA: NutritionPlan[] = [
              {
                 mealTime: "Meal 1",
                 items: [
-                    { name: "Scrambled Eggs with whole wheat toast", quantity: 4, calories: 500 },
+                    { id: '102-0-0', name: "Scrambled Eggs with whole wheat toast", quantity: 4, calories: 500 },
                 ],
             },
             {
                 mealTime: "Meal 2",
                 items: [
-                    { name: "Chicken Breast with Brown Rice", quantity: 1, calories: 600 },
+                    { id: '102-1-0', name: "Chicken Breast with Brown Rice", quantity: 1, calories: 600 },
                 ],
             },
             {
                 mealTime: "Meal 3 (Post-Workout)",
                 items: [
-                    { name: "Whey Protein Shake", quantity: 1, calories: 300 },
+                    { id: '102-2-0', name: "Whey Protein Shake", quantity: 1, calories: 300 },
                 ],
             },
              {
                 mealTime: "Meal 4",
                 items: [
-                    { name: "Steak with Sweet Potato and Asparagus", quantity: 1, calories: 800 },
+                    { id: '102-3-0', name: "Steak with Sweet Potato and Asparagus", quantity: 1, calories: 800 },
                 ],
             },
             {
                 mealTime: "Meal 5",
                 items: [
-                     { name: "Cottage Cheese with Almonds", quantity: 1, calories: 400 },
+                     { id: '102-4-0', name: "Cottage Cheese with Almonds", quantity: 1, calories: 400 },
                 ],
             },
         ],

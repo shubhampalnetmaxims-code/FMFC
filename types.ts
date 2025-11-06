@@ -115,6 +115,7 @@ export interface Community {
 // --- Nutrition Plan Types ---
 
 export interface FoodItem {
+  id: string;
   name: string;
   quantity: number;
   calories: number;

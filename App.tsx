@@ -1,7 +1,6 @@
 
 
 
-
 import React, { useState, useEffect, useMemo } from 'react';
 import BottomNav from './components/BottomNav';
 import CommunityPage from './pages/CommunityPage';
@@ -9,7 +8,7 @@ import UnderDevelopmentPage from './pages/UnderDevelopmentPage';
 import LoginPage from './pages/LoginPage';
 // FIX: Corrected typo from DAILY_CHallenge_TASKS to DAILY_CHALLENGE_TASKS.
 import { NAV_ITEMS, NUTRITION_PLANS_DATA, LEADERBOARD_DATA, TEST_USER, TASK_POINTS, COMMUNITIES_DATA, USERS_DATA, DAILY_CHALLENGE_TASKS } from './constants';
-import { NavItemType, User, NutritionPlan, DietIntakeItem, UserNote, UserMeasurement, UserPhoto, Community, ChannelType, Post, ChatMessage, Channel, ChallengeTask } from './types';
+import { NavItemType, User, NutritionPlan, DietIntakeItem, UserNote, UserMeasurement, UserPhoto, Community, ChannelType, Post, ChatMessage, Channel, ChallengeTask, MealEntry, FoodItem } from './types';
 import SideMenu from './components/SideMenu';
 import ProfilePage from './pages/ProfilePage';
 import NutritionPage from './pages/NutritionPage';
@@ -28,10 +27,13 @@ import ComparePhotosPage from './pages/ComparePhotosPage';
 import ComparisonResultPage from './pages/ComparisonResultPage';
 import ShareComparisonPage from './pages/ShareComparisonPage';
 import ShareTasksPage from './pages/ShareTasksPage';
+import JournalPage from './pages/JournalPage';
+import AskAiPage from './pages/AskAiPage';
+import AddPlanFoodItemPage from './pages/AddPlanFoodItemPage';
 
 const App: React.FC = () => {
     const { addToast } = useToast();
-    const [activeTab, setActiveTab] = useState<NavItemType>('Goals');
+    const [activeTab, setActiveTab] = useState<NavItemType>('Profile');
     const [currentUser, setCurrentUser] = useState<User | null>(null);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [currentSecondaryPage, setCurrentSecondaryPage] = useState<string | null>(null);
@@ -62,6 +64,17 @@ const App: React.FC = () => {
     const [checkedNutritionItems, setCheckedNutritionItems] = useState<Record<string, Set<string>>>({}); // key: 'YYYY-MM-DD', value: Set<itemId>
     const [isViewingLeaderboard, setIsViewingLeaderboard] = useState(false);
     const [isViewingMyStats, setIsViewingMyStats] = useState(false);
+
+    // AI Flow State
+    const [isAskingAi, setIsAskingAi] = useState(false);
+
+    // Lifted Nutrition Plans state
+    const [nutritionPlans, setNutritionPlans] = useState<NutritionPlan[]>(NUTRITION_PLANS_DATA);
+    const activePlan = useMemo(() => nutritionPlans.find(p => p.isActive && !p.isTemplate), [nutritionPlans]);
+    const [editingPlanFoodItem, setEditingPlanFoodItem] = useState<{ planId: number; mealTime: string; item?: FoodItem } | null>(null);
+    
+    // Ensures mock data is only generated once per login
+    const [isHistoryInitialized, setIsHistoryInitialized] = useState(false);
 
     // STATE LIFTED FROM CommunityPage
     const [communities, setCommunities] = useState<Community[]>(COMMUNITIES_DATA);
@@ -100,63 +113,119 @@ const App: React.FC = () => {
     useEffect(() => {
         // This runs only once on initial load to create some mock history
         const initializeMockHistory = () => {
-            if (Object.keys(completedTasks).length === 0) {
-                const mockCompleted: Record<string, Set<string>> = {};
-                const today = new Date();
+            const today = new Date();
+            
+             // --- MOCK STREAK DATA ---
+            const mockCompleted: Record<string, Set<string>> = {};
+            // Go back 5 days to create a streak
+            for (let i = 1; i <= 5; i++) {
+                const pastDate = new Date(today);
+                pastDate.setDate(today.getDate() - i);
+                const dateKey = pastDate.toISOString().split('T')[0];
+                const completedTasksForDay = new Set<string>();
+                DAILY_CHALLENGE_TASKS.forEach(task => completedTasksForDay.add(task.id));
+                mockCompleted[dateKey] = completedTasksForDay;
+            }
+             // Add some random older completed days
+            for (let i = 7; i <= 10; i++) {
+                const pastDate = new Date(today);
+                pastDate.setDate(today.getDate() - i);
+                const dateKey = pastDate.toISOString().split('T')[0];
+                const completedTasksForDay = new Set<string>();
+                DAILY_CHALLENGE_TASKS.forEach(task => {
+                    if (Math.random() > 0.5) {
+                        completedTasksForDay.add(task.id);
+                    }
+                });
+                mockCompleted[dateKey] = completedTasksForDay;
+            }
+            setCompletedTasks(mockCompleted);
+            
+            // --- GENERATE RICH MOCK JOURNAL DATA for the last 20 days ---
+            const mockPhotos: UserPhoto[] = [];
+            const mockMeasurements: UserMeasurement[] = [];
+            const mockNotes: UserNote[] = [];
+            const mockCheckedNutrition: Record<string, Set<string>> = {};
+            const MOCK_NOTE_CONTENT = [
+                "Felt strong today, hit a new PR on squats!",
+                "Feeling a bit tired, need to focus on sleep.",
+                "Meal prep for the week is done! Feeling prepared.",
+                "Tried a new pre-workout, felt great.",
+                "Cardio was tough but pushed through.",
+                "Great workout session with the crew.",
+                "Feeling bloated. Need to watch my sodium.",
+                "Focused on form today. Lighter weight but better reps.",
+            ];
 
-                // Go back 5 days to create a streak
-                for (let i = 1; i <= 5; i++) {
-                    const pastDate = new Date(today);
-                    pastDate.setDate(today.getDate() - i);
-                    const dateKey = pastDate.toISOString().split('T')[0];
-                    
-                    const completedTasksForDay = new Set<string>();
-                    // FIX: Corrected typo from DAILY_CHallenge_TASKS to DAILY_CHALLENGE_TASKS.
-                    DAILY_CHALLENGE_TASKS.forEach(task => completedTasksForDay.add(task.id));
-                    mockCompleted[dateKey] = completedTasksForDay;
+            for (let i = 20; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(today.getDate() - i);
+                const dateKey = date.toISOString().split('T')[0];
+
+                // Add measurements every 3 days
+                if (i % 3 === 0) {
+                    mockMeasurements.push({
+                        id: `m${i}`, date: dateKey,
+                        weight: 80 - (i / 4), // steady decrease
+                        waist: 34 - (i / 10),
+                        bodyfat: 15 - (i / 8),
+                    });
                 }
 
-                for (let i = 7; i <= 10; i++) {
-                    const pastDate = new Date(today);
-                    pastDate.setDate(today.getDate() - i);
-                    const dateKey = pastDate.toISOString().split('T')[0];
-                    const completedTasksForDay = new Set<string>();
-                    // FIX: Corrected typo from DAILY_CHallenge_TASKS to DAILY_CHALLENGE_TASKS.
-                    DAILY_CHALLENGE_TASKS.forEach(task => {
+                // Add photos every 4 days
+                if (i % 4 === 0) {
+                     mockPhotos.push({
+                        id: `p${i}-front`, src: `https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=600&h=800&fit=crop&crop=faces&seed=front${i}`,
+                        type: 'Front', date: dateKey, description: `Progress check, day ${20 - i}.`
+                    });
+                     mockPhotos.push({
+                        id: `p${i}-side`, src: `https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=600&h=800&fit=crop&crop=faces&seed=side${i}`,
+                        type: 'Side', date: dateKey, description: `Side view, feeling leaner.`
+                    });
+                }
+                
+                // Add a gym photo every 5 days
+                if (i % 5 === 1) {
+                    mockPhotos.push({
+                         id: `p${i}-gym`, src: `https://images.unsplash.com/photo-1599058917212-d750089bc07e?q=80&w=600&h=800&fit=crop&crop=faces&seed=gym${i}`,
+                         type: 'Workout', date: dateKey, description: `Post-workout pump! Great session today.`
+                    });
+                }
+                
+                // Add notes randomly
+                if (Math.random() > 0.6) {
+                    mockNotes.push({
+                        id: `n${i}`, date: dateKey,
+                        content: MOCK_NOTE_CONTENT[Math.floor(Math.random() * MOCK_NOTE_CONTENT.length)]
+                    });
+                }
+                
+                // Track nutrition items
+                if (activePlan) {
+                    const checkedForDay = new Set<string>();
+                    const planItems = activePlan.content.flatMap(m => m.items);
+                    planItems.forEach(item => {
+                        // Check off between 50% and 100% of items
                         if (Math.random() > 0.5) {
-                            completedTasksForDay.add(task.id);
+                            checkedForDay.add(item.id);
                         }
                     });
-                    mockCompleted[dateKey] = completedTasksForDay;
+                    mockCheckedNutrition[dateKey] = checkedForDay;
                 }
-                setCompletedTasks(mockCompleted);
             }
 
-            if (userPhotos.length === 0) {
-                const today = new Date();
-                const dates = Array.from({ length: 5 }, (_, i) => {
-                    const d = new Date(today);
-                    d.setDate(today.getDate() - (i * 5));
-                    return d.toISOString().split('T')[0];
-                });
-
-                const mockPhotos: UserPhoto[] = [
-                    { id: 'p1', src: 'https://images.unsplash.com/photo-1549476464-373922117584?q=80&w=600&h=800&fit=crop&crop=faces&seed=front1', type: 'Front', date: dates[4], description: 'Starting point, feeling motivated.' },
-                    { id: 'p2', src: 'https://images.unsplash.com/photo-1577221084712-45b044c6dbb6?q=80&w=600&h=800&fit=crop&crop=faces&seed=side1', type: 'Side', date: dates[4], description: 'Side view, first day.' },
-                    { id: 'p3', src: 'https://images.unsplash.com/photo-1549476464-373922117584?q=80&w=600&h=800&fit=crop&crop=faces&seed=front2', type: 'Front', date: dates[2], description: '10 days in, seeing some changes.' },
-                    { id: 'p4', src: 'https://images.unsplash.com/photo-1577221084712-45b044c6dbb6?q=80&w=600&h=800&fit=crop&crop=faces&seed=side2', type: 'Side', date: dates[2], description: 'Side view, posture is better.' },
-                    { id: 'p5', src: 'https://images.unsplash.com/photo-1550345332-09e3ac987658?q=80&w=600&h=800&fit=crop&crop=faces&seed=back1', type: 'Back', date: dates[2], description: 'Back progress.' },
-                    { id: 'p6', src: 'https://images.unsplash.com/photo-1549476464-373922117584?q=80&w=600&h=800&fit=crop&crop=faces&seed=front3', type: 'Front', date: dates[0], description: 'Today! Feeling great.' },
-                    { id: 'p7', src: 'https://images.unsplash.com/photo-1577221084712-45b044c6dbb6?q=80&w=600&h=800&fit=crop&crop=faces&seed=side3', type: 'Side', date: dates[0], description: 'Final side view for comparison.' },
-                ];
-                setUserPhotos(mockPhotos.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
-            }
+            setUserPhotos(mockPhotos.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+            setUserMeasurements(mockMeasurements.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+            setUserNotes(mockNotes.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+            setCheckedNutritionItems(mockCheckedNutrition);
+            
+            setIsHistoryInitialized(true);
         };
 
-        if (currentUser) {
+        if (currentUser && !isHistoryInitialized) {
             initializeMockHistory();
         }
-    }, [currentUser, completedTasks, userPhotos]);
+    }, [currentUser, isHistoryInitialized, activePlan]);
 
 
     const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
@@ -164,6 +233,7 @@ const App: React.FC = () => {
     const handleSignOut = () => {
         setIsMenuOpen(false);
         setCurrentUser(null);
+        setIsHistoryInitialized(false); // Reset for next login
     };
 
     const handleSideMenuNavigate = (pageName: string) => {
@@ -187,6 +257,35 @@ const App: React.FC = () => {
     const handleBackFromPlanDetails = () => {
         setViewingNutritionPlan(null);
     }
+
+    const handleActivatePlan = (planId: number) => {
+        const template = nutritionPlans.find(p => p.id === planId && p.isTemplate);
+        if (!template) {
+            addToast('Template plan not found.', 'error');
+            return;
+        }
+    
+        // Create a new active plan from the template
+        const newActivePlan: NutritionPlan = {
+            ...template,
+            id: Date.now(), // New unique ID
+            isTemplate: false,
+            isActive: true,
+        };
+    
+        setNutritionPlans(prevPlans => {
+            // Deactivate all other plans and filter out old active plans that were based on the same template
+            const updatedPlans = prevPlans
+                .map(p => ({ ...p, isActive: false }));
+            
+            // Add the new active plan
+            return [...updatedPlans, newActivePlan];
+        });
+    
+        addToast(`'${template.name}' is now your active plan!`, 'success');
+        setCurrentSecondaryPage(null); // Go back to profile to see the change
+        setActiveTab('Profile');
+    };
 
     const handleOpenAddDietIntake = (date: Date) => {
         setEditingDietIntake(null);
@@ -220,6 +319,100 @@ const App: React.FC = () => {
     
     const handleDeleteDietIntake = (itemId: string) => {
         setAdditionalDietItems(prevItems => prevItems.filter(i => i.id !== itemId));
+    };
+
+    // --- CRUD for Food Items within a Nutrition Plan ---
+    const handleOpenAddPlanFoodItem = (planId: number, mealTime: string) => {
+        setEditingPlanFoodItem({ planId, mealTime, item: undefined });
+    };
+
+    const handleOpenEditPlanFoodItem = (planId: number, mealTime: string, item: FoodItem) => {
+        setEditingPlanFoodItem({ planId, mealTime, item });
+    };
+
+    const handleClosePlanFoodItem = () => {
+        setEditingPlanFoodItem(null);
+    };
+
+    const calculatePlanTotals = (content: MealEntry[]) => {
+        const newEnergyTotal = content.flatMap(m => m.items).reduce((sum, item) => sum + (item.calories || 0), 0);
+        return newEnergyTotal;
+    };
+
+    const handleSavePlanFoodItem = (newItemData: { name: string, quantity: number, calories: number }) => {
+        if (!editingPlanFoodItem) return;
+
+        const { planId, mealTime, item: originalItem } = editingPlanFoodItem;
+
+        setNutritionPlans(prevPlans => {
+            const newPlans = prevPlans.map(plan => {
+                if (plan.id === planId) {
+                    const newContent = plan.content.map(meal => {
+                        if (meal.mealTime === mealTime) {
+                            if (originalItem) { // Editing
+                                const updatedItems = meal.items.map(i =>
+                                    i.id === originalItem.id ? { ...i, ...newItemData } : i
+                                );
+                                return { ...meal, items: updatedItems };
+                            } else { // Adding
+                                const newItem: FoodItem = {
+                                    id: Date.now().toString(),
+                                    ...newItemData,
+                                };
+                                return { ...meal, items: [...meal.items, newItem] };
+                            }
+                        }
+                        return meal;
+                    });
+
+                    const newEnergyTotal = calculatePlanTotals(newContent);
+                    const newTotals = { ...plan.totals, energy: newEnergyTotal };
+                    const updatedPlan = { ...plan, content: newContent, totals: newTotals };
+                    
+                    // Also update the currently viewed plan to see changes instantly
+                    if (viewingNutritionPlan?.id === planId) {
+                        setViewingNutritionPlan(updatedPlan);
+                    }
+                    
+                    return updatedPlan;
+                }
+                return plan;
+            });
+            return newPlans;
+        });
+
+        addToast(originalItem ? 'Food item updated!' : 'Food item added to plan!', 'success');
+        handleClosePlanFoodItem();
+    };
+
+    const handleDeletePlanFoodItem = (planId: number, mealTime: string, itemId: string) => {
+        if (!window.confirm('Are you sure you want to permanently delete this item from the plan?')) return;
+    
+        setNutritionPlans(prevPlans => {
+            return prevPlans.map(plan => {
+                if (plan.id === planId) {
+                    const newContent = plan.content.map(meal => {
+                        if (meal.mealTime === mealTime) {
+                            const updatedItems = meal.items.filter(i => i.id !== itemId);
+                            return { ...meal, items: updatedItems };
+                        }
+                        return meal;
+                    });
+    
+                    const newEnergyTotal = calculatePlanTotals(newContent);
+                    const newTotals = { ...plan.totals, energy: newEnergyTotal };
+                    const updatedPlan = { ...plan, content: newContent, totals: newTotals };
+    
+                    if (viewingNutritionPlan?.id === planId) {
+                        setViewingNutritionPlan(updatedPlan);
+                    }
+    
+                    return updatedPlan;
+                }
+                return plan;
+            });
+        });
+        addToast('Food item removed from plan.', 'info');
     };
 
     const handleOpenAddNote = (date: Date) => {
@@ -298,18 +491,39 @@ const App: React.FC = () => {
 
     const handleSaveMeasurement = (data: Omit<UserMeasurement, 'id'>) => {
         const { date, ...measurementData } = data;
-
+        const isEditing = editingMeasurement && editingMeasurement.id;
+    
         const conflictingMeasurement = userMeasurements.find(m => m.date === date && m.id !== editingMeasurement?.id);
+    
         if (conflictingMeasurement) {
-            addToast("A measurement entry for this date already exists. Please choose a different date or edit the existing entry.", 'error');
-            return;
-        }
-
-        if (editingMeasurement && editingMeasurement.id) {
+            if (isEditing) {
+                // User is editing an entry and changed its date to one that's already occupied.
+                // We'll update the destination entry with the new data, and remove the original source entry.
+                // This effectively "moves" and overwrites in one step.
+                addToast(`Updated measurements for ${date}.`, 'info');
+    
+                const updatedDataForConflict = { ...conflictingMeasurement, ...measurementData, date };
+                
+                setUserMeasurements(prev => {
+                    // Remove the original entry that was being edited.
+                    const withoutOriginal = prev.filter(m => m.id !== editingMeasurement.id);
+                    // Find the conflicting entry in the filtered list and update it.
+                    return withoutOriginal.map(m => m.id === conflictingMeasurement.id ? updatedDataForConflict : m)
+                         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+                });
+    
+            } else {
+                // User is trying to ADD a new entry on a date that already has one.
+                addToast("A measurement entry for this date already exists. Please choose a different date or edit the existing entry.", 'error');
+                return;
+            }
+        } else if (isEditing) {
+            // Standard update: editing an entry without changing its date to a conflicting one.
             const updatedMeasurement: UserMeasurement = { ...editingMeasurement, ...measurementData, date };
             setUserMeasurements(prev => prev.map(m => m.id === editingMeasurement.id ? updatedMeasurement : m)
                 .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
         } else {
+            // Standard add: creating a new entry on an empty date.
             const newMeasurement: UserMeasurement = { id: Date.now().toString(), date, ...measurementData };
             setUserMeasurements(prev => [newMeasurement, ...prev]
                 .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
@@ -326,7 +540,7 @@ const App: React.FC = () => {
                 return newCompleted;
             });
         }
-
+    
         handleCloseAddMeasurement();
     };
     
@@ -448,7 +662,6 @@ const App: React.FC = () => {
         });
     };
     
-    const activePlan = NUTRITION_PLANS_DATA.find(p => p.isActive && !p.isTemplate);
     useEffect(() => {
         if (!activePlan) return;
 
@@ -502,7 +715,7 @@ const App: React.FC = () => {
     const handleBackFromMyStats = () => {
         setIsViewingMyStats(false);
     };
-    
+
     // Points calculation logic
     const currentUserTotalPoints = useMemo(() => {
         // FIX: Correctly type the results of Object.values() to resolve errors in the reduce function.
@@ -834,8 +1047,38 @@ const App: React.FC = () => {
         handleCloseShareComparison();
     };
 
+    // --- AI Flow Handlers ---
+    const handleOpenAskAi = () => setIsAskingAi(true);
+    const handleCloseAskAi = () => setIsAskingAi(false);
+    const handleSaveAiPlan = (plan: NutritionPlan) => {
+        setNutritionPlans(prev => [...prev, plan]);
+        addToast('New nutrition plan saved as template!', 'success');
+        handleCloseAskAi();
+        handleSideMenuNavigate('My Nutrition Plans');
+    };
+
 
     const renderPage = () => {
+        if (editingPlanFoodItem) {
+            return <AddPlanFoodItemPage
+                onClose={handleClosePlanFoodItem}
+                onSave={handleSavePlanFoodItem}
+                initialData={editingPlanFoodItem.item}
+                mealTime={editingPlanFoodItem.mealTime}
+            />;
+        }
+
+        if (isAskingAi) {
+            return <AskAiPage
+                onClose={handleCloseAskAi}
+                userMeasurements={userMeasurements}
+                additionalDietItems={additionalDietItems}
+                activePlan={activePlan}
+                checkedNutritionItems={checkedNutritionItems}
+                onSavePlan={handleSaveAiPlan}
+            />;
+        }
+
         if (sharingTasksData) {
             return <ShareTasksPage
                 currentUser={currentUser!}
@@ -939,18 +1182,45 @@ const App: React.FC = () => {
         }
 
         if (viewingNutritionPlan) {
-            return <NutritionPlanDetailsPage plan={viewingNutritionPlan} onBack={handleBackFromPlanDetails} />;
+            const isActivePlan = viewingNutritionPlan.id === activePlan?.id;
+            return <NutritionPlanDetailsPage 
+                        plan={viewingNutritionPlan} 
+                        onBack={handleBackFromPlanDetails}
+                        isEditable={isActivePlan}
+                        onAddItemToMeal={(mealTime) => handleOpenAddPlanFoodItem(viewingNutritionPlan.id, mealTime)}
+                        onEditItem={(mealTime, item) => handleOpenEditPlanFoodItem(viewingNutritionPlan.id, mealTime, item)}
+                        onDeleteItem={(mealTime, itemId) => handleDeletePlanFoodItem(viewingNutritionPlan.id, mealTime, itemId)}
+                   />;
         }
         
         if (currentSecondaryPage) {
             if (currentSecondaryPage === 'My Nutrition Plans') {
-                return <NutritionPage onBack={handleBackFromSecondaryPage} />;
+                return <NutritionPage 
+                            plans={nutritionPlans} 
+                            onBack={handleBackFromSecondaryPage} 
+                            onViewPlan={handleViewNutritionPlan}
+                            onActivatePlan={handleActivatePlan}
+                       />;
             }
-            const showBackButton = currentSecondaryPage === 'Progress';
+            if (currentSecondaryPage === 'Progress') {
+                 return <JournalPage
+                    onBack={handleBackFromSecondaryPage}
+                    userPhotos={userPhotos}
+                    userMeasurements={userMeasurements}
+                    userNotes={userNotes}
+                    additionalDietItems={additionalDietItems}
+                    activePlan={activePlan}
+                    checkedNutritionItems={checkedNutritionItems}
+                    onToggleNutritionItem={handleToggleNutritionItem}
+                    onEditDietIntake={handleOpenEditDietIntake}
+                    onDeleteDietIntake={handleDeleteDietIntake}
+                    onAskAi={handleOpenAskAi}
+                />;
+            }
             return <UnderDevelopmentPage 
                         pageName={currentSecondaryPage} 
                         onMenuClick={toggleMenu} 
-                        onBack={showBackButton ? handleBackFromSecondaryPage : undefined} 
+                        onBack={handleBackFromSecondaryPage} 
                     />;
         }
 
@@ -984,6 +1254,7 @@ const App: React.FC = () => {
                             currentUser={currentUser!}
                             onNavigate={handleSideMenuNavigate}
                             onMenuClick={toggleMenu}
+                            activePlan={activePlan}
                             onViewPlan={handleViewNutritionPlan}
                             onAddDietIntake={handleOpenAddDietIntake}
                             onEditDietIntake={handleOpenEditDietIntake}

@@ -1,23 +1,27 @@
 
+
+
 import React from 'react';
-import type { NutritionPlan } from '../types';
+import type { NutritionPlan, FoodItem } from '../types';
 import Icon from '../components/Icon';
-import { useToast } from '../components/ToastProvider';
 
 interface NutritionPlanDetailsPageProps {
     plan: NutritionPlan;
     onBack: () => void;
+    isEditable: boolean;
+    onAddItemToMeal: (mealTime: string) => void;
+    onEditItem: (mealTime: string, item: FoodItem) => void;
+    onDeleteItem: (mealTime: string, itemId: string) => void;
 }
 
-const NutritionPlanDetailsPage: React.FC<NutritionPlanDetailsPageProps> = ({ plan, onBack }) => {
-    const { addToast } = useToast();
+const NutritionPlanDetailsPage: React.FC<NutritionPlanDetailsPageProps> = ({ plan, onBack, isEditable, onAddItemToMeal, onEditItem, onDeleteItem }) => {
 
     const Card: React.FC<{title: string, children: React.ReactNode, hasMenu?: boolean}> = ({title, children, hasMenu}) => (
-        <div className="bg-[#F3EADF] p-4 sm:p-6 rounded-2xl shadow-md text-zinc-800">
+        <div className="bg-zinc-900 border border-zinc-800 p-4 sm:p-6 rounded-2xl shadow-md text-zinc-200">
              <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-bold">{title}</h3>
-                {hasMenu && (
-                    <button className="text-zinc-500 hover:text-zinc-800 p-1 -mr-2">
+                {hasMenu && isEditable && (
+                    <button className="text-zinc-500 hover:text-zinc-300 p-1 -mr-2">
                         <Icon type="dots-horizontal" className="w-6 h-6"/>
                     </button>
                 )}
@@ -27,17 +31,20 @@ const NutritionPlanDetailsPage: React.FC<NutritionPlanDetailsPageProps> = ({ pla
     );
     
     return (
-        <div className="h-full flex flex-col bg-zinc-900 relative">
+        <div className="h-full flex flex-col bg-zinc-950 relative">
             <header className="sticky top-0 bg-zinc-950/80 backdrop-blur-sm z-10 p-4 flex items-center">
                  <button onClick={onBack} className="mr-4 text-zinc-400 hover:text-zinc-200">
                     <Icon type="arrow-left" />
                 </button>
                 <h1 className="text-xl font-bold text-zinc-100">{plan.name}</h1>
+                 {plan.isActive && !plan.isTemplate && (
+                    <span className="ml-3 text-xs font-bold bg-amber-400 text-black px-2 py-0.5 rounded-full">ACTIVE</span>
+                 )}
             </header>
             
             <main className="flex-grow overflow-y-auto p-4 space-y-6">
                 <Card title="Notes" hasMenu>
-                    <p className="text-zinc-600">{plan.notes}</p>
+                    <p className="text-zinc-400">{plan.notes}</p>
                 </Card>
                 
                 <Card title="Nutrition totals">
@@ -53,7 +60,7 @@ const NutritionPlanDetailsPage: React.FC<NutritionPlanDetailsPageProps> = ({ pla
                             };
                             return (
                                 <div key={key} className="flex justify-between items-baseline">
-                                    <p className="capitalize text-zinc-600">{key}</p>
+                                    <p className="capitalize text-zinc-400">{key}</p>
                                     <p className="font-semibold text-lg">{value.toLocaleString()} {units[key]}</p>
                                 </div>
                             );
@@ -65,36 +72,48 @@ const NutritionPlanDetailsPage: React.FC<NutritionPlanDetailsPageProps> = ({ pla
                     <div className="space-y-6">
                         {plan.content.map((meal, index) => (
                             <div key={index}>
-                                <h4 className="font-bold text-zinc-500 mb-2">{meal.mealTime}</h4>
+                                <div className="flex justify-between items-center">
+                                    <h4 className="font-bold text-zinc-500 mb-2">{meal.mealTime}</h4>
+                                    {isEditable && (
+                                        <button onClick={() => onAddItemToMeal(meal.mealTime)} className="text-xs font-semibold flex items-center space-x-1 text-amber-400 hover:text-amber-300">
+                                            <Icon type="plus" className="w-4 h-4" />
+                                            <span>Add Food</span>
+                                        </button>
+                                    )}
+                                </div>
                                 <div className="space-y-2">
                                     {meal.items.map((item, itemIndex) => (
-                                        <div key={itemIndex} className="flex justify-between items-start">
-                                            <p className="text-zinc-700 pr-4">{item.name}</p>
-                                            <div className="text-right shrink-0">
-                                                <p className="font-semibold">
+                                        <div key={item.id} className="flex justify-between items-center group">
+                                            <div className="pr-4">
+                                                <p className="text-zinc-300 ">{item.name}</p>
+                                                <p className="font-semibold text-sm">
                                                     (x{item.quantity}) {item.calories.toLocaleString(undefined, {
                                                         minimumFractionDigits: 0,
                                                         maximumFractionDigits: 2,
                                                     })} Cal
                                                 </p>
                                             </div>
+                                            {isEditable && (
+                                                <div className="flex items-center shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <button onClick={() => onEditItem(meal.mealTime, item)} className="p-2 text-zinc-400 hover:text-amber-400 rounded-full hover:bg-zinc-800">
+                                                        <Icon type="pencil" className="w-4 h-4" />
+                                                    </button>
+                                                     <button onClick={() => onDeleteItem(meal.mealTime, item.id)} className="p-2 text-zinc-400 hover:text-red-500 rounded-full hover:bg-zinc-800">
+                                                        <Icon type="trash" className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            )}
                                         </div>
                                     ))}
+                                    {meal.items.length === 0 && isEditable && (
+                                        <p className="text-sm text-zinc-600 italic">No items in this meal. Add one!</p>
+                                    )}
                                 </div>
                             </div>
                         ))}
                     </div>
                 </Card>
             </main>
-
-            <button
-                onClick={() => addToast("Adding entries is coming soon!", 'info')}
-                className="absolute bottom-6 right-6 bg-[#FACD83] hover:bg-amber-400 text-black rounded-full p-4 shadow-lg transition-transform hover:scale-105 flex items-center space-x-2"
-                aria-label="Add entry"
-            >
-                <Icon type="plus" className="w-6 h-6" />
-                <span className="font-semibold pr-2">Add entry</span>
-            </button>
         </div>
     );
 };
