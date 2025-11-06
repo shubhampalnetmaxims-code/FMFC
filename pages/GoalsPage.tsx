@@ -1,6 +1,8 @@
 
 
 
+
+
 import React, { useState, useMemo, useEffect } from 'react';
 import Icon from '../components/Icon';
 import { DAILY_CHALLENGE_TASKS, WEEKLY_CHALLENGE_TASKS, TEST_USER, TASK_POINTS } from '../constants';
@@ -26,6 +28,8 @@ interface GoalsPageProps {
     onShareAchievement: (data: { streak: number; pointsEarned: number; }) => void;
     onViewMyStats: () => void;
     onShareTasks: (data: { date: Date; tasks: ChallengeTask[]; completedDaily: Set<string>; completedWeekly: Set<string>; }) => void;
+    onToggleNotifications: () => void;
+    hasUnreadNotifications: boolean;
 }
 
 const GoalItem: React.FC<{
@@ -95,7 +99,7 @@ const GoalItem: React.FC<{
     );
 };
 
-const GoalsPage: React.FC<GoalsPageProps> = ({ onMenuClick, completedTasks, onToggleManualTask, completedWeeklyTasks, onToggleWeeklyTask, onViewLeaderboard, currentUserTotalPoints, currentUserRank, leaderboardData, onShareAchievement, onViewMyStats, onShareTasks }) => {
+const GoalsPage: React.FC<GoalsPageProps> = ({ onMenuClick, completedTasks, onToggleManualTask, completedWeeklyTasks, onToggleWeeklyTask, onViewLeaderboard, currentUserTotalPoints, currentUserRank, leaderboardData, onShareAchievement, onViewMyStats, onShareTasks, onToggleNotifications, hasUnreadNotifications }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [showCongratsModal, setShowCongratsModal] = useState(false);
     const [congratsShownForDate, setCongratsShownForDate] = useState<string | null>(null);
@@ -225,9 +229,9 @@ const GoalsPage: React.FC<GoalsPageProps> = ({ onMenuClick, completedTasks, onTo
                              <button onClick={onViewLeaderboard} className="relative text-zinc-400 hover:text-zinc-200">
                                 <Icon type="users" className="w-6 h-6" />
                             </button>
-                            <button className="relative text-zinc-400 hover:text-zinc-200">
+                            <button onClick={onToggleNotifications} className="relative text-zinc-400 hover:text-zinc-200">
                                 <Icon type="bell" className="w-6 h-6" />
-                                <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-zinc-950"></span>
+                                {hasUnreadNotifications && <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-zinc-950"></span>}
                             </button>
                         </div>
                     </div>

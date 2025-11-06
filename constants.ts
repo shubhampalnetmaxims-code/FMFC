@@ -1,7 +1,9 @@
 
 
 
-import type { NavItemType, Community, User, UserRole, File, NutritionPlan, ChallengeTask } from './types';
+
+
+import type { NavItemType, Community, User, UserRole, File, NutritionPlan, ChallengeTask, Notification } from './types';
 
 interface NavItem {
     id: NavItemType;
@@ -49,6 +51,15 @@ const DUMMY_FILES: File[] = [
     { id: 2, name: 'Strength_Training_Guide.docx', url: '#', size: '876KB', type: 'DOCX' },
     { id: 3, name: 'Monthly_Progress_Tracker.xlsx', url: '#', size: '245KB', type: 'XLSX' },
     { id: 4, name: 'Healthy_Recipes_Vol1.pdf', url: '#', size: '3.5MB', type: 'PDF' },
+];
+
+// --- NOTIFICATIONS DATA ---
+export const NOTIFICATIONS_DATA: Notification[] = [
+    { id: 1, type: 'community', text: 'Alex Fitness posted in #general-posts.', timestamp: '2m ago', isRead: false },
+    { id: 2, type: 'goal', text: 'You completed all daily tasks! +50 points.', timestamp: '1h ago', isRead: false },
+    { id: 3, type: 'mention', text: 'Admin User mentioned you in #support.', timestamp: '3h ago', isRead: false },
+    { id: 4, type: 'like', text: 'GymBro liked your post.', timestamp: '1d ago', isRead: true },
+    { id: 5, type: 'community', text: 'A new challenge #30DaySquatChallenge has started in Barbell Brigade.', timestamp: '2d ago', isRead: true },
 ];
 
 // --- NUTRITION PLANS DATA ---

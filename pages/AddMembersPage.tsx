@@ -7,9 +7,11 @@ import Icon from '../components/Icon';
 interface AddMembersPageProps {
     community: Community;
     onBack: () => void;
+    onToggleNotifications: () => void;
+    hasUnreadNotifications: boolean;
 }
 
-const AddMembersPage: React.FC<AddMembersPageProps> = ({ community, onBack }) => {
+const AddMembersPage: React.FC<AddMembersPageProps> = ({ community, onBack, onToggleNotifications, hasUnreadNotifications }) => {
     const [inviteInput, setInviteInput] = useState('');
     const [showQRCode, setShowQRCode] = useState(false);
     const [linkCopied, setLinkCopied] = useState(false);
@@ -69,9 +71,9 @@ const AddMembersPage: React.FC<AddMembersPageProps> = ({ community, onBack }) =>
                     </button>
                     <h1 className="text-lg font-bold text-zinc-100">Invite Members</h1>
                     <div className="ml-auto">
-                        <button className="relative text-zinc-400 hover:text-zinc-200">
+                        <button onClick={onToggleNotifications} className="relative text-zinc-400 hover:text-zinc-200">
                             <Icon type="bell" className="w-6 h-6" />
-                            <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-zinc-950"></span>
+                            {hasUnreadNotifications && <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-zinc-950"></span>}
                         </button>
                     </div>
                 </header>

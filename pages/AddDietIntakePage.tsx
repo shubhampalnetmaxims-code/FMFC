@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect } from 'react';
 import Icon from '../components/Icon';
 import { DietIntakeItem, FoodSearchItem } from '../types';
@@ -217,15 +216,17 @@ const AddDietIntakePage: React.FC<AddDietIntakePageProps> = ({ onClose, onSave, 
                     </button>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                    <StyledInput
-                        name="meal"
-                        label="Meal"
-                        value={formData.meal}
-                        onChange={handleChange}
-                        placeholder="e.g. Snack, Lunch"
-                    />
-                     <div>
+                <div className="flex gap-3">
+                    <div className="w-1/2">
+                        <StyledInput
+                            name="meal"
+                            label="Meal"
+                            value={formData.meal}
+                            onChange={handleChange}
+                            placeholder="e.g. Snack, Lunch"
+                        />
+                    </div>
+                    <div className="w-1/2">
                         <label className="text-xs text-zinc-400 mb-1 block">Date</label>
                         <div className="bg-zinc-800 border border-zinc-700 rounded-lg flex items-center justify-center text-sm font-semibold cursor-pointer relative text-zinc-200 h-[46px]">
                              {formatDateForDisplay(formData.date)}
@@ -240,33 +241,49 @@ const AddDietIntakePage: React.FC<AddDietIntakePageProps> = ({ onClose, onSave, 
                     </div>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-3">
-                     <StyledInput
-                        name="energy"
-                        type="text"
-                        inputMode="decimal"
-                        value={formData.energy}
-                        onChange={handleNumberChange}
-                        label="Energy (Cal, each)"
-                        placeholder="0"
-                    />
-                    <StyledInput
-                        name="quantity"
-                        type="text"
-                        inputMode="decimal"
-                        value={formData.quantity}
-                        onChange={handleNumberChange}
-                        label="Quantity"
-                        placeholder="0"
-                    />
+                <div className="flex gap-3">
+                     <div className="w-1/2">
+                        <StyledInput
+                            name="energy"
+                            type="text"
+                            inputMode="decimal"
+                            value={formData.energy}
+                            onChange={handleNumberChange}
+                            label="Energy (Cal, each)"
+                            placeholder="0"
+                        />
+                    </div>
+                    <div className="w-1/2">
+                        <StyledInput
+                            name="quantity"
+                            type="text"
+                            inputMode="decimal"
+                            value={formData.quantity}
+                            onChange={handleNumberChange}
+                            label="Quantity"
+                            placeholder="0"
+                        />
+                    </div>
                 </div>
                 
-                <div className="grid grid-cols-3 gap-3">
-                    <StyledInput name="carbohydrates" type="text" inputMode="decimal" label="Carbs (g)" value={formData.carbohydrates} onChange={handleNumberChange} placeholder="0" />
-                    <StyledInput name="proteins" type="text" inputMode="decimal" label="Proteins (g)" value={formData.proteins} onChange={handleNumberChange} placeholder="0" />
-                    <StyledInput name="fats" type="text" inputMode="decimal" label="Fats (g)" value={formData.fats} onChange={handleNumberChange} placeholder="0" />
-                    <StyledInput name="fibre" type="text" inputMode="decimal" label="Fibre (g)" value={formData.fibre} onChange={handleNumberChange} placeholder="0" />
-                    <StyledInput name="water" type="text" inputMode="decimal" label="Water (mL)" value={formData.water} onChange={handleNumberChange} placeholder="0" />
+                <div className="flex gap-3">
+                    <div className="w-1/3">
+                        <StyledInput name="carbohydrates" type="text" inputMode="decimal" label="Carbs (g)" value={formData.carbohydrates} onChange={handleNumberChange} placeholder="0" />
+                    </div>
+                     <div className="w-1/3">
+                        <StyledInput name="proteins" type="text" inputMode="decimal" label="Proteins (g)" value={formData.proteins} onChange={handleNumberChange} placeholder="0" />
+                    </div>
+                     <div className="w-1/3">
+                        <StyledInput name="fats" type="text" inputMode="decimal" label="Fats (g)" value={formData.fats} onChange={handleNumberChange} placeholder="0" />
+                    </div>
+                </div>
+                <div className="flex gap-3">
+                    <div className="w-1/2">
+                        <StyledInput name="fibre" type="text" inputMode="decimal" label="Fibre (g)" value={formData.fibre} onChange={handleNumberChange} placeholder="0" />
+                    </div>
+                    <div className="w-1/2">
+                        <StyledInput name="water" type="text" inputMode="decimal" label="Water (mL)" value={formData.water} onChange={handleNumberChange} placeholder="0" />
+                    </div>
                 </div>
             </main>
         </div>

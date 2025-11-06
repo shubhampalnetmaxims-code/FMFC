@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import Icon from '../components/Icon';
 
@@ -7,9 +8,11 @@ interface UnderDevelopmentPageProps {
     onMenuClick: () => void;
     showHeader?: boolean;
     onBack?: () => void;
+    onToggleNotifications?: () => void;
+    hasUnreadNotifications?: boolean;
 }
 
-const UnderDevelopmentPage: React.FC<UnderDevelopmentPageProps> = ({ pageName, onMenuClick, showHeader = true, onBack }) => {
+const UnderDevelopmentPage: React.FC<UnderDevelopmentPageProps> = ({ pageName, onMenuClick, showHeader = true, onBack, onToggleNotifications, hasUnreadNotifications }) => {
     return (
         <div className="w-full h-full flex flex-col">
              {showHeader && (
@@ -28,9 +31,9 @@ const UnderDevelopmentPage: React.FC<UnderDevelopmentPageProps> = ({ pageName, o
                         </div>
                         <h1 className="text-xl font-bold text-zinc-100 uppercase tracking-wider">{pageName}</h1>
                         <div className="w-8">
-                            <button className="relative text-zinc-400 hover:text-zinc-200">
+                             <button onClick={onToggleNotifications} className="relative text-zinc-400 hover:text-zinc-200">
                                 <Icon type="bell" className="w-6 h-6" />
-                                <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-zinc-950"></span>
+                                {hasUnreadNotifications && <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-zinc-950"></span>}
                             </button>
                         </div>
                     </div>

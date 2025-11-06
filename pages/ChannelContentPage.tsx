@@ -6,6 +6,7 @@ import ChatPane from '../components/ChatPane';
 import MemberListPane from '../components/MemberListPane';
 import CreatePostModal from '../components/CreatePostModal';
 import SupportAdminView from '../components/SupportAdminView';
+import { useToast } from '../components/ToastProvider';
 
 interface ChannelContentPageProps {
     community: Community;
@@ -14,9 +15,12 @@ interface ChannelContentPageProps {
     onBack: () => void;
     onAddPost: (newPostData: Omit<Post, 'id' | 'user' | 'communityId' | 'channelId' | 'likes' | 'commentCount' | 'comments'>) => void;
     onAddChatMessage: (newMsgData: Partial<ChatMessage> & { text: string }) => void;
+    onToggleNotifications: () => void;
+    hasUnreadNotifications: boolean;
 }
 
-const ChannelContentPage: React.FC<ChannelContentPageProps> = ({ community, channelId, currentUser, onBack, onAddPost, onAddChatMessage }) => {
+const ChannelContentPage: React.FC<ChannelContentPageProps> = ({ community, channelId, currentUser, onBack, onAddPost, onAddChatMessage, onToggleNotifications, hasUnreadNotifications }) => {
+    const { addToast } = useToast();
     const [isCreatePostModalOpen, setCreatePostModalOpen] = useState(false);
     const selectedChannel = community.channels.find(c => c.id === channelId)!;
     const isAdmin = community.adminId === currentUser.id;
@@ -24,6 +28,7 @@ const ChannelContentPage: React.FC<ChannelContentPageProps> = ({ community, chan
     const handlePostSubmit = (postData: {description: string, hashtags: string[], image?: string, video?: string}) => {
         onAddPost(postData);
         setCreatePostModalOpen(false);
+        addToast('Post created successfully!', 'success');
     };
 
     const renderMainContent = () => {
@@ -89,9 +94,9 @@ const ChannelContentPage: React.FC<ChannelContentPageProps> = ({ community, chan
                      <p className="text-lg font-bold text-zinc-100">#{selectedChannel.name}</p>
                 </div>
                 <div className="ml-auto flex items-center space-x-4">
-                     <button className="relative text-zinc-400 hover:text-zinc-200">
+                     <button onClick={onToggleNotifications} className="relative text-zinc-400 hover:text-zinc-200">
                         <Icon type="bell" className="w-6 h-6" />
-                        <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-zinc-950"></span>
+                        {hasUnreadNotifications && <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-zinc-950"></span>}
                     </button>
                      <button className="text-zinc-400 hover:text-zinc-200"><Icon type="search" className="w-5 h-5"/></button>
                      <button className="text-zinc-400 hover:text-zinc-200"><Icon type="dots-horizontal" /></button>

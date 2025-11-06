@@ -34,6 +34,8 @@ interface CommunityPageProps {
     onSetIsAddingMembers: (isAdding: boolean) => void;
     onSetHubActiveFilter: (filter: CommunityHubFilterType) => void;
     onCreateCommunity: (data: { name: string; description: string; isPrivate: boolean; }) => void;
+    onToggleNotifications: () => void;
+    hasUnreadNotifications: boolean;
 }
 
 const CommunityPage: React.FC<CommunityPageProps> = (props) => {
@@ -42,7 +44,7 @@ const CommunityPage: React.FC<CommunityPageProps> = (props) => {
         hubActiveFilter, isAddingMembers, onSelectCommunity, onSelectChannel,
         onBackToCommunityHub, onBackToCommunityList, onLeaveCommunity, onCreatePost,
         onAddOrUpdateChatMessage, onUpdateCommunity, onAddChannel, onUpdateChannel, onAddMembers,
-        onSetIsAddingMembers, onSetHubActiveFilter, onCreateCommunity
+        onSetIsAddingMembers, onSetHubActiveFilter, onCreateCommunity, onToggleNotifications, hasUnreadNotifications
     } = props;
 
     const [activeSubTab, setActiveSubTab] = useState<SubTab>('All Feed');
@@ -92,7 +94,12 @@ const CommunityPage: React.FC<CommunityPageProps> = (props) => {
         }
 
         if (isAddingMembers) {
-            return <AddMembersPage community={community} onBack={() => onSetIsAddingMembers(false)} />;
+            return <AddMembersPage 
+                        community={community} 
+                        onBack={() => onSetIsAddingMembers(false)}
+                        onToggleNotifications={onToggleNotifications}
+                        hasUnreadNotifications={hasUnreadNotifications}
+                    />;
         }
 
         if (selectedChannelId) {
@@ -103,6 +110,8 @@ const CommunityPage: React.FC<CommunityPageProps> = (props) => {
                         onBack={onBackToCommunityHub}
                         onAddPost={(newPost) => onCreatePost(community.id, selectedChannelId, newPost)}
                         onAddChatMessage={(newMsg) => onAddOrUpdateChatMessage(community.id, newMsg)}
+                        onToggleNotifications={onToggleNotifications}
+                        hasUnreadNotifications={hasUnreadNotifications}
                     />;
         }
 
@@ -118,6 +127,8 @@ const CommunityPage: React.FC<CommunityPageProps> = (props) => {
                     onAddMembers={onAddMembers}
                     activeFilter={hubActiveFilter}
                     setActiveFilter={onSetHubActiveFilter}
+                    onToggleNotifications={onToggleNotifications}
+                    hasUnreadNotifications={hasUnreadNotifications}
                 />;
     };
 
@@ -176,9 +187,9 @@ const CommunityPage: React.FC<CommunityPageProps> = (props) => {
                             </div>
                             <h1 className="text-xl font-bold text-zinc-100 uppercase tracking-wider">Community</h1>
                              <div className="w-8">
-                                <button className="relative text-zinc-400 hover:text-zinc-200">
+                                <button onClick={onToggleNotifications} className="relative text-zinc-400 hover:text-zinc-200">
                                     <Icon type="bell" className="w-6 h-6" />
-                                    <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-zinc-950"></span>
+                                    {hasUnreadNotifications && <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-zinc-950"></span>}
                                 </button>
                             </div>
                         </div>

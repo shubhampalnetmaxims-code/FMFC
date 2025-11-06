@@ -1,6 +1,9 @@
 
 
 
+
+
+
 export type UserRole = 'customer' | 'admin';
 
 export interface User {
@@ -119,6 +122,11 @@ export interface FoodItem {
   name: string;
   quantity: number;
   calories: number;
+  carbohydrates?: number;
+  proteins?: number;
+  fats?: number;
+  fibre?: number;
+  water?: number;
 }
 
 export interface MealEntry {
@@ -222,4 +230,14 @@ export interface Toast {
   id: number;
   message: string;
   type: 'success' | 'error' | 'warning' | 'info';
+}
+
+// --- Notifications ---
+export interface Notification {
+  id: number;
+  type: 'community' | 'goal' | 'mention' | 'like';
+  text: string;
+  timestamp: string;
+  isRead: boolean;
+  linkTo?: string; // Optional for future navigation
 }

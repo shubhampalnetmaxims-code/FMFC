@@ -1,4 +1,5 @@
 
+
 import React, { useState, useRef, useEffect } from 'react';
 import type { Community, Channel, User, ChannelType } from '../types';
 import Icon from '../components/Icon';
@@ -25,9 +26,11 @@ interface CommunityHubPageProps {
     onAddMembers: () => void;
     activeFilter: CommunityHubFilterType;
     setActiveFilter: (filter: CommunityHubFilterType) => void;
+    onToggleNotifications: () => void;
+    hasUnreadNotifications: boolean;
 }
 
-const CommunityHubPage: React.FC<CommunityHubPageProps> = ({ community, currentUser, onSelectChannel, onBack, onLeaveCommunity, onUpdateCommunity, onAddChannel, onUpdateChannel, onAddMembers, activeFilter, setActiveFilter }) => {
+const CommunityHubPage: React.FC<CommunityHubPageProps> = ({ community, currentUser, onSelectChannel, onBack, onLeaveCommunity, onUpdateCommunity, onAddChannel, onUpdateChannel, onAddMembers, activeFilter, setActiveFilter, onToggleNotifications, hasUnreadNotifications }) => {
     const { addToast } = useToast();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -287,9 +290,9 @@ const CommunityHubPage: React.FC<CommunityHubPageProps> = ({ community, currentU
                 </button>
                 <h1 className="text-lg font-bold text-zinc-100 uppercase tracking-wider">{community.name}</h1>
                 <div className="ml-auto flex items-center space-x-4">
-                    <button className="relative text-zinc-400 hover:text-zinc-200">
+                    <button onClick={onToggleNotifications} className="relative text-zinc-400 hover:text-zinc-200">
                         <Icon type="bell" className="w-6 h-6" />
-                        <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-zinc-950"></span>
+                        {hasUnreadNotifications && <span className="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-zinc-950"></span>}
                     </button>
                     <div className="relative" ref={menuRef}>
                         <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-zinc-400 hover:text-zinc-200">

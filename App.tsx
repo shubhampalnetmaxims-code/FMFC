@@ -1,14 +1,18 @@
 
 
 
+
+
+
+
 import React, { useState, useEffect, useMemo } from 'react';
 import BottomNav from './components/BottomNav';
 import CommunityPage from './pages/CommunityPage';
 import UnderDevelopmentPage from './pages/UnderDevelopmentPage';
 import LoginPage from './pages/LoginPage';
 // FIX: Corrected typo from DAILY_CHallenge_TASKS to DAILY_CHALLENGE_TASKS.
-import { NAV_ITEMS, NUTRITION_PLANS_DATA, LEADERBOARD_DATA, TEST_USER, TASK_POINTS, COMMUNITIES_DATA, USERS_DATA, DAILY_CHALLENGE_TASKS } from './constants';
-import { NavItemType, User, NutritionPlan, DietIntakeItem, UserNote, UserMeasurement, UserPhoto, Community, ChannelType, Post, ChatMessage, Channel, ChallengeTask, MealEntry, FoodItem } from './types';
+import { NAV_ITEMS, NUTRITION_PLANS_DATA, LEADERBOARD_DATA, TEST_USER, TASK_POINTS, COMMUNITIES_DATA, USERS_DATA, DAILY_CHALLENGE_TASKS, NOTIFICATIONS_DATA } from './constants';
+import { NavItemType, User, NutritionPlan, DietIntakeItem, UserNote, UserMeasurement, UserPhoto, Community, ChannelType, Post, ChatMessage, Channel, ChallengeTask, MealEntry, FoodItem, Notification, NutritionTotals } from './types';
 import SideMenu from './components/SideMenu';
 import ProfilePage from './pages/ProfilePage';
 import NutritionPage from './pages/NutritionPage';
@@ -30,6 +34,7 @@ import ShareTasksPage from './pages/ShareTasksPage';
 import JournalPage from './pages/JournalPage';
 import AskAiPage from './pages/AskAiPage';
 import AddPlanFoodItemPage from './pages/AddPlanFoodItemPage';
+import NotificationsPanel from './components/NotificationsPanel';
 
 const App: React.FC = () => {
     const { addToast } = useToast();
@@ -109,6 +114,22 @@ const App: React.FC = () => {
         toPhoto: UserPhoto;
         description: string;
     } | null>(null);
+    
+    // STATE FOR NOTIFICATIONS
+    const [notifications, setNotifications] = useState<Notification[]>(NOTIFICATIONS_DATA);
+    const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+
+    const hasUnreadNotifications = useMemo(() => notifications.some(n => !n.isRead), [notifications]);
+
+    const handleToggleNotifications = () => {
+        setIsNotificationsOpen(prev => !prev);
+    };
+
+    const handleMarkAllAsRead = () => {
+        setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+        addToast('All notifications marked as read', 'info');
+        setIsNotificationsOpen(false); // Close panel after action
+    };
 
     useEffect(() => {
         // This runs only once on initial load to create some mock history
@@ -307,18 +328,21 @@ const App: React.FC = () => {
     const handleSaveDietIntake = (data: DietIntakeItem) => {
         if (editingDietIntake) {
              setAdditionalDietItems(prev => prev.map(item => item.id === editingDietIntake.id ? { ...item, ...data } : item));
+             addToast('Diet intake updated!', 'success');
         } else {
              const newItem: DietIntakeItem = {
                 ...data,
                 id: Date.now().toString(),
             };
             setAdditionalDietItems(prev => [...prev, newItem]);
+            addToast('Food added to your daily log!', 'success');
         }
         handleCloseAddDietIntake();
     };
     
     const handleDeleteDietIntake = (itemId: string) => {
         setAdditionalDietItems(prevItems => prevItems.filter(i => i.id !== itemId));
+        addToast('Diet intake removed.', 'info');
     };
 
     // --- CRUD for Food Items within a Nutrition Plan ---
@@ -334,12 +358,19 @@ const App: React.FC = () => {
         setEditingPlanFoodItem(null);
     };
 
-    const calculatePlanTotals = (content: MealEntry[]) => {
-        const newEnergyTotal = content.flatMap(m => m.items).reduce((sum, item) => sum + (item.calories || 0), 0);
-        return newEnergyTotal;
+    const calculatePlanTotals = (content: MealEntry[]): NutritionTotals => {
+        return content.flatMap(m => m.items).reduce((totals, item) => {
+            totals.energy += item.calories || 0;
+            totals.carbohydrates += item.carbohydrates || 0;
+            totals.proteins += item.proteins || 0;
+            totals.fats += item.fats || 0;
+            totals.fibre += item.fibre || 0;
+            totals.water += item.water || 0;
+            return totals;
+        }, { energy: 0, carbohydrates: 0, proteins: 0, fats: 0, fibre: 0, water: 0 });
     };
 
-    const handleSavePlanFoodItem = (newItemData: { name: string, quantity: number, calories: number }) => {
+    const handleSavePlanFoodItem = (newItemData: Omit<FoodItem, 'id'>) => {
         if (!editingPlanFoodItem) return;
 
         const { planId, mealTime, item: originalItem } = editingPlanFoodItem;
@@ -365,8 +396,7 @@ const App: React.FC = () => {
                         return meal;
                     });
 
-                    const newEnergyTotal = calculatePlanTotals(newContent);
-                    const newTotals = { ...plan.totals, energy: newEnergyTotal };
+                    const newTotals = calculatePlanTotals(newContent);
                     const updatedPlan = { ...plan, content: newContent, totals: newTotals };
                     
                     // Also update the currently viewed plan to see changes instantly
@@ -399,8 +429,7 @@ const App: React.FC = () => {
                         return meal;
                     });
     
-                    const newEnergyTotal = calculatePlanTotals(newContent);
-                    const newTotals = { ...plan.totals, energy: newEnergyTotal };
+                    const newTotals = calculatePlanTotals(newContent);
                     const updatedPlan = { ...plan, content: newContent, totals: newTotals };
     
                     if (viewingNutritionPlan?.id === planId) {
@@ -437,12 +466,14 @@ const App: React.FC = () => {
             setUserNotes(prev => prev.map(note => note.id === editingNote.id ? { ...note, ...data } : note)
                 .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
             );
+            addToast('Note updated!', 'success');
         } else {
             const newNote: UserNote = {
                 id: Date.now().toString(),
                 ...data,
             };
             setUserNotes(prev => [newNote, ...prev].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+            addToast('Note added!', 'success');
         }
         
         handleCloseAddNote();
@@ -450,6 +481,7 @@ const App: React.FC = () => {
     
     const handleDeleteNote = (noteId: string) => {
         setUserNotes(prevNotes => prevNotes.filter(n => n.id !== noteId));
+        addToast('Note deleted.', 'info');
     };
     
     const handleOpenAddMeasurement = (date: Date) => {
@@ -522,11 +554,13 @@ const App: React.FC = () => {
             const updatedMeasurement: UserMeasurement = { ...editingMeasurement, ...measurementData, date };
             setUserMeasurements(prev => prev.map(m => m.id === editingMeasurement.id ? updatedMeasurement : m)
                 .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+            addToast('Measurements updated!', 'success');
         } else {
             // Standard add: creating a new entry on an empty date.
             const newMeasurement: UserMeasurement = { id: Date.now().toString(), date, ...measurementData };
             setUserMeasurements(prev => [newMeasurement, ...prev]
                 .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+            addToast('Measurements saved!', 'success');
         }
         
         const today = new Date();
@@ -535,7 +569,10 @@ const App: React.FC = () => {
             setCompletedTasks(prev => {
                 const newCompleted = { ...prev };
                 const tasksForDate = new Set(newCompleted[todayKey] || []);
-                tasksForDate.add('log_measurements');
+                if (!tasksForDate.has('log_measurements')) {
+                    tasksForDate.add('log_measurements');
+                    addToast(`Task completed: Log daily measurements! +${TASK_POINTS} points`, 'success');
+                }
                 newCompleted[todayKey] = tasksForDate;
                 return newCompleted;
             });
@@ -546,6 +583,7 @@ const App: React.FC = () => {
     
     const handleDeleteMeasurement = (measurementId: string) => {
         setUserMeasurements(prev => prev.filter(m => m.id !== measurementId));
+        addToast('Measurement entry deleted.', 'info');
     };
 
     const handleOpenAddPhoto = (date: Date) => {
@@ -571,12 +609,14 @@ const App: React.FC = () => {
             setUserPhotos(prev => prev.map(p => p.id === editingPhoto.id ? updatedPhoto : p)
                 .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
             );
+            addToast('Photo details updated!', 'success');
         } else {
             const newPhoto: UserPhoto = {
                 id: Date.now().toString(),
                 ...photoData,
             };
             setUserPhotos(prev => [newPhoto, ...prev].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+            addToast('Photo added!', 'success');
         }
         
         const today = new Date();
@@ -594,7 +634,13 @@ const App: React.FC = () => {
                 setCompletedTasks(prev => {
                     const newCompleted = { ...prev };
                     const tasksForDate = new Set(newCompleted[todayKey] || []);
-                    tasksForDate.add(finalTaskId);
+                    if (!tasksForDate.has(finalTaskId)) {
+                        tasksForDate.add(finalTaskId);
+                        const taskTitle = DAILY_CHALLENGE_TASKS.find(t => t.id === finalTaskId)?.title;
+                        if (taskTitle) {
+                            addToast(`Task completed: ${taskTitle}! +${TASK_POINTS} points`, 'success');
+                        }
+                    }
                     newCompleted[todayKey] = tasksForDate;
                     return newCompleted;
                 });
@@ -606,6 +652,7 @@ const App: React.FC = () => {
 
     const handleDeletePhoto = (photoId: string) => {
         setUserPhotos(prevPhotos => prevPhotos.filter(p => p.id !== photoId));
+        addToast('Photo deleted.', 'info');
     };
     
     const handleToggleManualTask = (taskId: string, date: Date) => {
@@ -617,6 +664,7 @@ const App: React.FC = () => {
                 tasksForDate.delete(taskId);
             } else {
                 tasksForDate.add(taskId);
+                addToast(`Task completed! +${TASK_POINTS} points`, 'success');
             }
             newCompleted[dateKey] = tasksForDate;
             return newCompleted;
@@ -640,6 +688,7 @@ const App: React.FC = () => {
                 tasksForWeek.delete(taskId);
             } else {
                 tasksForWeek.add(taskId);
+                addToast(`Weekly task completed! +${TASK_POINTS} points`, 'success');
             }
             newCompleted[weekKey] = tasksForWeek;
             return newCompleted;
@@ -688,6 +737,7 @@ const App: React.FC = () => {
                 if (allItemsChecked && !wasCompleted) {
                     tasksForDate.add('meal_plan');
                     newCompleted[dateISO] = tasksForDate;
+                    addToast(`Task completed: Stick to your meal plan! +${TASK_POINTS} points`, 'success');
                     return newCompleted;
                 } else if (!allItemsChecked && wasCompleted) {
                     tasksForDate.delete('meal_plan');
@@ -698,7 +748,7 @@ const App: React.FC = () => {
             });
         });
 
-    }, [checkedNutritionItems, activePlan, additionalDietItems]);
+    }, [checkedNutritionItems, activePlan, additionalDietItems, addToast]);
     
     const handleViewLeaderboard = () => {
         setIsViewingLeaderboard(true);
@@ -788,6 +838,7 @@ const App: React.FC = () => {
     };
 
     const handleLeaveCommunity = (communityId: number) => {
+        const community = communities.find(c => c.id === communityId);
         setCommunities(prev => prev.map(c => {
             if (c.id === communityId) {
                 return {
@@ -797,6 +848,9 @@ const App: React.FC = () => {
             }
             return c;
         }));
+        if (community) {
+            addToast(`You have left ${community.name}.`, 'info');
+        }
         handleBackToCommunityList();
     };
 
@@ -840,15 +894,18 @@ const App: React.FC = () => {
             }
             return c;
         }));
+        addToast(newMsgData.id ? 'Message updated.' : 'Message sent!', 'success');
     };
     
     const handleUpdateCommunity = (communityId: number, updatedData: { name: string; description: string }) => {
         setCommunities(prev => prev.map(c => 
             c.id === communityId ? { ...c, ...updatedData } : c
         ));
+        addToast('Community details updated.', 'success');
     };
 
     const handleAddChannel = (communityId: number, channelName: string, channelType: ChannelType) => {
+        let channelAdded = false;
         setCommunities(prev => prev.map(c => {
             if (c.id === communityId) {
                 const newChannel: Channel = {
@@ -860,13 +917,18 @@ const App: React.FC = () => {
                     addToast('A channel with this name already exists.', 'error');
                     return c;
                 }
+                channelAdded = true;
                 return { ...c, channels: [...c.channels, newChannel] };
             }
             return c;
         }));
+        if (channelAdded) {
+            addToast('New channel created!', 'success');
+        }
     };
 
     const handleUpdateChannel = (communityId: number, channelId: number, updatedData: { name: string; type: ChannelType }) => {
+        let channelUpdated = false;
         setCommunities(prev => prev.map(c => {
             if (c.id === communityId) {
                 const sanitizedName = updatedData.name.trim().toLowerCase().replace(/\s+/g, '-');
@@ -874,10 +936,14 @@ const App: React.FC = () => {
                     addToast('A channel with this name already exists.', 'error');
                     return c;
                 }
+                channelUpdated = true;
                 return { ...c, channels: c.channels.map(ch => ch.id === channelId ? { ...ch, name: sanitizedName, type: updatedData.type } : ch )};
             }
             return c;
         }));
+        if (channelUpdated) {
+            addToast('Channel updated.', 'success');
+        }
     };
 
     const handleCreateCommunity = (data: { name: string; description: string; isPrivate: boolean; }) => {
@@ -904,6 +970,7 @@ const App: React.FC = () => {
             ],
         };
         setCommunities(prev => [newCommunity, ...prev]);
+        addToast(`Community "${data.name}" created!`, 'success');
     };
 
     // --- Share Achievement Handlers ---
@@ -935,6 +1002,7 @@ const App: React.FC = () => {
         const { description, hashtags } = sharingAchievementData;
         const postData = { description, hashtags };
         handleCreatePost(communityId, channelId, postData);
+        addToast('Achievement shared!', 'success');
         handleCloseShareAchievement();
     };
 
@@ -974,6 +1042,7 @@ const App: React.FC = () => {
             hashtags: ['#FitnessGoals', '#DailyTasks', '#FMFC'],
         };
         handleCreatePost(communityId, channelId, postData);
+        addToast('Goals shared!', 'success');
         handleCloseShareTasks();
     };
 
@@ -1044,6 +1113,7 @@ const App: React.FC = () => {
     const handleShareComparisonPost = (communityId: number, channelId: number) => {
         if (!sharingComparisonData) return;
         handleCreatePost(communityId, channelId, sharingComparisonData);
+        addToast('Comparison shared!', 'success');
         handleCloseShareComparison();
     };
 
@@ -1221,6 +1291,8 @@ const App: React.FC = () => {
                         pageName={currentSecondaryPage} 
                         onMenuClick={toggleMenu} 
                         onBack={handleBackFromSecondaryPage} 
+                        onToggleNotifications={handleToggleNotifications}
+                        hasUnreadNotifications={hasUnreadNotifications}
                     />;
         }
 
@@ -1248,6 +1320,8 @@ const App: React.FC = () => {
                             onSetIsAddingMembers={setIsAddingMembers}
                             onSetHubActiveFilter={setHubActiveFilter}
                             onCreateCommunity={handleCreateCommunity}
+                            onToggleNotifications={handleToggleNotifications}
+                            hasUnreadNotifications={hasUnreadNotifications}
                         />;
             case 'Profile':
                 return <ProfilePage
@@ -1275,6 +1349,8 @@ const App: React.FC = () => {
                             onComparePhotos={handleOpenComparePhotos}
                             checkedNutritionItems={checkedNutritionItems}
                             onToggleNutritionItem={handleToggleNutritionItem}
+                            onToggleNotifications={handleToggleNotifications}
+                            hasUnreadNotifications={hasUnreadNotifications}
                         />;
             case 'Goals':
                  return <GoalsPage 
@@ -1290,10 +1366,17 @@ const App: React.FC = () => {
                             onShareAchievement={handleOpenShareAchievement}
                             onViewMyStats={handleViewMyStats}
                             onShareTasks={handleOpenShareTasks}
+                            onToggleNotifications={handleToggleNotifications}
+                            hasUnreadNotifications={hasUnreadNotifications}
                         />;
             case 'Session':
             case 'Workouts':
-                return <UnderDevelopmentPage pageName={activeTab} onMenuClick={toggleMenu} />;
+                return <UnderDevelopmentPage 
+                            pageName={activeTab} 
+                            onMenuClick={toggleMenu}
+                            onToggleNotifications={handleToggleNotifications}
+                            hasUnreadNotifications={hasUnreadNotifications}
+                        />;
             default:
                 return <CommunityPage 
                             currentUser={currentUser!} 
@@ -1317,6 +1400,8 @@ const App: React.FC = () => {
                             onSetIsAddingMembers={setIsAddingMembers}
                             onSetHubActiveFilter={setHubActiveFilter}
                             onCreateCommunity={handleCreateCommunity}
+                            onToggleNotifications={handleToggleNotifications}
+                            hasUnreadNotifications={hasUnreadNotifications}
                         />;
         }
     };
@@ -1334,6 +1419,13 @@ const App: React.FC = () => {
                 onNavigate={handleSideMenuNavigate}
                 onLogout={handleSignOut}
             />
+            {isNotificationsOpen && (
+                <NotificationsPanel
+                    notifications={notifications}
+                    onClose={() => setIsNotificationsOpen(false)}
+                    onMarkAllAsRead={handleMarkAllAsRead}
+                />
+             )}
             <main className="flex-grow min-h-0">
                 {renderPage()}
             </main>

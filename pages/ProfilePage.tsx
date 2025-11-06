@@ -2,6 +2,8 @@
 
 
 
+
+
 import React, { useState } from 'react';
 import type { User, NutritionPlan, DietIntakeItem, UserPhoto, UserNote, UserMeasurement } from '../types';
 import UnderDevelopmentPage from './UnderDevelopmentPage';
@@ -43,6 +45,8 @@ interface ProfilePageProps {
     onComparePhotos: () => void;
     checkedNutritionItems: Record<string, Set<string>>;
     onToggleNutritionItem: (itemId: string, date: Date) => void;
+    onToggleNotifications: () => void;
+    hasUnreadNotifications: boolean;
 }
 
 const ProfilePage: React.FC<ProfilePageProps> = ({ 
@@ -70,6 +74,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
     onComparePhotos,
     checkedNutritionItems,
     onToggleNutritionItem,
+    onToggleNotifications,
+    hasUnreadNotifications,
 }) => {
     const [activeSubTab, setActiveSubTab] = useState<ProfileSubTab>('Photos');
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -394,9 +400,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
                                 <span className="text-sm font-semibold text-amber-400">Progress</span>
                                 <Icon type="bolt" className="w-5 h-5 text-amber-400"/>
                             </button>
-                            <button className="relative text-zinc-400 hover:text-zinc-200 p-2 -mr-2">
+                            <button onClick={onToggleNotifications} className="relative text-zinc-400 hover:text-zinc-200 p-2 -mr-2">
                                 <Icon type="bell" className="w-6 h-6" />
-                                <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-zinc-950"></span>
+                                {hasUnreadNotifications && <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-zinc-950"></span>}
                             </button>
                         </div>
                     </div>
