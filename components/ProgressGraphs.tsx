@@ -92,7 +92,7 @@ const GraphCard: React.FC<GraphCardProps> = ({ title, metric, setMetric, metricO
 };
 
 // --- MAIN COMPONENT ---
-const ProgressGraphs: React.FC<ProgressGraphsProps> = ({ userMeasurements }) => {
+const ProgressGraphs: React.FC<ProgressGraphsProps> = ({ userMeasurements, additionalDietItems, activePlan, checkedNutritionItems }) => {
     // Shared state
     const [timePeriod, setTimePeriod] = useState(TIME_OPTIONS[0]);
     const [offset, setOffset] = useState(0);

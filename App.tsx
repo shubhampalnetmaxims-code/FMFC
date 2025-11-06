@@ -1,4 +1,7 @@
 
+
+
+
 import React, { useState, useEffect, useMemo } from 'react';
 import BottomNav from './components/BottomNav';
 import CommunityPage from './pages/CommunityPage';
@@ -21,9 +24,6 @@ import ShareAchievementPage from './pages/ShareAchievementPage';
 import { CommunityHubFilterType } from './pages/CommunityHubPage';
 import { useToast } from './components/ToastProvider';
 import MyStatsPage from './pages/MyStatsPage';
-import ComparePhotosPage from './pages/ComparePhotosPage';
-import ComparisonResultPage from './pages/ComparisonResultPage';
-import ShareComparisonPage from './pages/ShareComparisonPage';
 import ShareTasksPage from './pages/ShareTasksPage';
 import JournalPage from './pages/JournalPage';
 import AskAiPage from './pages/AskAiPage';
@@ -31,6 +31,7 @@ import AddPlanFoodItemPage from './pages/AddPlanFoodItemPage';
 import NotificationsPanel from './components/NotificationsPanel';
 import ShareNutritionPlanPage from './pages/ShareNutritionPlanPage';
 import SharedGoalDetailsPage from './pages/SharedGoalDetailsPage';
+import ShareProgressPage from './pages/ShareProgressPage';
 
 const App: React.FC = () => {
     const { addToast } = useToast();
@@ -91,11 +92,6 @@ const App: React.FC = () => {
         description: string;
         hashtags: string[];
     } | null>(null);
-     const [sharingComparisonData, setSharingComparisonData] = useState<{
-        image: string;
-        description: string;
-        hashtags: string[];
-    } | null>(null);
     const [sharingTasksData, setSharingTasksData] = useState<{
         date: Date;
         tasks: ChallengeTask[];
@@ -103,12 +99,10 @@ const App: React.FC = () => {
         completedWeekly: Set<string>;
     } | null>(null);
     const [sharingNutritionPlan, setSharingNutritionPlan] = useState<NutritionPlan | null>(null);
-
-    // STATE FOR PHOTO COMPARISON FLOW
-    const [isComparingPhotos, setIsComparingPhotos] = useState(false);
-    const [comparisonResultData, setComparisonResultData] = useState<{
-        fromPhoto: UserPhoto;
-        toPhoto: UserPhoto;
+    const [sharingProgressData, setSharingProgressData] = useState<{
+        before: UserPhoto;
+        after: UserPhoto;
+        generatedImage: string;
         description: string;
     } | null>(null);
     
@@ -162,7 +156,7 @@ const App: React.FC = () => {
             }
             setCompletedTasks(mockCompleted);
             
-            // --- GENERATE RICH MOCK JOURNAL DATA for the last 20 days ---
+            // --- GENERATE RICH MOCK JOURNAL DATA for the last 90 days ---
             const mockPhotos: UserPhoto[] = [];
             const mockMeasurements: UserMeasurement[] = [];
             const mockNotes: UserNote[] = [];
@@ -178,35 +172,40 @@ const App: React.FC = () => {
                 "Focused on form today. Lighter weight but better reps.",
             ];
 
-            for (let i = 20; i >= 0; i--) {
+            for (let i = 90; i >= 0; i--) {
                 const date = new Date();
                 date.setDate(today.getDate() - i);
                 const dateKey = date.toISOString().split('T')[0];
+                const dayNumber = 90 - i;
 
-                // Add measurements every 3 days
-                if (i % 3 === 0) {
+                // Add measurements every 5 days
+                if (i % 5 === 0) {
                     mockMeasurements.push({
                         id: `m${i}`, date: dateKey,
-                        weight: 80 - (i / 4), // steady decrease
-                        waist: 34 - (i / 10),
-                        bodyfat: 15 - (i / 8),
+                        weight: 85 - (dayNumber / 10), // steady decrease from 85kg
+                        waist: 36 - (dayNumber / 15),
+                        bodyfat: 20 - (dayNumber / 8),
                     });
                 }
 
-                // Add photos every 4 days
-                if (i % 4 === 0) {
+                // Add progress photos (Front, Side, Back) every 7 days (weekly)
+                if (i % 7 === 0) {
                      mockPhotos.push({
                         id: `p${i}-front`, src: `https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=600&h=800&fit=crop&crop=faces&seed=front${i}`,
-                        type: 'Front', date: dateKey, description: `Progress check, day ${20 - i}.`
+                        type: 'Front', date: dateKey, description: `Week ${Math.floor(dayNumber / 7)} check-in. Feeling good.`
                     });
                      mockPhotos.push({
                         id: `p${i}-side`, src: `https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=600&h=800&fit=crop&crop=faces&seed=side${i}`,
-                        type: 'Side', date: dateKey, description: `Side view, feeling leaner.`
+                        type: 'Side', date: dateKey, description: `Side view, Week ${Math.floor(dayNumber / 7)}.`
+                    });
+                    mockPhotos.push({
+                        id: `p${i}-back`, src: `https://images.unsplash.com/photo-1550345332-09e3ac987658?q=80&w=600&h=800&fit=crop&crop=faces&seed=back${i}`,
+                        type: 'Back', date: dateKey, description: `Back progress, Week ${Math.floor(dayNumber / 7)}.`
                     });
                 }
                 
-                // Add a gym photo every 5 days
-                if (i % 5 === 1) {
+                // Add a workout photo randomly
+                if (Math.random() < 0.15) { // Roughly every 6-7 days
                     mockPhotos.push({
                          id: `p${i}-gym`, src: `https://images.unsplash.com/photo-1599058917212-d750089bc07e?q=80&w=600&h=800&fit=crop&crop=faces&seed=gym${i}`,
                          type: 'Workout', date: dateKey, description: `Post-workout pump! Great session today.`
@@ -214,7 +213,7 @@ const App: React.FC = () => {
                 }
                 
                 // Add notes randomly
-                if (Math.random() > 0.6) {
+                if (Math.random() > 0.4) { // More frequent notes
                     mockNotes.push({
                         id: `n${i}`, date: dateKey,
                         content: MOCK_NOTE_CONTENT[Math.floor(Math.random() * MOCK_NOTE_CONTENT.length)]
@@ -604,12 +603,15 @@ const App: React.FC = () => {
     };
 
     const handleSavePhoto = (photoData: Omit<UserPhoto, 'id'>) => {
+        let savedPhoto: UserPhoto;
+
         if (editingPhoto) {
             const updatedPhoto: UserPhoto = { ...editingPhoto, ...photoData };
             setUserPhotos(prev => prev.map(p => p.id === editingPhoto.id ? updatedPhoto : p)
                 .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
             );
             addToast('Photo details updated!', 'success');
+            savedPhoto = updatedPhoto;
         } else {
             const newPhoto: UserPhoto = {
                 id: Date.now().toString(),
@@ -617,6 +619,17 @@ const App: React.FC = () => {
             };
             setUserPhotos(prev => [newPhoto, ...prev].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
             addToast('Photo added!', 'success');
+            savedPhoto = newPhoto;
+        }
+
+        if (savedPhoto.description) {
+            const newNote: UserNote = {
+                id: `note-from-photo-${savedPhoto.id}-${Date.now()}`,
+                date: savedPhoto.date,
+                content: `[Photo: ${savedPhoto.type}]\n${savedPhoto.description}`
+            };
+            setUserNotes(prev => [newNote, ...prev].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+            addToast('Note added from photo description.', 'info');
         }
         
         const today = new Date();
@@ -1092,6 +1105,28 @@ const App: React.FC = () => {
         setViewingSharedItem(null); // Close the detail view after copying
     };
 
+    // --- Share Progress Comparison Handlers ---
+    const handleOpenShareProgress = (data: { before: UserPhoto; after: UserPhoto; generatedImage: string; description: string; }) => {
+        setSharingProgressData(data);
+    };
+    
+    const handleCloseShareProgress = () => {
+        setSharingProgressData(null);
+    };
+    
+    const handleShareProgressPost = (communityId: number, channelId: number) => {
+        if (!sharingProgressData || !currentUser) return;
+        const { generatedImage, description } = sharingProgressData;
+        const postData = {
+            image: generatedImage,
+            description,
+            hashtags: ['#Progress', '#Transformation', '#FMFC'],
+        };
+        handleCreatePost(communityId, channelId, postData);
+        addToast('Progress shared!', 'success');
+        handleCloseShareProgress();
+    };
+
     // --- Community Shared Item View Handlers ---
     const handleViewSharedItem = (item: NutritionPlan | SharedGoal, type: 'nutrition' | 'goal', communityName: string) => {
         setViewingSharedItem({ data: item, type, communityName });
@@ -1099,78 +1134,6 @@ const App: React.FC = () => {
 
     const handleCloseSharedItemView = () => {
         setViewingSharedItem(null);
-    };
-
-
-    // --- Photo Comparison Handlers ---
-    const handleOpenComparePhotos = () => setIsComparingPhotos(true);
-    const handleCloseComparePhotos = () => setIsComparingPhotos(false);
-    
-    const handleStartComparison = (data: { fromPhoto: UserPhoto; toPhoto: UserPhoto; description: string; }) => {
-        setComparisonResultData(data);
-        setIsComparingPhotos(false);
-    };
-
-    const handleCloseComparisonResult = () => setComparisonResultData(null);
-
-    const handleOpenShareComparison = async (data: { fromPhoto: UserPhoto; toPhoto: UserPhoto; description: string }) => {
-        addToast('Generating your comparison image...', 'info');
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-            addToast('Could not generate image.', 'error');
-            return;
-        }
-
-        const loadImage = (src: string): Promise<HTMLImageElement> => new Promise((resolve, reject) => {
-            const img = new Image();
-            img.crossOrigin = "Anonymous";
-            img.onload = () => resolve(img);
-            img.onerror = reject;
-            img.src = src;
-        });
-
-        try {
-            const [img1, img2] = await Promise.all([loadImage(data.fromPhoto.src), loadImage(data.toPhoto.src)]);
-
-            canvas.width = 1200;
-            canvas.height = 900;
-
-            ctx.fillStyle = '#18181b'; // zinc-900
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.drawImage(img1, 0, 0, 600, 800);
-            ctx.drawImage(img2, 600, 0, 600, 800);
-
-            ctx.fillStyle = 'white';
-            ctx.font = 'bold 32px sans-serif';
-            ctx.textAlign = 'center';
-
-            ctx.fillText(`From: ${new Date(data.fromPhoto.date + 'T00:00:00').toLocaleDateString()}`, 300, 850);
-            ctx.fillText(`To: ${new Date(data.toPhoto.date + 'T00:00:00').toLocaleDateString()}`, 900, 850);
-            
-            const compositeImage = canvas.toDataURL('image/jpeg', 0.9);
-
-            setSharingComparisonData({
-                image: compositeImage,
-                description: data.description,
-                hashtags: ['#Progress', '#Transformation', '#FMFC'],
-            });
-            setComparisonResultData(null);
-
-        } catch (error) {
-            console.error("Error creating comparison image:", error);
-            addToast('Failed to load images for comparison.', 'error');
-        }
-    };
-
-    const handleCloseShareComparison = () => setSharingComparisonData(null);
-
-    const handleShareComparisonPost = (communityId: number, channelId: number) => {
-        if (!sharingComparisonData) return;
-        handleCreatePost(communityId, channelId, sharingComparisonData);
-        addToast('Comparison shared!', 'success');
-        handleCloseShareComparison();
     };
 
     // --- AI Flow Handlers ---
@@ -1227,6 +1190,16 @@ const App: React.FC = () => {
             />;
         }
 
+        if (sharingProgressData) {
+            return <ShareProgressPage
+                currentUser={currentUser!}
+                shareData={sharingProgressData}
+                userCommunities={communities.filter(c => c.members.some(m => m.id === currentUser!.id))}
+                onBack={handleCloseShareProgress}
+                onShareToChannel={handleShareProgressPost}
+            />;
+        }
+
         if (sharingNutritionPlan) {
             return <ShareNutritionPlanPage
                 currentUser={currentUser!}
@@ -1244,32 +1217,6 @@ const App: React.FC = () => {
                 userCommunities={communities.filter(c => c.members.some(m => m.id === currentUser!.id))}
                 onBack={handleCloseShareTasks}
                 onShareToChannel={handleShareTasksPost}
-            />;
-        }
-
-         if (sharingComparisonData) {
-            return <ShareComparisonPage
-                currentUser={currentUser!}
-                shareData={sharingComparisonData}
-                userCommunities={communities.filter(c => c.members.some(m => m.id === currentUser!.id))}
-                onBack={handleCloseShareComparison}
-                onShareToChannel={handleShareComparisonPost}
-            />;
-        }
-
-        if (comparisonResultData) {
-            return <ComparisonResultPage
-                comparisonData={comparisonResultData}
-                onBack={handleCloseComparisonResult}
-                onShare={handleOpenShareComparison}
-            />;
-        }
-
-        if (isComparingPhotos) {
-            return <ComparePhotosPage
-                userPhotos={userPhotos}
-                onBack={handleCloseComparePhotos}
-                onCompare={handleStartComparison}
             />;
         }
 
@@ -1365,16 +1312,14 @@ const App: React.FC = () => {
             if (currentSecondaryPage === 'Progress') {
                  return <JournalPage
                     onBack={handleBackFromSecondaryPage}
-                    userPhotos={userPhotos}
                     userMeasurements={userMeasurements}
-                    userNotes={userNotes}
                     additionalDietItems={additionalDietItems}
                     activePlan={activePlan}
                     checkedNutritionItems={checkedNutritionItems}
-                    onToggleNutritionItem={handleToggleNutritionItem}
-                    onEditDietIntake={handleOpenEditDietIntake}
-                    onDeleteDietIntake={handleDeleteDietIntake}
+                    userPhotos={userPhotos}
+                    userNotes={userNotes}
                     onAskAi={() => setAiSource('journal')}
+                    onShareProgress={handleOpenShareProgress}
                 />;
             }
             return <UnderDevelopmentPage 
@@ -1438,7 +1383,6 @@ const App: React.FC = () => {
                             onAddPhoto={handleOpenAddPhoto}
                             onEditPhoto={handleOpenEditPhoto}
                             onDeletePhoto={handleDeletePhoto}
-                            onComparePhotos={handleOpenComparePhotos}
                             checkedNutritionItems={checkedNutritionItems}
                             onToggleNutritionItem={handleToggleNutritionItem}
                             onToggleNotifications={handleToggleNotifications}

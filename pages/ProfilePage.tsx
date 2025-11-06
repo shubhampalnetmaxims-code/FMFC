@@ -42,7 +42,6 @@ interface ProfilePageProps {
     onAddPhoto: (date: Date) => void;
     onEditPhoto: (photo: UserPhoto) => void;
     onDeletePhoto: (photoId: string) => void;
-    onComparePhotos: () => void;
     checkedNutritionItems: Record<string, Set<string>>;
     onToggleNutritionItem: (itemId: string, date: Date) => void;
     onToggleNotifications: () => void;
@@ -71,7 +70,6 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
     onAddPhoto,
     onEditPhoto,
     onDeletePhoto,
-    onComparePhotos,
     checkedNutritionItems,
     onToggleNutritionItem,
     onToggleNotifications,
@@ -328,24 +326,14 @@ const ProfilePage: React.FC<ProfilePageProps> = ({
     const renderFAB = () => {
         if (activeSubTab === 'Photos') {
             return (
-                <div className="absolute bottom-24 right-6 flex flex-col items-end space-y-3">
-                     <button
-                        onClick={onComparePhotos}
-                        className="bg-zinc-700 hover:bg-zinc-600 text-amber-300 shadow-lg transition-transform hover:scale-105 flex items-center justify-center rounded-full px-4 py-3 space-x-2"
-                        aria-label="Compare Photos"
-                    >
-                        <Icon type="refresh" className="w-5 h-5" />
-                        <span className="font-semibold text-sm">Compare</span>
-                    </button>
-                    <button
-                        onClick={() => onAddPhoto(selectedDate)}
-                        className="bg-amber-500 hover:bg-amber-600 text-black shadow-lg transition-transform hover:scale-105 flex items-center justify-center rounded-full px-4 py-3 space-x-2"
-                        aria-label="Add photo"
-                    >
-                        <Icon type="plus" className="w-6 h-6" />
-                        <span className="font-semibold text-sm">Add Photo</span>
-                    </button>
-                </div>
+                <button
+                    onClick={() => onAddPhoto(selectedDate)}
+                    className="absolute bottom-24 right-6 bg-amber-500 hover:bg-amber-600 text-black shadow-lg transition-transform hover:scale-105 flex items-center justify-center rounded-full px-4 py-3 space-x-2"
+                    aria-label="Add photo"
+                >
+                    <Icon type="plus" className="w-6 h-6" />
+                    <span className="font-semibold text-sm">Add Photo</span>
+                </button>
             );
         }
 
