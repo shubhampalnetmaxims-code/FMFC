@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PostCard from '../components/PostCard';
 import { USERS_DATA } from '../constants';
-import type { User, Community, Post, ChatMessage, Channel, ChannelType } from '../types';
+import type { User, Community, Post, ChatMessage, Channel, ChannelType, NutritionPlan, SharedGoal } from '../types';
 import CommunityCard from '../components/CommunityCard';
 import CommunityHubPage, { CommunityHubFilterType } from './CommunityHubPage';
 import ChannelContentPage from './ChannelContentPage';
@@ -36,6 +36,8 @@ interface CommunityPageProps {
     onCreateCommunity: (data: { name: string; description: string; isPrivate: boolean; }) => void;
     onToggleNotifications: () => void;
     hasUnreadNotifications: boolean;
+    onCopyPlan: (plan: NutritionPlan) => void;
+    onViewSharedItem: (item: NutritionPlan | SharedGoal, type: 'nutrition' | 'goal', communityName: string) => void;
 }
 
 const CommunityPage: React.FC<CommunityPageProps> = (props) => {
@@ -44,7 +46,8 @@ const CommunityPage: React.FC<CommunityPageProps> = (props) => {
         hubActiveFilter, isAddingMembers, onSelectCommunity, onSelectChannel,
         onBackToCommunityHub, onBackToCommunityList, onLeaveCommunity, onCreatePost,
         onAddOrUpdateChatMessage, onUpdateCommunity, onAddChannel, onUpdateChannel, onAddMembers,
-        onSetIsAddingMembers, onSetHubActiveFilter, onCreateCommunity, onToggleNotifications, hasUnreadNotifications
+        onSetIsAddingMembers, onSetHubActiveFilter, onCreateCommunity, onToggleNotifications, hasUnreadNotifications,
+        onCopyPlan, onViewSharedItem
     } = props;
 
     const [activeSubTab, setActiveSubTab] = useState<SubTab>('All Feed');
@@ -129,6 +132,8 @@ const CommunityPage: React.FC<CommunityPageProps> = (props) => {
                     setActiveFilter={onSetHubActiveFilter}
                     onToggleNotifications={onToggleNotifications}
                     hasUnreadNotifications={hasUnreadNotifications}
+                    onCopyPlan={onCopyPlan}
+                    onViewSharedItem={onViewSharedItem}
                 />;
     };
 
@@ -138,7 +143,7 @@ const CommunityPage: React.FC<CommunityPageProps> = (props) => {
         switch(activeSubTab) {
             case 'All Feed':
                 return (
-                    <div className="px-2 md:px-4 py-4">
+                    <div className="h-full overflow-y-auto px-2 md:px-4 py-4">
                         {allPosts.map((post) => (
                             <PostCard key={post.id} post={post} currentUser={currentUser} showCommunityName={true} />
                         ))}

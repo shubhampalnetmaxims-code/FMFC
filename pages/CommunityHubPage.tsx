@@ -1,7 +1,5 @@
-
-
 import React, { useState, useRef, useEffect } from 'react';
-import type { Community, Channel, User, ChannelType } from '../types';
+import type { Community, Channel, User, ChannelType, NutritionPlan, SharedGoal } from '../types';
 import Icon from '../components/Icon';
 import MemberListPane from '../components/MemberListPane';
 import MediaGrid from '../components/MediaGrid';
@@ -11,8 +9,10 @@ import PostCard from '../components/PostCard';
 import MediaViewerModal from '../components/MediaViewerModal';
 import FileListPane from '../components/FileListPane';
 import { useToast } from '../components/ToastProvider';
+import SharedPlansPane from '../components/SharedPlansPane';
+import SharedGoalsPane from '../components/SharedGoalsPane';
 
-export type CommunityHubFilterType = 'feed' | 'channels' | 'members' | 'files' | 'media' | 'workouts' | 'goals' | 'meals';
+export type CommunityHubFilterType = 'feed' | 'channels' | 'members' | 'files' | 'media' | 'workouts' | 'goals' | 'nutrition';
 
 interface CommunityHubPageProps {
     community: Community;
@@ -28,9 +28,11 @@ interface CommunityHubPageProps {
     setActiveFilter: (filter: CommunityHubFilterType) => void;
     onToggleNotifications: () => void;
     hasUnreadNotifications: boolean;
+    onCopyPlan: (plan: NutritionPlan) => void;
+    onViewSharedItem: (item: NutritionPlan | SharedGoal, type: 'nutrition' | 'goal', communityName: string) => void;
 }
 
-const CommunityHubPage: React.FC<CommunityHubPageProps> = ({ community, currentUser, onSelectChannel, onBack, onLeaveCommunity, onUpdateCommunity, onAddChannel, onUpdateChannel, onAddMembers, activeFilter, setActiveFilter, onToggleNotifications, hasUnreadNotifications }) => {
+const CommunityHubPage: React.FC<CommunityHubPageProps> = ({ community, currentUser, onSelectChannel, onBack, onLeaveCommunity, onUpdateCommunity, onAddChannel, onUpdateChannel, onAddMembers, activeFilter, setActiveFilter, onToggleNotifications, hasUnreadNotifications, onCopyPlan, onViewSharedItem }) => {
     const { addToast } = useToast();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -245,17 +247,16 @@ const CommunityHubPage: React.FC<CommunityHubPageProps> = ({ community, currentU
                     </div>
                 );
             case 'goals':
-                return (
-                    <div className="text-center py-16 text-zinc-500">
-                        <p>No goals have been set for this community yet.</p>
-                    </div>
-                );
-            case 'meals':
-                return (
-                    <div className="text-center py-16 text-zinc-500">
-                        <p>No meals have been shared in this community yet.</p>
-                    </div>
-                );
+                return <SharedGoalsPane 
+                            goals={community.sharedGoals || []} 
+                            onView={(goal) => onViewSharedItem(goal, 'goal', community.name)} 
+                        />;
+            case 'nutrition':
+                return <SharedPlansPane 
+                            plans={community.sharedPlans || []} 
+                            onCopyPlan={onCopyPlan} 
+                            onView={(plan) => onViewSharedItem(plan, 'nutrition', community.name)}
+                        />;
             default:
                 return null;
         }
@@ -331,7 +332,7 @@ const CommunityHubPage: React.FC<CommunityHubPageProps> = ({ community, currentU
                     <FilterButton label="Files" icon="file-document" isActive={activeFilter === 'files'} onClick={() => setActiveFilter('files')} />
                     <FilterButton label="Workouts" icon="workouts" isActive={activeFilter === 'workouts'} onClick={() => setActiveFilter('workouts')} />
                     <FilterButton label="Goals" icon="goals" isActive={activeFilter === 'goals'} onClick={() => setActiveFilter('goals')} />
-                    <FilterButton label="Meals" icon="fire" isActive={activeFilter === 'meals'} onClick={() => setActiveFilter('meals')} />
+                    <FilterButton label="Nutrition" icon="fire" isActive={activeFilter === 'nutrition'} onClick={() => setActiveFilter('nutrition')} />
                 </div>
             </div>
 

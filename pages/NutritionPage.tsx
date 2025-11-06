@@ -1,5 +1,7 @@
 
 
+
+
 import React from 'react';
 import { NutritionPlan } from '../types';
 import Icon from '../components/Icon';
@@ -10,9 +12,10 @@ interface NutritionPageProps {
     plans: NutritionPlan[];
     onViewPlan: (plan: NutritionPlan) => void;
     onActivatePlan: (planId: number) => void;
+    onAskAi: () => void;
 }
 
-const NutritionPage: React.FC<NutritionPageProps> = ({ onBack, plans, onViewPlan, onActivatePlan }) => {
+const NutritionPage: React.FC<NutritionPageProps> = ({ onBack, plans, onViewPlan, onActivatePlan, onAskAi }) => {
     const { addToast } = useToast();
     
     const activePlan = plans.find(p => p.isActive && !p.isTemplate);
@@ -79,14 +82,22 @@ const NutritionPage: React.FC<NutritionPageProps> = ({ onBack, plans, onViewPlan
                                 </div>
                             </div>
                         ))}
-                         {/* Add new plan button */}
-                        <button 
-                            onClick={() => addToast("Creating custom plans is coming soon!", "info")}
-                            className="w-full flex items-center justify-center space-x-2 border-2 border-dashed border-zinc-700 text-zinc-500 hover:text-amber-400 hover:border-amber-400/50 rounded-lg py-4 transition-colors"
-                        >
-                            <Icon type="plus" className="w-5 h-5"/>
-                            <span className="font-semibold">Create New Plan</span>
-                        </button>
+                         <div className="grid grid-cols-2 gap-4">
+                            <button 
+                                onClick={() => addToast("Creating custom plans is coming soon!", "info")}
+                                className="w-full flex items-center justify-center space-x-2 border-2 border-dashed border-zinc-700 text-zinc-500 hover:text-amber-400 hover:border-amber-400/50 rounded-lg py-4 transition-colors"
+                            >
+                                <Icon type="plus" className="w-5 h-5"/>
+                                <span className="font-semibold text-sm">Create New Plan</span>
+                            </button>
+                             <button 
+                                onClick={onAskAi}
+                                className="w-full flex items-center justify-center space-x-2 border-2 border-dashed border-zinc-700 text-zinc-500 hover:text-amber-400 hover:border-amber-400/50 rounded-lg py-4 transition-colors"
+                            >
+                                <Icon type="sparkles" className="w-5 h-5"/>
+                                <span className="font-semibold text-sm">Ask AI</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </main>

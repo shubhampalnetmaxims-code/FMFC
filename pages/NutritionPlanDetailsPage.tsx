@@ -1,6 +1,3 @@
-
-
-
 import React from 'react';
 import type { NutritionPlan, FoodItem } from '../types';
 import Icon from '../components/Icon';
@@ -12,9 +9,11 @@ interface NutritionPlanDetailsPageProps {
     onAddItemToMeal: (mealTime: string) => void;
     onEditItem: (mealTime: string, item: FoodItem) => void;
     onDeleteItem: (mealTime: string, itemId: string) => void;
+    onShare?: (plan: NutritionPlan) => void;
+    onCopyPlan?: (plan: NutritionPlan) => void;
 }
 
-const NutritionPlanDetailsPage: React.FC<NutritionPlanDetailsPageProps> = ({ plan, onBack, isEditable, onAddItemToMeal, onEditItem, onDeleteItem }) => {
+const NutritionPlanDetailsPage: React.FC<NutritionPlanDetailsPageProps> = ({ plan, onBack, isEditable, onAddItemToMeal, onEditItem, onDeleteItem, onShare, onCopyPlan }) => {
 
     const Card: React.FC<{title: string, children: React.ReactNode, hasMenu?: boolean}> = ({title, children, hasMenu}) => (
         <div className="bg-zinc-900 border border-zinc-800 p-4 sm:p-6 rounded-2xl shadow-md text-zinc-200">
@@ -40,6 +39,11 @@ const NutritionPlanDetailsPage: React.FC<NutritionPlanDetailsPageProps> = ({ pla
                  {plan.isActive && !plan.isTemplate && (
                     <span className="ml-3 text-xs font-bold bg-amber-400 text-black px-2 py-0.5 rounded-full">ACTIVE</span>
                  )}
+                 {plan.isTemplate && onShare && (
+                    <button onClick={() => onShare(plan)} className="ml-auto p-2 text-zinc-400 hover:text-amber-400">
+                        <Icon type="share" className="w-5 h-5" />
+                    </button>
+                )}
             </header>
             
             <main className="flex-grow overflow-y-auto p-4 space-y-6">
@@ -114,6 +118,17 @@ const NutritionPlanDetailsPage: React.FC<NutritionPlanDetailsPageProps> = ({ pla
                     </div>
                 </Card>
             </main>
+            {onCopyPlan && (
+                 <footer className="p-4 border-t border-zinc-800 sticky bottom-0 bg-zinc-950">
+                    <button
+                        onClick={() => onCopyPlan(plan)}
+                        className="w-full bg-amber-500 hover:bg-amber-600 text-black font-bold py-3 px-4 rounded-lg focus:outline-none focus:shadow-outline transition-colors duration-200 flex items-center justify-center space-x-2"
+                    >
+                        <Icon type="plus" className="w-5 h-5" />
+                        <span>Copy to My Templates</span>
+                    </button>
+                </footer>
+            )}
         </div>
     );
 };

@@ -1,10 +1,4 @@
 
-
-
-
-
-
-
 import React, { useState, useEffect, useMemo } from 'react';
 import BottomNav from './components/BottomNav';
 import CommunityPage from './pages/CommunityPage';
@@ -12,7 +6,7 @@ import UnderDevelopmentPage from './pages/UnderDevelopmentPage';
 import LoginPage from './pages/LoginPage';
 // FIX: Corrected typo from DAILY_CHallenge_TASKS to DAILY_CHALLENGE_TASKS.
 import { NAV_ITEMS, NUTRITION_PLANS_DATA, LEADERBOARD_DATA, TEST_USER, TASK_POINTS, COMMUNITIES_DATA, USERS_DATA, DAILY_CHALLENGE_TASKS, NOTIFICATIONS_DATA } from './constants';
-import { NavItemType, User, NutritionPlan, DietIntakeItem, UserNote, UserMeasurement, UserPhoto, Community, ChannelType, Post, ChatMessage, Channel, ChallengeTask, MealEntry, FoodItem, Notification, NutritionTotals } from './types';
+import { NavItemType, User, NutritionPlan, DietIntakeItem, UserNote, UserMeasurement, UserPhoto, Community, ChannelType, Post, ChatMessage, Channel, ChallengeTask, MealEntry, FoodItem, Notification, NutritionTotals, SharedGoal } from './types';
 import SideMenu from './components/SideMenu';
 import ProfilePage from './pages/ProfilePage';
 import NutritionPage from './pages/NutritionPage';
@@ -35,6 +29,8 @@ import JournalPage from './pages/JournalPage';
 import AskAiPage from './pages/AskAiPage';
 import AddPlanFoodItemPage from './pages/AddPlanFoodItemPage';
 import NotificationsPanel from './components/NotificationsPanel';
+import ShareNutritionPlanPage from './pages/ShareNutritionPlanPage';
+import SharedGoalDetailsPage from './pages/SharedGoalDetailsPage';
 
 const App: React.FC = () => {
     const { addToast } = useToast();
@@ -71,7 +67,7 @@ const App: React.FC = () => {
     const [isViewingMyStats, setIsViewingMyStats] = useState(false);
 
     // AI Flow State
-    const [isAskingAi, setIsAskingAi] = useState(false);
+    const [aiSource, setAiSource] = useState<null | 'journal' | 'nutrition'>(null);
 
     // Lifted Nutrition Plans state
     const [nutritionPlans, setNutritionPlans] = useState<NutritionPlan[]>(NUTRITION_PLANS_DATA);
@@ -106,6 +102,7 @@ const App: React.FC = () => {
         completedDaily: Set<string>;
         completedWeekly: Set<string>;
     } | null>(null);
+    const [sharingNutritionPlan, setSharingNutritionPlan] = useState<NutritionPlan | null>(null);
 
     // STATE FOR PHOTO COMPARISON FLOW
     const [isComparingPhotos, setIsComparingPhotos] = useState(false);
@@ -118,6 +115,9 @@ const App: React.FC = () => {
     // STATE FOR NOTIFICATIONS
     const [notifications, setNotifications] = useState<Notification[]>(NOTIFICATIONS_DATA);
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+
+    // STATE FOR VIEWING SHARED COMMUNITY ITEMS
+    const [viewingSharedItem, setViewingSharedItem] = useState<{ type: 'nutrition' | 'goal', data: NutritionPlan | SharedGoal, communityName: string } | null>(null);
 
     const hasUnreadNotifications = useMemo(() => notifications.some(n => !n.isRead), [notifications]);
 
@@ -968,6 +968,8 @@ const App: React.FC = () => {
                  { id: 3, user: dummyMember, text: "How do I sync my tracker?", timestamp: 'Today 12:05 PM', reactions: [], notes: 'Follow up.' },
                  { id: 4, user: currentUser!, text: `Hey ${dummyMember.name}! Go to Profile > Settings.`, timestamp: 'Today 12:06 PM', reactions: [], toUserId: dummyMember.id, }
             ],
+            sharedPlans: [],
+            sharedGoals: [],
         };
         setCommunities(prev => [newCommunity, ...prev]);
         addToast(`Community "${data.name}" created!`, 'success');
@@ -1017,34 +1019,88 @@ const App: React.FC = () => {
 
     const handleShareTasksPost = (communityId: number, channelId: number) => {
         if (!sharingTasksData || !currentUser) return;
-        const { date, tasks, completedDaily, completedWeekly } = sharingTasksData;
-
+    
+        const newSharedGoal: SharedGoal = {
+            id: Date.now(),
+            user: currentUser,
+            date: sharingTasksData.date.toISOString().split('T')[0],
+            tasks: sharingTasksData.tasks,
+            completedDaily: sharingTasksData.completedDaily,
+            completedWeekly: sharingTasksData.completedWeekly,
+        };
+    
+        setCommunities(prev => prev.map(c => {
+            if (c.id === communityId) {
+                return { ...c, sharedGoals: [...(c.sharedGoals || []), newSharedGoal] };
+            }
+            return c;
+        }));
+    
         const formatDate = (d: Date) => d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-
-        const dailyTasks = tasks.filter(t => t.frequency === 'daily');
-        const weeklyTasks = tasks.filter(t => t.frequency === 'weekly');
-
-        let description = `My Goals for ${formatDate(date)}\n\n`;
-
-        if (dailyTasks.length > 0) {
-            description += "Daily Tasks:\n";
-            description += dailyTasks.map(t => `${completedDaily.has(t.id) ? '✅' : '🔲'} ${t.title}`).join('\n');
-            description += "\n\n";
-        }
-
-        if (weeklyTasks.length > 0) {
-            description += "Weekly Tasks:\n";
-            description += weeklyTasks.map(t => `${completedWeekly.has(t.id) ? '✅' : '🔲'} ${t.title}`).join('\n');
-        }
-        
+    
         const postData = {
-            description: description.trim(),
-            hashtags: ['#FitnessGoals', '#DailyTasks', '#FMFC'],
+            description: `${currentUser.name} shared their goals for ${formatDate(sharingTasksData.date)}. Check them out in the community's Goals tab!`,
+            hashtags: ['#DailyGoals', '#Accountability', '#FMFC'],
         };
         handleCreatePost(communityId, channelId, postData);
-        addToast('Goals shared!', 'success');
+    
+        addToast('Goals shared to community!', 'success');
         handleCloseShareTasks();
     };
+
+    // --- Share Nutrition Plan Handlers ---
+    const handleOpenSharePlan = (plan: NutritionPlan) => {
+        setSharingNutritionPlan(plan);
+    };
+
+    const handleCloseSharePlan = () => {
+        setSharingNutritionPlan(null);
+    };
+    
+    const handleSharePlanToCommunity = (communityId: number, channelId: number) => {
+        if (!sharingNutritionPlan) return;
+        
+        setCommunities(prev => prev.map(c => {
+            if (c.id === communityId) {
+                const updatedSharedPlans = [...(c.sharedPlans || []), sharingNutritionPlan];
+                return { ...c, sharedPlans: updatedSharedPlans };
+            }
+            return c;
+        }));
+
+        const postData = {
+            description: `${currentUser!.name} shared a new nutrition plan: "${sharingNutritionPlan.name}". Check it out in the community's Nutrition tab!`,
+            hashtags: ['#NutritionPlan', '#HealthyEating', '#FMFC'],
+        };
+        handleCreatePost(communityId, channelId, postData);
+
+        addToast(`Plan shared to community!`, 'success');
+        handleCloseSharePlan();
+    };
+    
+    const handleCopyTemplatePlan = (planToCopy: NutritionPlan) => {
+        const newTemplate: NutritionPlan = {
+            ...planToCopy,
+            id: Date.now(),
+            isTemplate: true,
+            isActive: false,
+            name: `${planToCopy.name} (Copied)`,
+        };
+
+        setNutritionPlans(prev => [...prev, newTemplate]);
+        addToast(`"${planToCopy.name}" was copied to your templates.`, 'success');
+        setViewingSharedItem(null); // Close the detail view after copying
+    };
+
+    // --- Community Shared Item View Handlers ---
+    const handleViewSharedItem = (item: NutritionPlan | SharedGoal, type: 'nutrition' | 'goal', communityName: string) => {
+        setViewingSharedItem({ data: item, type, communityName });
+    };
+
+    const handleCloseSharedItemView = () => {
+        setViewingSharedItem(null);
+    };
+
 
     // --- Photo Comparison Handlers ---
     const handleOpenComparePhotos = () => setIsComparingPhotos(true);
@@ -1118,8 +1174,7 @@ const App: React.FC = () => {
     };
 
     // --- AI Flow Handlers ---
-    const handleOpenAskAi = () => setIsAskingAi(true);
-    const handleCloseAskAi = () => setIsAskingAi(false);
+    const handleCloseAskAi = () => setAiSource(null);
     const handleSaveAiPlan = (plan: NutritionPlan) => {
         setNutritionPlans(prev => [...prev, plan]);
         addToast('New nutrition plan saved as template!', 'success');
@@ -1129,6 +1184,28 @@ const App: React.FC = () => {
 
 
     const renderPage = () => {
+        if (viewingSharedItem) {
+            if (viewingSharedItem.type === 'nutrition') {
+                return <NutritionPlanDetailsPage 
+                            plan={viewingSharedItem.data as NutritionPlan} 
+                            onBack={handleCloseSharedItemView}
+                            isEditable={false}
+                            onAddItemToMeal={() => {}}
+                            onEditItem={() => {}}
+                            onDeleteItem={() => {}}
+                            onCopyPlan={handleCopyTemplatePlan}
+                       />;
+            }
+             if (viewingSharedItem.type === 'goal') {
+                return <SharedGoalDetailsPage
+                            sharedGoal={viewingSharedItem.data as SharedGoal}
+                            communityName={viewingSharedItem.communityName}
+                            onBack={handleCloseSharedItemView}
+                            onCopyTasks={() => addToast("This will copy these tasks to your goals for today. (Coming soon!)", "info")}
+                        />;
+            }
+        }
+
         if (editingPlanFoodItem) {
             return <AddPlanFoodItemPage
                 onClose={handleClosePlanFoodItem}
@@ -1138,7 +1215,7 @@ const App: React.FC = () => {
             />;
         }
 
-        if (isAskingAi) {
+        if (aiSource) {
             return <AskAiPage
                 onClose={handleCloseAskAi}
                 userMeasurements={userMeasurements}
@@ -1146,6 +1223,17 @@ const App: React.FC = () => {
                 activePlan={activePlan}
                 checkedNutritionItems={checkedNutritionItems}
                 onSavePlan={handleSaveAiPlan}
+                source={aiSource}
+            />;
+        }
+
+        if (sharingNutritionPlan) {
+            return <ShareNutritionPlanPage
+                currentUser={currentUser!}
+                planData={sharingNutritionPlan}
+                userCommunities={communities.filter(c => c.members.some(m => m.id === currentUser!.id))}
+                onBack={handleCloseSharePlan}
+                onShareToChannel={handleSharePlanToCommunity}
             />;
         }
 
@@ -1256,10 +1344,11 @@ const App: React.FC = () => {
             return <NutritionPlanDetailsPage 
                         plan={viewingNutritionPlan} 
                         onBack={handleBackFromPlanDetails}
-                        isEditable={isActivePlan}
+                        isEditable={isActivePlan || viewingNutritionPlan.isTemplate}
                         onAddItemToMeal={(mealTime) => handleOpenAddPlanFoodItem(viewingNutritionPlan.id, mealTime)}
                         onEditItem={(mealTime, item) => handleOpenEditPlanFoodItem(viewingNutritionPlan.id, mealTime, item)}
                         onDeleteItem={(mealTime, itemId) => handleDeletePlanFoodItem(viewingNutritionPlan.id, mealTime, itemId)}
+                        onShare={handleOpenSharePlan}
                    />;
         }
         
@@ -1270,6 +1359,7 @@ const App: React.FC = () => {
                             onBack={handleBackFromSecondaryPage} 
                             onViewPlan={handleViewNutritionPlan}
                             onActivatePlan={handleActivatePlan}
+                            onAskAi={() => setAiSource('nutrition')}
                        />;
             }
             if (currentSecondaryPage === 'Progress') {
@@ -1284,7 +1374,7 @@ const App: React.FC = () => {
                     onToggleNutritionItem={handleToggleNutritionItem}
                     onEditDietIntake={handleOpenEditDietIntake}
                     onDeleteDietIntake={handleDeleteDietIntake}
-                    onAskAi={handleOpenAskAi}
+                    onAskAi={() => setAiSource('journal')}
                 />;
             }
             return <UnderDevelopmentPage 
@@ -1322,6 +1412,8 @@ const App: React.FC = () => {
                             onCreateCommunity={handleCreateCommunity}
                             onToggleNotifications={handleToggleNotifications}
                             hasUnreadNotifications={hasUnreadNotifications}
+                            onCopyPlan={handleCopyTemplatePlan}
+                            onViewSharedItem={handleViewSharedItem}
                         />;
             case 'Profile':
                 return <ProfilePage
@@ -1402,6 +1494,8 @@ const App: React.FC = () => {
                             onCreateCommunity={handleCreateCommunity}
                             onToggleNotifications={handleToggleNotifications}
                             hasUnreadNotifications={hasUnreadNotifications}
+                            onCopyPlan={handleCopyTemplatePlan}
+                            onViewSharedItem={handleViewSharedItem}
                         />;
         }
     };

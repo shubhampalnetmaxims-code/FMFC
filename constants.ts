@@ -1,8 +1,3 @@
-
-
-
-
-
 import type { NavItemType, Community, User, UserRole, File, NutritionPlan, ChallengeTask, Notification } from './types';
 
 interface NavItem {
@@ -331,6 +326,8 @@ export const COMMUNITIES_DATA: Community[] = [
             { id: 10, user: fitLife, text: "It was the 'Heavy Squat Day' workout.", timestamp: 'Today 11:08 AM', reactions: [], notes: 'User is on iOS v1.2. Follow up on ticket #4351.' },
         ],
         files: DUMMY_FILES,
+        sharedPlans: [],
+        sharedGoals: [],
         goals: [],
         workouts: [],
         meals: [],
@@ -448,6 +445,8 @@ export const COMMUNITIES_DATA: Community[] = [
             { id: 11, user: testUser, text: "I can't find the protein powder you mentioned in your latest recipe. Is there a good substitute?", timestamp: 'Today 1:12 PM', reactions: [] },
         ],
         files: [DUMMY_FILES[3]],
+        sharedPlans: [],
+        sharedGoals: [],
         goals: [],
         workouts: [],
         meals: [],
@@ -533,6 +532,8 @@ export const COMMUNITIES_DATA: Community[] = [
             { id: 23, user: adminUser, text: `Hi ${testUser.name}, sorry to hear that. I've created a support ticket for you. Can you tell me what device you're using?`, timestamp: 'Today 2:31 PM', reactions: [], toUserId: testUser.id },
         ],
         files: [DUMMY_FILES[0], DUMMY_FILES[3]],
+        sharedPlans: [],
+        sharedGoals: [],
         goals: [],
         workouts: [],
         meals: [],

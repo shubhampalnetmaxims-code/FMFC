@@ -1,243 +1,206 @@
+// FIX: Replaced entire file content with proper type definitions and exports to resolve circular dependencies and missing type errors across the application.
 
-
-
-
-
+export type NavItemType = 'Community' | 'Session' | 'Goals' | 'Workouts' | 'Profile';
 
 export type UserRole = 'customer' | 'admin';
 
 export interface User {
-  id: number;
-  name: string;
-  avatar: string;
-  role?: UserRole;
+    id: number;
+    name: string;
+    avatar: string;
+    role?: UserRole;
 }
 
-export interface Comment {
-  user: User;
-  text: string;
+export interface File {
+    id: number;
+    name: string;
+    url: string;
+    size: string;
+    type: string;
 }
 
-export interface Post {
-  id: number;
-  user: User;
-  communityId: number;
-  channelId: number;
-  image?: string;
-  video?: string;
-  likes: number;
-  commentCount: number;
-  comments: Comment[];
-  description: string;
-  hashtags: string[];
+export type NotificationType = 'community' | 'goal' | 'mention' | 'like';
+
+export interface Notification {
+    id: number;
+    type: NotificationType;
+    text: string;
+    timestamp: string;
+    isRead: boolean;
 }
 
-export type NavItemType = 'Community' | 'Session' | 'Goals' | 'Workouts' | 'Profile';
-
-export interface Reaction {
-  emoji: string;
-  user: User;
+export interface NutritionTotals {
+    energy: number;
+    carbohydrates: number;
+    proteins: number;
+    fats: number;
+    fibre: number;
+    water: number;
 }
 
-export interface ChatMessage {
-  id: number;
-  user: User;
-  text: string;
-  timestamp: string;
-  reactions: Reaction[];
-  imageUrl?: string;
-  videoUrl?: string;
-  audioUrl?: string;
-  notes?: string;
-  // FIX: Added optional 'toUserId' property to support targeted admin replies in support channels, resolving a type error in SupportAdminView.tsx.
-  toUserId?: number;
+export interface FoodItem {
+    id: string;
+    name: string;
+    quantity: number;
+    calories: number;
+    carbohydrates?: number;
+    proteins?: number;
+    fats?: number;
+    fibre?: number;
+    water?: number;
+}
+
+export interface MealEntry {
+    mealTime: string;
+    items: FoodItem[];
+}
+
+export interface NutritionPlan {
+    id: number;
+    name: string;
+    description: string;
+    isTemplate: boolean;
+    isActive: boolean;
+    notes: string;
+    totals: NutritionTotals;
+    content: MealEntry[];
+}
+
+export interface ChallengeTask {
+    id: string;
+    title: string;
+    type: 'auto' | 'manual';
+    frequency: 'daily' | 'weekly';
+    category: 'Nutrition' | 'Activity' | 'Progress' | 'Mindfulness';
+    autoCheckCondition?: string;
+    repeatDays?: string[];
 }
 
 export type ChannelType = 'posts' | 'chat' | 'members' | 'admin-only';
 
 export interface Channel {
-  id: number;
-  name: string;
-  type: ChannelType;
-  isPrivate?: boolean;
-}
-
-export interface File {
-  id: number;
-  name: string;
-  url: string; // This would be a URL to the file storage
-  size: string;
-  type: 'PDF' | 'DOCX' | 'PNG' | 'JPG' | 'XLSX';
-}
-
-export interface Goal {
-  id: number;
-  title: string;
-  description: string;
-  target: string;
-  isCompleted: boolean;
-}
-
-export interface Workout {
     id: number;
     name: string;
+    type: ChannelType;
+    isPrivate?: boolean;
+}
+
+export interface Comment {
+    user: User;
+    text: string;
+}
+
+export interface Post {
+    id: number;
+    user: User;
+    communityId: number;
+    channelId: number;
+    image?: string;
+    video?: string;
     description: string;
-    type: 'Cardio' | 'Strength' | 'Flexibility' | 'HIIT' | 'Other';
-    duration: number; // in minutes
-    videoUrl?: string;
+    hashtags: string[];
+    likes: number;
+    commentCount: number;
+    comments: Comment[];
+}
+
+export interface ChatMessage {
+    id: number;
+    user: User;
+    text: string;
+    timestamp: string;
+    reactions: { emoji: string; user: User }[];
+    toUserId?: number;
+    notes?: string;
     imageUrl?: string;
 }
 
-export interface Meal {
-  id: number;
-  name: string;
-  description: string;
-  imageUrl: string;
-  calories: number;
-  protein: number;
-  carbs: number;
-  fats: number;
+export interface SharedGoal {
+    id: number;
+    user: User;
+    date: string;
+    tasks: ChallengeTask[];
+    completedDaily: Set<string>;
+    completedWeekly: Set<string>;
 }
 
 export interface Community {
-  id: number;
-  name: string;
-  description?: string;
-  isPrivate?: boolean;
-  adminId: number;
-  members: User[];
-  channels: Channel[];
-  posts: Post[];
-  chatMessages: ChatMessage[];
-  files?: File[];
-  goals?: Goal[];
-  workouts?: Workout[];
-  meals?: Meal[];
-}
-
-// --- Nutrition Plan Types ---
-
-export interface FoodItem {
-  id: string;
-  name: string;
-  quantity: number;
-  calories: number;
-  carbohydrates?: number;
-  proteins?: number;
-  fats?: number;
-  fibre?: number;
-  water?: number;
-}
-
-export interface MealEntry {
-  mealTime: string; // 'M1', 'M2', 'Breakfast', etc.
-  items: FoodItem[];
-}
-
-export interface NutritionTotals {
-  energy: number; // Cal
-  carbohydrates: number; // g
-  proteins: number; // g
-  fats: number; // g
-  fibre: number; // g
-  water: number; // mL
-}
-
-export interface NutritionPlan {
-  id: number;
-  name:string;
-  description: string;
-  isTemplate: boolean;
-  isActive: boolean;
-  notes: string;
-  totals: NutritionTotals;
-  content: MealEntry[];
-}
-
-// --- Food Search and Diet Intake Types ---
-export interface FoodMeasure {
-  name: string;
-  grams: number;
-}
-
-export interface FoodSearchItem {
-  id: number;
-  description: string;
-  nutrients_per_100g: NutritionTotals;
-  measures: FoodMeasure[];
+    id: number;
+    name: string;
+    description: string;
+    isPrivate: boolean;
+    adminId: number;
+    members: User[];
+    channels: Channel[];
+    posts: Post[];
+    chatMessages: ChatMessage[];
+    files?: File[];
+    sharedPlans?: NutritionPlan[];
+    sharedGoals?: SharedGoal[];
+    goals?: any[];
+    workouts?: any[];
+    meals?: any[];
 }
 
 export interface DietIntakeItem {
-  id: string;
-  description: string;
-  meal: string;
-  date: string; // YYYY-MM-DD
-  quantity: number;
-  energy: number;
-  carbohydrates: number;
-  proteins: number;
-  fats: number;
-  fibre: number;
-  water: number;
-}
-
-// --- Profile Page Types ---
-export interface UserPhoto {
-  id: string;
-  src: string;
-  type: string;
-  date: string;
-  description: string;
+    id: string;
+    description: string;
+    meal: string;
+    date: string;
+    quantity: number;
+    energy: number;
+    carbohydrates: number;
+    proteins: number;
+    fats: number;
+    fibre: number;
+    water: number;
 }
 
 export interface UserNote {
-  id: string;
-  date: string; // YYYY-MM-DD
-  content: string;
+    id: string;
+    date: string;
+    content: string;
 }
 
 export interface UserMeasurement {
-  id: string;
-  date: string; // YYYY-MM-DD
-  weight?: number;
-  height?: number;
-  chest?: number;
-  waist?: number;
-  hips?: number;
-  neck?: number;
-  thigh?: number;
-  biceps?: number;
-  triceps?: number;
-  subscapular?: number;
-  suprailiac?: number;
-  bodyfat?: number;
+    id: string;
+    date: string;
+    weight?: number;
+    height?: number;
+    chest?: number;
+    waist?: number;
+    bodyfat?: number;
+    hips?: number;
+    neck?: number;
+    thigh?: number;
+    biceps?: number;
+    triceps?: number;
+    subscapular?: number;
+    suprailiac?: number;
 }
 
-// --- Goals Page Types ---
-export interface ChallengeTask {
-  id: string;
-  title: string;
-  type: 'auto' | 'manual';
-  frequency: 'daily' | 'weekly';
-  category: 'Nutrition' | 'Activity' | 'Mindfulness' | 'Progress';
-  // 'auto' types have a condition to check for completion
-  autoCheckCondition?: 'photo_front' | 'photo_side' | 'nutrition_plan_complete' | 'note_added' | 'measurement_added';
-  repeatDays?: string[];
+export interface UserPhoto {
+    id: string;
+    src: string;
+    type: string;
+    date: string;
+    description: string;
 }
 
-// --- Toast Types ---
+export interface FoodMeasure {
+    name: string;
+    grams: number;
+}
+
+export interface FoodSearchItem {
+    id: number;
+    description: string;
+    nutrients_per_100g: NutritionTotals;
+    measures: FoodMeasure[];
+}
+
 export interface Toast {
-  id: number;
-  message: string;
-  type: 'success' | 'error' | 'warning' | 'info';
-}
-
-// --- Notifications ---
-export interface Notification {
-  id: number;
-  type: 'community' | 'goal' | 'mention' | 'like';
-  text: string;
-  timestamp: string;
-  isRead: boolean;
-  linkTo?: string; // Optional for future navigation
+    id: number;
+    message: string;
+    type: 'success' | 'error' | 'warning' | 'info';
 }
