@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../components/Icon';
 import { DietIntakeItem } from '../types';
@@ -74,6 +75,10 @@ const AiScanFlow: React.FC<AiScanFlowProps> = ({ onClose, onComplete }) => {
                     fats: 28,
                     fibre: 5,
                     water: 80,
+                    vitaminA: 75,
+                    vitaminC: 30,
+                    calcium: 50,
+                    iron: 1.5,
                 };
                 onComplete({ description, ...mockData });
             }, 3500);

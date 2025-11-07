@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../components/Icon';
 import { DietIntakeItem } from '../types';
@@ -47,6 +48,10 @@ const BarcodeScannerPage: React.FC<BarcodeScannerPageProps> = ({ onClose, onScan
                 fats: 6,
                 fibre: 1,
                 water: 5,
+                vitaminA: 150,
+                vitaminC: 10,
+                calcium: 200,
+                iron: 2.5,
             };
 
             // Short delay to show "Barcode found!" message before closing

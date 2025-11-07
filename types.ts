@@ -36,6 +36,10 @@ export interface NutritionTotals {
     fats: number;
     fibre: number;
     water: number;
+    vitaminA?: number;
+    vitaminC?: number;
+    calcium?: number;
+    iron?: number;
 }
 
 export interface FoodItem {
@@ -48,6 +52,10 @@ export interface FoodItem {
     fats?: number;
     fibre?: number;
     water?: number;
+    vitaminA?: number;
+    vitaminC?: number;
+    calcium?: number;
+    iron?: number;
 }
 
 export interface MealEntry {
@@ -154,6 +162,10 @@ export interface DietIntakeItem {
     fats: number;
     fibre: number;
     water: number;
+    vitaminA?: number;
+    vitaminC?: number;
+    calcium?: number;
+    iron?: number;
 }
 
 export interface UserNote {

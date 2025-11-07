@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import Icon from '../components/Icon';
 import { FoodItem, FoodSearchItem, DietIntakeItem } from '../types';
@@ -38,8 +39,13 @@ const AddPlanFoodItemPage: React.FC<AddPlanFoodItemPageProps> = ({ onClose, onSa
         fats: '',
         fibre: '',
         water: '',
+        vitaminA: '',
+        vitaminC: '',
+        calcium: '',
+        iron: '',
     });
 
+    const [showMicros, setShowMicros] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
     const [selectedFood, setSelectedFood] = useState<FoodSearchItem | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -57,6 +63,10 @@ const AddPlanFoodItemPage: React.FC<AddPlanFoodItemPageProps> = ({ onClose, onSa
                 fats: String(initialData.fats || ''),
                 fibre: String(initialData.fibre || ''),
                 water: String(initialData.water || ''),
+                vitaminA: String(initialData.vitaminA || ''),
+                vitaminC: String(initialData.vitaminC || ''),
+                calcium: String(initialData.calcium || ''),
+                iron: String(initialData.iron || ''),
             });
         }
     }, [initialData]);
@@ -87,6 +97,10 @@ const AddPlanFoodItemPage: React.FC<AddPlanFoodItemPageProps> = ({ onClose, onSa
             fats: parseFloat(formData.fats) || 0,
             fibre: parseFloat(formData.fibre) || 0,
             water: parseFloat(formData.water) || 0,
+            vitaminA: parseFloat(formData.vitaminA) || 0,
+            vitaminC: parseFloat(formData.vitaminC) || 0,
+            calcium: parseFloat(formData.calcium) || 0,
+            iron: parseFloat(formData.iron) || 0,
         };
         onSave(dataToSave);
     };
@@ -107,11 +121,15 @@ const AddPlanFoodItemPage: React.FC<AddPlanFoodItemPageProps> = ({ onClose, onSa
             name: data.description,
             quantity: String(data.quantity),
             calories: String(parseFloat(data.energy.toFixed(2))),
-            carbohydrates: String(parseFloat(data.carbohydrates.toFixed(2))),
-            proteins: String(parseFloat(data.proteins.toFixed(2))),
-            fats: String(parseFloat(data.fats.toFixed(2))),
-            fibre: String(parseFloat(data.fibre.toFixed(2))),
-            water: String(parseFloat(data.water.toFixed(2))),
+            carbohydrates: String(data.carbohydrates ? parseFloat(data.carbohydrates.toFixed(2)) : ''),
+            proteins: String(data.proteins ? parseFloat(data.proteins.toFixed(2)) : ''),
+            fats: String(data.fats ? parseFloat(data.fats.toFixed(2)) : ''),
+            fibre: String(data.fibre ? parseFloat(data.fibre.toFixed(2)) : ''),
+            water: String(data.water ? parseFloat(data.water.toFixed(2)) : ''),
+            vitaminA: String(data.vitaminA ? parseFloat(data.vitaminA.toFixed(2)) : ''),
+            vitaminC: String(data.vitaminC ? parseFloat(data.vitaminC.toFixed(2)) : ''),
+            calcium: String(data.calcium ? parseFloat(data.calcium.toFixed(2)) : ''),
+            iron: String(data.iron ? parseFloat(data.iron.toFixed(2)) : ''),
         }));
     }
 
@@ -238,6 +256,37 @@ const AddPlanFoodItemPage: React.FC<AddPlanFoodItemPageProps> = ({ onClose, onSa
                     <div className="w-1/2">
                         <StyledInput name="water" type="text" inputMode="decimal" label="Water (mL)" value={formData.water} onChange={handleNumberChange} placeholder="0" />
                     </div>
+                </div>
+
+                 <div className="border-t border-zinc-700 pt-4">
+                    <button
+                        onClick={() => setShowMicros(!showMicros)}
+                        className="w-full flex justify-between items-center text-left text-zinc-300 hover:text-white"
+                        aria-expanded={showMicros}
+                    >
+                        <span className="font-semibold">Micronutrients (Optional)</span>
+                        <Icon type="arrow-right" className={`w-5 h-5 transition-transform transform ${showMicros ? 'rotate-90' : 'rotate-0'}`} />
+                    </button>
+                    {showMicros && (
+                        <div className="mt-4 space-y-4">
+                            <div className="flex gap-3">
+                                <div className="w-1/2">
+                                    <StyledInput name="vitaminA" type="text" inputMode="decimal" label="Vitamin A (mcg)" value={formData.vitaminA} onChange={handleNumberChange} placeholder="0" />
+                                </div>
+                                <div className="w-1/2">
+                                    <StyledInput name="vitaminC" type="text" inputMode="decimal" label="Vitamin C (mg)" value={formData.vitaminC} onChange={handleNumberChange} placeholder="0" />
+                                </div>
+                            </div>
+                            <div className="flex gap-3">
+                                <div className="w-1/2">
+                                    <StyledInput name="calcium" type="text" inputMode="decimal" label="Calcium (mg)" value={formData.calcium} onChange={handleNumberChange} placeholder="0" />
+                                </div>
+                                <div className="w-1/2">
+                                    <StyledInput name="iron" type="text" inputMode="decimal" label="Iron (mg)" value={formData.iron} onChange={handleNumberChange} placeholder="0" />
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </main>
         </div>

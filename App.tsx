@@ -2,6 +2,8 @@
 
 
 
+
+
 import React, { useState, useEffect, useMemo } from 'react';
 import BottomNav from './components/BottomNav';
 import CommunityPage from './pages/CommunityPage';
@@ -188,26 +190,32 @@ const App: React.FC = () => {
                     });
                 }
 
-                // Add progress photos (Front, Side, Back) every 7 days (weekly)
-                if (i % 7 === 0) {
+                // Add progress photos with more variety in dates and types
+                if (i % 8 === 0) { // Add a Front photo roughly weekly
                      mockPhotos.push({
-                        id: `p${i}-front`, src: `https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=600&h=800&fit=crop&crop=faces&seed=front${i}`,
-                        type: 'Front', date: dateKey, description: `Week ${Math.floor(dayNumber / 7)} check-in. Feeling good.`
+                        id: `p${i}-front`, src: `https://picsum.photos/600/800?random=front-${i}`,
+                        type: 'Front', date: dateKey, description: `Front view, Day ${dayNumber}.`
                     });
+                }
+
+                if ((i + 3) % 10 === 0) { // Add a Side photo on a different schedule
                      mockPhotos.push({
-                        id: `p${i}-side`, src: `https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=600&h=800&fit=crop&crop=faces&seed=side${i}`,
-                        type: 'Side', date: dateKey, description: `Side view, Week ${Math.floor(dayNumber / 7)}.`
+                        id: `p${i}-side`, src: `https://picsum.photos/600/800?random=side-${i}`,
+                        type: 'Side', date: dateKey, description: `Side view, Day ${dayNumber}.`
                     });
+                }
+
+                if ((i + 6) % 12 === 0) { // Add a Back photo on yet another schedule
                     mockPhotos.push({
-                        id: `p${i}-back`, src: `https://images.unsplash.com/photo-1550345332-09e3ac987658?q=80&w=600&h=800&fit=crop&crop=faces&seed=back${i}`,
-                        type: 'Back', date: dateKey, description: `Back progress, Week ${Math.floor(dayNumber / 7)}.`
+                        id: `p${i}-back`, src: `https://picsum.photos/600/800?random=back-${i}`,
+                        type: 'Back', date: dateKey, description: `Back progress, Day ${dayNumber}.`
                     });
                 }
                 
                 // Add a workout photo randomly
-                if (Math.random() < 0.15) { // Roughly every 6-7 days
+                if (i > 0 && Math.random() < 0.1) { // A bit less frequent
                     mockPhotos.push({
-                         id: `p${i}-gym`, src: `https://images.unsplash.com/photo-1599058917212-d750089bc07e?q=80&w=600&h=800&fit=crop&crop=faces&seed=gym${i}`,
+                         id: `p${i}-gym`, src: `https://picsum.photos/600/800?random=gym-${i}`,
                          type: 'Workout', date: dateKey, description: `Post-workout pump! Great session today.`
                     });
                 }
@@ -365,8 +373,12 @@ const App: React.FC = () => {
             totals.fats += item.fats || 0;
             totals.fibre += item.fibre || 0;
             totals.water += item.water || 0;
+            totals.vitaminA = (totals.vitaminA || 0) + (item.vitaminA || 0);
+            totals.vitaminC = (totals.vitaminC || 0) + (item.vitaminC || 0);
+            totals.calcium = (totals.calcium || 0) + (item.calcium || 0);
+            totals.iron = (totals.iron || 0) + (item.iron || 0);
             return totals;
-        }, { energy: 0, carbohydrates: 0, proteins: 0, fats: 0, fibre: 0, water: 0 });
+        }, { energy: 0, carbohydrates: 0, proteins: 0, fats: 0, fibre: 0, water: 0, vitaminA: 0, vitaminC: 0, calcium: 0, iron: 0 });
     };
 
     const handleSavePlanFoodItem = (newItemData: Omit<FoodItem, 'id'>) => {
@@ -1346,6 +1358,7 @@ const App: React.FC = () => {
                             onBackToCommunityHub={handleBackToCommunityHub}
                             onBackToCommunityList={handleBackToCommunityList}
                             onLeaveCommunity={handleLeaveCommunity}
+                            // FIX: The prop 'onCreatePost' was referencing an undefined variable 'onCreatePost'. Corrected to use 'handleCreatePost'.
                             onCreatePost={handleCreatePost}
                             onAddOrUpdateChatMessage={handleAddOrUpdateChatMessage}
                             onUpdateCommunity={handleUpdateCommunity}
@@ -1427,6 +1440,7 @@ const App: React.FC = () => {
                             onBackToCommunityHub={handleBackToCommunityHub}
                             onBackToCommunityList={handleBackToCommunityList}
                             onLeaveCommunity={handleLeaveCommunity}
+                            // FIX: The prop 'onCreatePost' was referencing an undefined variable 'onCreatePost'. Corrected to use 'handleCreatePost'.
                             onCreatePost={handleCreatePost}
                             onAddOrUpdateChatMessage={handleAddOrUpdateChatMessage}
                             onUpdateCommunity={handleUpdateCommunity}

@@ -73,6 +73,10 @@ export const NUTRITION_PLANS_DATA: NutritionPlan[] = [
             fats: 509,
             fibre: 2.04,
             water: 677,
+            vitaminA: 0,
+            vitaminC: 0,
+            calcium: 0,
+            iron: 0,
         },
         content: [
             {
@@ -110,6 +114,10 @@ export const NUTRITION_PLANS_DATA: NutritionPlan[] = [
             fats: 75,
             fibre: 30,
             water: 2000,
+            vitaminA: 0,
+            vitaminC: 0,
+            calcium: 0,
+            iron: 0,
         },
         content: [
              {
@@ -153,6 +161,10 @@ export const NUTRITION_PLANS_DATA: NutritionPlan[] = [
             fats: 110,
             fibre: 40,
             water: 3000,
+            vitaminA: 0,
+            vitaminC: 0,
+            calcium: 0,
+            iron: 0,
         },
         content: [
              {

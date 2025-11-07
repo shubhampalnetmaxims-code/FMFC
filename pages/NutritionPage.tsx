@@ -2,6 +2,8 @@
 
 
 
+
+
 import React from 'react';
 import { NutritionPlan } from '../types';
 import Icon from '../components/Icon';
@@ -82,14 +84,7 @@ const NutritionPage: React.FC<NutritionPageProps> = ({ onBack, plans, onViewPlan
                                 </div>
                             </div>
                         ))}
-                         <div className="grid grid-cols-2 gap-4">
-                            <button 
-                                onClick={() => addToast("Creating custom plans is coming soon!", "info")}
-                                className="w-full flex items-center justify-center space-x-2 border-2 border-dashed border-zinc-700 text-zinc-500 hover:text-amber-400 hover:border-amber-400/50 rounded-lg py-4 transition-colors"
-                            >
-                                <Icon type="plus" className="w-5 h-5"/>
-                                <span className="font-semibold text-sm">Create New Plan</span>
-                            </button>
+                         <div className="grid grid-cols-1 gap-4">
                              <button 
                                 onClick={onAskAi}
                                 className="w-full flex items-center justify-center space-x-2 border-2 border-dashed border-zinc-700 text-zinc-500 hover:text-amber-400 hover:border-amber-400/50 rounded-lg py-4 transition-colors"
