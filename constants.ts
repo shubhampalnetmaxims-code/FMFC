@@ -1,4 +1,6 @@
-import type { NavItemType, Community, User, UserRole, File, NutritionPlan, ChallengeTask, Notification } from './types';
+
+
+import type { NavItemType, Community, User, UserRole, File, NutritionPlan, ChallengeTask, Notification, Workout, WorkoutStyle, MuscleGroup, WorkoutDay, Equipment } from './types';
 
 interface NavItem {
     id: NavItemType;
@@ -218,6 +220,64 @@ export const WEEKLY_CHALLENGE_TASKS: ChallengeTask[] = [
     { id: 'active_recovery', title: '1 Active Recovery Day', type: 'manual', frequency: 'weekly', category: 'Activity', repeatDays: ['Sun'] },
     { id: 'meal_prep', title: 'Plan meals for the week', type: 'manual', frequency: 'weekly', category: 'Nutrition', repeatDays: ['Sun'] },
     { id: 'review_progress', title: 'Review weekly progress', type: 'manual', frequency: 'weekly', category: 'Progress', repeatDays: ['Sat'] },
+];
+
+// --- WORKOUTS DATA ---
+
+export const WORKOUT_STYLES: WorkoutStyle[] = ['Calisthenics', 'Bodybuilding', 'CrossFit', 'Powerlifting', 'HIIT'];
+export const MUSCLE_GROUPS: MuscleGroup[] = ['Chest', 'Back', 'Legs', 'Shoulders', 'Arms', 'Core'];
+export const WORKOUT_DAYS: WorkoutDay[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+export const EQUIPMENT_TYPES: Equipment[] = ['Dumbbell', 'Barbell', 'Kettlebell', 'Bodyweight', 'Machine'];
+export const WORKOUT_DIFFICULTIES = [1, 2, 3, 4, 5];
+
+export const WORKOUTS_DATA: Workout[] = [
+    { 
+        id: 1, 
+        title: "Workout 1", 
+        image: "https://images.pexels.com/photos/416809/pexels-photo-416809.jpeg?auto=compress&cs=tinysrgb&w=600", 
+        duration: 70, 
+        style: 'HIIT', 
+        muscleGroup: 'Core', 
+        day: 'Monday', 
+        difficulty: 2, 
+        equipment: 'Bodyweight', 
+        description: "Get ready to explore how our software can revolutionize your daily tasks! With intuitive designs and robust features, you’ll find yourself working smarter and faster. Let’s embark on this exciting journey to elevate your productivity!",
+        phases: [
+            {
+                id: 'phase-1',
+                name: 'WARM-UP PHASE (3)',
+                sets: [
+                    {
+                        id: 'set-1-1',
+                        name: 'WARM-UP',
+                        reps: 1,
+                        duration: 30,
+                        exercises: [
+                            { id: 'ex-1', name: 'Jumping Jacks', image: 'https://i.imgur.com/r6dJ3yG.gif' },
+                            { id: 'ex-2', name: 'Arm Circles', image: 'https://i.imgur.com/w1p2z6X.gif' },
+                        ]
+                    },
+                    {
+                        id: 'set-1-2',
+                        name: 'STRETCHING',
+                        reps: 1,
+                        duration: 30,
+                        exercises: [
+                            { id: 'ex-3', name: 'Torso Twists', image: 'https://i.imgur.com/JkZ2s1J.gif' },
+                        ]
+                    }
+                ]
+            },
+        ],
+        isTemplate: true,
+    },
+    { id: 2, title: "Workout 2", image: "https://images.pexels.com/photos/1552106/pexels-photo-1552106.jpeg?auto=compress&cs=tinysrgb&w=600", duration: 60, style: 'Calisthenics', muscleGroup: 'Legs', day: 'Tuesday', difficulty: 3, equipment: 'Bodyweight', description: "Build lower body strength and endurance using only your bodyweight.", phases: [], isTemplate: true },
+    { id: 3, title: "Workout 3", image: "https://images.pexels.com/photos/1552242/pexels-photo-1552242.jpeg?auto=compress&cs=tinysrgb&w=600", duration: 50, style: 'Bodybuilding', muscleGroup: 'Chest', day: 'Wednesday', difficulty: 4, equipment: 'Barbell', description: "Classic chest day focused on building mass and strength with heavy compound lifts.", phases: [], isTemplate: true },
+    { id: 4, title: "Workout 4", image: "https://images.pexels.com/photos/2261477/pexels-photo-2261477.jpeg?auto=compress&cs=tinysrgb&w=600", duration: 85, style: 'Powerlifting', muscleGroup: 'Back', day: 'Thursday', difficulty: 5, equipment: 'Barbell', description: "A heavy deadlift session designed to maximize your pulling strength.", phases: [], isTemplate: true },
+    { id: 5, title: "Workout 5", image: "https://images.pexels.com/photos/3837464/pexels-photo-3837464.jpeg?auto=compress&cs=tinysrgb&w=600", duration: 45, style: 'Bodybuilding', muscleGroup: 'Shoulders', day: 'Friday', difficulty: 3, equipment: 'Dumbbell', description: "Isolate and build your deltoids for a broader, more defined look.", phases: [], isTemplate: true },
+    { id: 6, title: "Workout 6", image: "https://images.pexels.com/photos/3289711/pexels-photo-3289711.jpeg?auto=compress&cs=tinysrgb&w=600", duration: 55, style: 'CrossFit', muscleGroup: 'Arms', day: 'Saturday', difficulty: 4, equipment: 'Kettlebell', description: "A challenging CrossFit WOD combining kettlebell movements and gymnastics.", phases: [], isTemplate: true },
+    { id: 7, title: "Workout 7", image: "https://images.pexels.com/photos/4753997/pexels-photo-4753997.jpeg?auto=compress&cs=tinysrgb&w=600", duration: 75, style: 'Calisthenics', muscleGroup: 'Chest', day: 'Monday', difficulty: 3, equipment: 'Bodyweight', description: "Master your bodyweight with advanced push-up variations and dips.", phases: [], isTemplate: true },
+    { id: 8, title: "Workout 8", image: "https://images.pexels.com/photos/28080/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=600", duration: 60, style: 'HIIT', muscleGroup: 'Legs', day: 'Sunday', difficulty: 5, equipment: 'Dumbbell', description: "An explosive leg day HIIT workout to build power and shred fat.", phases: [], isTemplate: true },
 ];
 
 // --- COMMUNITIES DATA ---

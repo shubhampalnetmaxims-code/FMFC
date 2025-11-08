@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import type { Community, Channel, User, ChannelType, NutritionPlan, SharedGoal } from '../types';
+import type { Community, Channel, User, ChannelType, NutritionPlan, SharedGoal, Workout } from '../types';
 import Icon from '../components/Icon';
 import MemberListPane from '../components/MemberListPane';
 import MediaGrid from '../components/MediaGrid';
@@ -11,6 +11,7 @@ import FileListPane from '../components/FileListPane';
 import { useToast } from '../components/ToastProvider';
 import SharedPlansPane from '../components/SharedPlansPane';
 import SharedGoalsPane from '../components/SharedGoalsPane';
+import WorkoutCard from '../components/WorkoutCard';
 
 export type CommunityHubFilterType = 'feed' | 'channels' | 'members' | 'files' | 'media' | 'workouts' | 'goals' | 'nutrition';
 
@@ -30,9 +31,10 @@ interface CommunityHubPageProps {
     hasUnreadNotifications: boolean;
     onCopyPlan: (plan: NutritionPlan) => void;
     onViewSharedItem: (item: NutritionPlan | SharedGoal, type: 'nutrition' | 'goal', communityName: string) => void;
+    onViewWorkout: (workout: Workout) => void;
 }
 
-const CommunityHubPage: React.FC<CommunityHubPageProps> = ({ community, currentUser, onSelectChannel, onBack, onLeaveCommunity, onUpdateCommunity, onAddChannel, onUpdateChannel, onAddMembers, activeFilter, setActiveFilter, onToggleNotifications, hasUnreadNotifications, onCopyPlan, onViewSharedItem }) => {
+const CommunityHubPage: React.FC<CommunityHubPageProps> = ({ community, currentUser, onSelectChannel, onBack, onLeaveCommunity, onUpdateCommunity, onAddChannel, onUpdateChannel, onAddMembers, activeFilter, setActiveFilter, onToggleNotifications, hasUnreadNotifications, onCopyPlan, onViewSharedItem, onViewWorkout }) => {
     const { addToast } = useToast();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -241,9 +243,18 @@ const CommunityHubPage: React.FC<CommunityHubPageProps> = ({ community, currentU
             case 'files':
                  return <FileListPane files={community.files || []} />;
             case 'workouts':
+                if (!community.workouts || community.workouts.length === 0) {
+                    return (
+                        <div className="text-center py-16 text-zinc-500">
+                            <p>No workouts have been shared in this community yet.</p>
+                        </div>
+                    );
+                }
                 return (
-                    <div className="text-center py-16 text-zinc-500">
-                        <p>No workouts have been shared in this community yet.</p>
+                    <div className="p-4 grid grid-cols-2 gap-4">
+                        {community.workouts.map(workout => (
+                            <WorkoutCard key={workout.id} workout={workout} onViewWorkout={onViewWorkout} />
+                        ))}
                     </div>
                 );
             case 'goals':

@@ -1,7 +1,8 @@
 
+
 import React from 'react';
 
-type IconType = 'community' | 'session' | 'goals' | 'workouts' | 'profile' | 'like' | 'like-filled' | 'comment' | 'share' | 'send' | 'hash' | 'users' | 'arrow-left' | 'dots-horizontal' | 'search' | 'lock-closed' | 'emoji' | 'file-document' | 'photo' | 'plus' | 'paper-clip' | 'microphone' | 'video-camera' | 'user-plus' | 'pencil' | 'pin' | 'note' | 'chat-bubble-left-right' | 'download' | 'file-pdf' | 'file-doc' | 'file-xls' | 'bell' | 'fire' | 'menu' | 'cog' | 'logout' | 'x' | 'arrow-right' | 'bolt' | 'barcode' | 'check' | 'trash' | 'spinner' | 'refresh' | 'sparkles' | 'eye' | 'eye-off';
+type IconType = 'community' | 'session' | 'goals' | 'workouts' | 'profile' | 'like' | 'like-filled' | 'comment' | 'share' | 'send' | 'hash' | 'users' | 'arrow-left' | 'dots-horizontal' | 'search' | 'lock-closed' | 'emoji' | 'file-document' | 'photo' | 'plus' | 'paper-clip' | 'microphone' | 'video-camera' | 'user-plus' | 'pencil' | 'pin' | 'note' | 'chat-bubble-left-right' | 'download' | 'file-pdf' | 'file-doc' | 'file-xls' | 'bell' | 'fire' | 'menu' | 'cog' | 'logout' | 'x' | 'arrow-right' | 'bolt' | 'barcode' | 'check' | 'trash' | 'spinner' | 'refresh' | 'sparkles' | 'eye' | 'eye-off' | 'chevron-down' | 'chevron-right';
 
 interface IconProps {
   type: IconType;
@@ -219,6 +220,16 @@ const Icon: React.FC<IconProps> = ({ type, className = 'w-6 h-6' }) => {
     check: (
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+        </svg>
+    ),
+    'chevron-down': (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+        </svg>
+    ),
+    'chevron-right': (
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
         </svg>
     ),
     trash: (

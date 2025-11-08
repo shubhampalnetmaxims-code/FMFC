@@ -1,8 +1,10 @@
 
+
 import React, { useState } from 'react';
 import type { Channel, ChatMessage, User } from '../types';
 import Icon from './Icon';
 import { useToast } from './ToastProvider';
+import WorkoutMessageCard from './WorkoutMessageCard';
 
 interface ChatPaneProps {
     channel: Channel;
@@ -60,6 +62,7 @@ const ChatPane: React.FC<ChatPaneProps> = ({ channel, messages, currentUser, onS
                             {msg.imageUrl && (
                                 <img src={msg.imageUrl} alt="Shared content" className="mt-2 rounded-lg max-w-xs" />
                             )}
+                            {msg.workout && <WorkoutMessageCard workout={msg.workout} />}
                             {msg.reactions.length > 0 && (
                                 <div className="flex space-x-1 mt-1">
                                     {msg.reactions.map((r, i) => (

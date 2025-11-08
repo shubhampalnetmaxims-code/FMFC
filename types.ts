@@ -1,3 +1,5 @@
+
+
 // FIX: Replaced entire file content with proper type definitions and exports to resolve circular dependencies and missing type errors across the application.
 
 export type NavItemType = 'Community' | 'Session' | 'Goals' | 'Workouts' | 'Profile';
@@ -121,6 +123,7 @@ export interface ChatMessage {
     toUserId?: number;
     notes?: string;
     imageUrl?: string;
+    workout?: Workout;
 }
 
 export interface SharedGoal {
@@ -146,7 +149,7 @@ export interface Community {
     sharedPlans?: NutritionPlan[];
     sharedGoals?: SharedGoal[];
     goals?: any[];
-    workouts?: any[];
+    workouts?: Workout[];
     meals?: any[];
 }
 
@@ -215,4 +218,45 @@ export interface Toast {
     id: number;
     message: string;
     type: 'success' | 'error' | 'warning' | 'info';
+}
+
+// --- WORKOUTS ---
+export type WorkoutStyle = 'Calisthenics' | 'Bodybuilding' | 'CrossFit' | 'Powerlifting' | 'HIIT';
+export type MuscleGroup = 'Chest' | 'Back' | 'Legs' | 'Shoulders' | 'Arms' | 'Core';
+export type WorkoutDay = 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+export type Equipment = 'Dumbbell' | 'Barbell' | 'Kettlebell' | 'Bodyweight' | 'Machine';
+
+export interface Exercise {
+    id: string;
+    name: string;
+    image: string;
+}
+
+export interface ExerciseSet {
+    id: string;
+    name: string;
+    reps: number;
+    duration: number; // in mins
+    exercises: Exercise[];
+}
+
+export interface WorkoutPhase {
+    id: string;
+    name: string;
+    sets: ExerciseSet[];
+}
+
+export interface Workout {
+    id: number;
+    title: string;
+    image: string;
+    duration: number; // in minutes
+    style: WorkoutStyle;
+    muscleGroup: MuscleGroup;
+    day: WorkoutDay;
+    difficulty: 1 | 2 | 3 | 4 | 5;
+    equipment: Equipment;
+    description: string;
+    phases: WorkoutPhase[];
+    isTemplate?: boolean;
 }
