@@ -230,6 +230,9 @@ export interface Exercise {
     id: string;
     name: string;
     image: string;
+    videoUrl?: string;
+    steps?: string[];
+    benefits?: string[];
 }
 
 export interface ExerciseSet {

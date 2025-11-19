@@ -230,6 +230,24 @@ export const WORKOUT_DAYS: WorkoutDay[] = ['Monday', 'Tuesday', 'Wednesday', 'Th
 export const EQUIPMENT_TYPES: Equipment[] = ['Dumbbell', 'Barbell', 'Kettlebell', 'Bodyweight', 'Machine'];
 export const WORKOUT_DIFFICULTIES = [1, 2, 3, 4, 5];
 
+const STANDARD_STEPS = [
+    "Start in a standing position with your feet shoulder-width apart.",
+    "Engage your core and keep your back straight.",
+    "Lower your body as if you were sitting back into a chair.",
+    "Keep your knees behind your toes and your weight in your heels.",
+    "Push back up to the starting position."
+];
+
+const STANDARD_BENEFITS = [
+    "Improves cardiovascular health.",
+    "Builds muscular strength and endurance.",
+    "Burns calories and aids in weight loss.",
+    "Enhances flexibility and range of motion."
+];
+
+const VIDEO_URL_1 = "https://videos.pexels.com/video-files/4753648/4753648-hd.mp4";
+const VIDEO_URL_2 = "https://videos.pexels.com/video-files/3840428/3840428-hd.mp4";
+
 export const WORKOUTS_DATA: Workout[] = [
     { 
         id: 1, 
@@ -253,8 +271,31 @@ export const WORKOUTS_DATA: Workout[] = [
                         reps: 1,
                         duration: 30,
                         exercises: [
-                            { id: 'ex-1', name: 'Jumping Jacks', image: 'https://i.imgur.com/r6dJ3yG.gif' },
-                            { id: 'ex-2', name: 'Arm Circles', image: 'https://i.imgur.com/w1p2z6X.gif' },
+                            { 
+                                id: 'ex-1', 
+                                name: 'Jumping Jacks', 
+                                image: 'https://i.imgur.com/r6dJ3yG.gif',
+                                videoUrl: VIDEO_URL_1,
+                                steps: [
+                                    "Stand upright with your legs together, arms at your sides.",
+                                    "Bend your knees slightly, and jump into the air.",
+                                    "As you jump, spread your legs to be about shoulder-width apart.",
+                                    "Stretch your arms out and over your head.",
+                                    "Jump back to the starting position."
+                                ],
+                                benefits: [
+                                    "Cardiovascular health",
+                                    "Full body warmup",
+                                    "Calorie burning"
+                                ]
+                            },
+                            { 
+                                id: 'ex-2', 
+                                name: 'Arm Circles', 
+                                image: 'https://i.imgur.com/w1p2z6X.gif',
+                                steps: ["Stand with arms extended.", "Rotate arms in small circles.", "Gradually increase circle size."],
+                                benefits: ["Shoulder mobility", "Warm up shoulder joints"]
+                            },
                         ]
                     },
                     {
@@ -263,7 +304,13 @@ export const WORKOUTS_DATA: Workout[] = [
                         reps: 1,
                         duration: 30,
                         exercises: [
-                            { id: 'ex-3', name: 'Torso Twists', image: 'https://i.imgur.com/JkZ2s1J.gif' },
+                            { 
+                                id: 'ex-3', 
+                                name: 'Torso Twists', 
+                                image: 'https://i.imgur.com/JkZ2s1J.gif',
+                                steps: ["Stand feet shoulder width.", "Twist torso left and right.", "Keep hips forward."],
+                                benefits: ["Core mobility", "Spine health"]
+                            },
                         ]
                     }
                 ]

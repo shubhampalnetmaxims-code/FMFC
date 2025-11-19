@@ -1,14 +1,19 @@
+
 import React, { useState, useRef, useEffect } from 'react';
-import { Workout } from '../types';
+import { Workout, Exercise } from '../types';
 import Icon from '../components/Icon';
 
 interface WorkoutDetailsPageProps {
     workout: Workout;
     onBack: () => void;
     onShare: (workout: Workout) => void;
+    onExerciseClick: (exercise: Exercise) => void;
+    onCopyTemplate?: (workout: Workout) => void;
+    onAddToMyWorkouts?: (workout: Workout) => void;
+    onStart?: (workout: Workout) => void;
 }
 
-const WorkoutDetailsPage: React.FC<WorkoutDetailsPageProps> = ({ workout, onBack, onShare }) => {
+const WorkoutDetailsPage: React.FC<WorkoutDetailsPageProps> = ({ workout, onBack, onShare, onExerciseClick, onCopyTemplate, onAddToMyWorkouts, onStart }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -34,17 +39,43 @@ const WorkoutDetailsPage: React.FC<WorkoutDetailsPageProps> = ({ workout, onBack
                         <Icon type="dots-horizontal" className="w-6 h-6" />
                     </button>
                     {isMenuOpen && (
-                        <div className="absolute right-0 mt-2 w-48 bg-zinc-800 border border-zinc-700 rounded-md shadow-lg z-20">
+                        <div className="absolute right-0 mt-2 w-56 bg-zinc-800 border border-zinc-700 rounded-md shadow-lg z-20 py-1">
                             <button 
                                 onClick={() => {
                                     onShare(workout);
                                     setIsMenuOpen(false);
                                 }}
-                                className="flex items-center space-x-2 w-full text-left px-4 py-2 text-sm text-zinc-200 hover:bg-zinc-700"
+                                className="flex items-center space-x-2 w-full text-left px-4 py-3 text-sm text-zinc-200 hover:bg-zinc-700"
                             >
-                                <Icon type="share" className="w-4 h-4"/>
+                                <Icon type="share" className="w-4 h-4 text-zinc-400"/>
                                 <span>Share Workout</span>
                             </button>
+                            
+                            {onCopyTemplate && (
+                                <button 
+                                    onClick={() => {
+                                        onCopyTemplate(workout);
+                                        setIsMenuOpen(false);
+                                    }}
+                                    className="flex items-center space-x-2 w-full text-left px-4 py-3 text-sm text-zinc-200 hover:bg-zinc-700 border-t border-zinc-700"
+                                >
+                                    <Icon type="file-document" className="w-4 h-4 text-zinc-400"/>
+                                    <span>Copy to Templates</span>
+                                </button>
+                            )}
+
+                            {onAddToMyWorkouts && (
+                                <button 
+                                    onClick={() => {
+                                        onAddToMyWorkouts(workout);
+                                        setIsMenuOpen(false);
+                                    }}
+                                    className="flex items-center space-x-2 w-full text-left px-4 py-3 text-sm text-zinc-200 hover:bg-zinc-700 border-t border-zinc-700"
+                                >
+                                    <Icon type="plus" className="w-4 h-4 text-zinc-400"/>
+                                    <span>Add to My Workouts</span>
+                                </button>
+                            )}
                         </div>
                     )}
                 </div>
@@ -74,11 +105,15 @@ const WorkoutDetailsPage: React.FC<WorkoutDetailsPageProps> = ({ workout, onBack
                                         </div>
                                         <div className="mt-2 space-y-px">
                                             {set.exercises.map(exercise => (
-                                                <div key={exercise.id} className="flex items-center bg-zinc-900 p-3">
+                                                <button 
+                                                    key={exercise.id} 
+                                                    onClick={() => onExerciseClick(exercise)}
+                                                    className="flex items-center bg-zinc-900 p-3 w-full text-left hover:bg-zinc-800 transition-colors"
+                                                >
                                                     <img src={exercise.image} alt={exercise.name} className="w-20 h-20 object-contain rounded-md mr-4 bg-white/5"/>
                                                     <p className="font-semibold text-zinc-200 flex-grow">{exercise.name}</p>
                                                     <Icon type="chevron-right" className="w-5 h-5 text-zinc-600"/>
-                                                </div>
+                                                </button>
                                             ))}
                                         </div>
                                     </div>
@@ -90,7 +125,10 @@ const WorkoutDetailsPage: React.FC<WorkoutDetailsPageProps> = ({ workout, onBack
             </main>
 
             <footer className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-zinc-950 to-transparent">
-                <button className="w-full bg-amber-400 hover:bg-amber-500 text-black font-bold py-4 px-4 rounded-full focus:outline-none focus:shadow-outline transition-colors duration-200 text-lg flex items-center justify-center space-x-2">
+                <button 
+                    onClick={() => onStart && onStart(workout)}
+                    className="w-full bg-amber-400 hover:bg-amber-500 text-black font-bold py-4 px-4 rounded-full focus:outline-none focus:shadow-outline transition-colors duration-200 text-lg flex items-center justify-center space-x-2"
+                >
                     <Icon type="workouts" className="w-6 h-6" />
                     <span>START WORKOUT</span>
                 </button>

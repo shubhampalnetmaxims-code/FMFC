@@ -1,19 +1,11 @@
 
-
-
-
-
-
-
-
 import React, { useState, useEffect, useMemo } from 'react';
 import BottomNav from './components/BottomNav';
 import CommunityPage from './pages/CommunityPage';
 import UnderDevelopmentPage from './pages/UnderDevelopmentPage';
 import LoginPage from './pages/LoginPage';
-// FIX: Corrected typo from DAILY_CHallenge_TASKS to DAILY_CHALLENGE_TASKS.
-import { NAV_ITEMS, NUTRITION_PLANS_DATA, LEADERBOARD_DATA, TEST_USER, TASK_POINTS, COMMUNITIES_DATA, USERS_DATA, DAILY_CHALLENGE_TASKS, NOTIFICATIONS_DATA } from './constants';
-import { NavItemType, User, NutritionPlan, DietIntakeItem, UserNote, UserMeasurement, UserPhoto, Community, ChannelType, Post, ChatMessage, Channel, ChallengeTask, MealEntry, FoodItem, Notification, NutritionTotals, SharedGoal, Workout } from './types';
+import { NAV_ITEMS, NUTRITION_PLANS_DATA, LEADERBOARD_DATA, TEST_USER, TASK_POINTS, COMMUNITIES_DATA, USERS_DATA, DAILY_CHALLENGE_TASKS, NOTIFICATIONS_DATA, WORKOUTS_DATA } from './constants';
+import { NavItemType, User, NutritionPlan, DietIntakeItem, UserNote, UserMeasurement, UserPhoto, Community, ChannelType, Post, ChatMessage, Channel, ChallengeTask, MealEntry, FoodItem, Notification, NutritionTotals, SharedGoal, Workout, Exercise } from './types';
 import SideMenu from './components/SideMenu';
 import ProfilePage from './pages/ProfilePage';
 import NutritionPage from './pages/NutritionPage';
@@ -39,6 +31,10 @@ import ShareProgressPage from './pages/ShareProgressPage';
 import WorkoutsPage from './pages/WorkoutsPage';
 import WorkoutDetailsPage from './pages/WorkoutDetailsPage';
 import ShareWorkoutPage from './pages/ShareWorkoutPage';
+import ExerciseDetailsPage from './pages/ExerciseDetailsPage';
+import WorkoutSessionPage from './pages/WorkoutSessionPage';
+import CreateWorkoutPage from './pages/CreateWorkoutPage';
+import FloatingNotificationBadge from './components/FloatingNotificationBadge';
 
 const App: React.FC = () => {
     const { addToast } = useToast();
@@ -118,12 +114,20 @@ const App: React.FC = () => {
     // STATE FOR NOTIFICATIONS
     const [notifications, setNotifications] = useState<Notification[]>(NOTIFICATIONS_DATA);
     const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+    const [notificationBadgeData, setNotificationBadgeData] = useState<{ communityId: number; image: string } | null>(null);
+
 
     // STATE FOR VIEWING SHARED COMMUNITY ITEMS
     const [viewingSharedItem, setViewingSharedItem] = useState<{ type: 'nutrition' | 'goal', data: NutritionPlan | SharedGoal, communityName: string } | null>(null);
 
     // STATE FOR WORKOUTS
-    const [viewingWorkout, setViewingWorkout] = useState<Workout | null>(null);
+    const [publicWorkouts, setPublicWorkouts] = useState<Workout[]>(WORKOUTS_DATA);
+    const [viewingWorkout, setViewingWorkout] = useState<{ workout: Workout; isMine: boolean } | null>(null);
+    const [viewingExercise, setViewingExercise] = useState<Exercise | null>(null);
+    const [myWorkouts, setMyWorkouts] = useState<Workout[]>([WORKOUTS_DATA[0]]);
+    const [activeWorkoutSession, setActiveWorkoutSession] = useState<Workout | null>(null);
+    const [isCreatingWorkout, setIsCreatingWorkout] = useState(false);
+
 
     const hasUnreadNotifications = useMemo(() => notifications.some(n => !n.isRead), [notifications]);
 
@@ -136,6 +140,27 @@ const App: React.FC = () => {
         addToast('All notifications marked as read', 'info');
         setIsNotificationsOpen(false); // Close panel after action
     };
+
+    // --- SIMULATE INCOMING MESSAGE FOR BADGE DEMO ---
+    useEffect(() => {
+        if (!currentUser) return;
+        
+        // Simulate receiving a message from "The Flex Zone" (ID 2) after 3 seconds
+        const timer = setTimeout(() => {
+            // Only show if not already inside that community
+            if (selectedCommunityId !== 2) {
+                const community = communities.find(c => c.id === 2);
+                if (community && community.posts.length > 0) {
+                     // Use the community's most recent post image or a default for the badge
+                    const image = "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=200&auto.format&fit=crop"; 
+                    setNotificationBadgeData({ communityId: 2, image });
+                    addToast(`New message in ${community.name}`, 'info');
+                }
+            }
+        }, 3000);
+
+        return () => clearTimeout(timer);
+    }, [currentUser, selectedCommunityId, communities, addToast]);
 
     useEffect(() => {
         // This runs only once on initial load to create some mock history
@@ -741,7 +766,6 @@ const App: React.FC = () => {
                 itemsForDate.add(itemId);
             }
             newChecked[dateKey] = itemsForDate;
-            // FIX: Changed `newCompleted` to `newChecked` to resolve a typo.
             return newChecked;
         });
     };
@@ -1010,6 +1034,14 @@ const App: React.FC = () => {
         addToast(`Community "${data.name}" created!`, 'success');
     };
 
+    const handleBadgeClick = () => {
+        if (notificationBadgeData) {
+            setActiveTab('Community');
+            handleSelectCommunity(notificationBadgeData.communityId);
+            setNotificationBadgeData(null);
+        }
+    };
+
     // --- Share Achievement Handlers ---
     const handleOpenShareAchievement = (data: { streak: number; pointsEarned: number; }) => {
         const postData = {
@@ -1168,13 +1200,14 @@ const App: React.FC = () => {
     };
 
     // --- Workout Handlers ---
-    const handleViewWorkout = (workout: Workout) => {
-        setViewingWorkout(workout);
+    const handleViewWorkout = (workout: Workout, isMine: boolean = false) => {
+        setViewingWorkout({ workout, isMine });
     };
 
     const handleBackFromWorkout = () => {
         setViewingWorkout(null);
         setSharingWorkout(null);
+        setViewingExercise(null); // Ensure this is cleared
     };
     
     const handleOpenShareWorkout = (workout: Workout) => {
@@ -1216,8 +1249,92 @@ const App: React.FC = () => {
         setViewingWorkout(null); // Go back to workout list after sharing
     };
 
+    const handleViewExercise = (exercise: Exercise) => {
+        setViewingExercise(exercise);
+    };
+
+    const handleBackFromExercise = () => {
+        setViewingExercise(null);
+    };
+
+    const handleSaveWorkoutTemplate = (workout: Workout) => {
+        const newTemplate: Workout = {
+            ...workout,
+            id: Date.now(),
+            isTemplate: true,
+            title: `${workout.title} (Copy)`
+        };
+        setMyWorkouts(prev => [...prev, newTemplate]);
+        addToast('Workout copied to your templates!', 'success');
+    };
+
+    const handleAddToMyWorkouts = (workout: Workout) => {
+        const newWorkout: Workout = {
+            ...workout,
+            id: Date.now(),
+            isTemplate: false,
+        };
+        setMyWorkouts(prev => [...prev, newWorkout]);
+        addToast('Workout added to My Workouts!', 'success');
+    };
+
+    const handleStartWorkout = (workout: Workout) => {
+        setActiveWorkoutSession(workout);
+    };
+
+    const handleCloseSession = () => {
+        setActiveWorkoutSession(null);
+    };
+    
+    const handleCompleteSession = () => {
+        setActiveWorkoutSession(null);
+        setViewingWorkout(null); // Go back to main list
+        addToast("Workout session completed!", 'success');
+    };
+
+    const handleCreateWorkout = () => {
+        setIsCreatingWorkout(true);
+    };
+
+    const handleCloseCreateWorkout = () => {
+        setIsCreatingWorkout(false);
+    };
+
+    const handleSaveNewWorkout = (newWorkout: Workout, isPrivate: boolean) => {
+        setMyWorkouts(prev => [...prev, newWorkout]);
+        
+        if (!isPrivate) {
+            setPublicWorkouts(prev => [...prev, newWorkout]);
+        }
+        
+        setIsCreatingWorkout(false);
+        addToast('Workout created successfully!', 'success');
+    };
+
 
     const renderPage = () => {
+        if (activeWorkoutSession) {
+            return <WorkoutSessionPage
+                workout={activeWorkoutSession}
+                onClose={handleCloseSession}
+                onComplete={handleCompleteSession}
+            />;
+        }
+
+        if (isCreatingWorkout) {
+            return <CreateWorkoutPage
+                onClose={handleCloseCreateWorkout}
+                onSave={handleSaveNewWorkout}
+            />;
+        }
+
+        if (viewingExercise) {
+            return <ExerciseDetailsPage 
+                        exercise={viewingExercise} 
+                        onBack={handleBackFromExercise} 
+                    />;
+        }
+
         if (sharingWorkout) {
             return <ShareWorkoutPage
                 currentUser={currentUser!}
@@ -1229,10 +1346,15 @@ const App: React.FC = () => {
         }
 
         if (viewingWorkout) {
+            const { workout, isMine } = viewingWorkout;
             return <WorkoutDetailsPage 
-                        workout={viewingWorkout} 
+                        workout={workout} 
                         onBack={handleBackFromWorkout}
                         onShare={handleOpenShareWorkout}
+                        onExerciseClick={handleViewExercise}
+                        onCopyTemplate={!isMine ? handleSaveWorkoutTemplate : undefined}
+                        onAddToMyWorkouts={!isMine ? handleAddToMyWorkouts : undefined}
+                        onStart={handleStartWorkout}
                     />;
         }
 
@@ -1435,12 +1557,10 @@ const App: React.FC = () => {
                             onBackToCommunityHub={handleBackToCommunityHub}
                             onBackToCommunityList={handleBackToCommunityList}
                             onLeaveCommunity={handleLeaveCommunity}
-                            // FIX: The prop 'onCreatePost' was referencing an undefined variable 'onCreatePost'. Corrected to use 'handleCreatePost'.
                             onCreatePost={handleCreatePost}
                             onAddOrUpdateChatMessage={handleAddOrUpdateChatMessage}
                             onUpdateCommunity={handleUpdateCommunity}
                             onAddChannel={handleAddChannel}
-                            // FIX: The prop 'onUpdateChannel' was passed an undefined variable 'onUpdateChannel'. Corrected to use 'handleUpdateChannel'.
                             onUpdateChannel={handleUpdateChannel}
                             onAddMembers={() => setIsAddingMembers(true)}
                             onSetIsAddingMembers={setIsAddingMembers}
@@ -1448,7 +1568,6 @@ const App: React.FC = () => {
                             onCreateCommunity={handleCreateCommunity}
                             onToggleNotifications={handleToggleNotifications}
                             hasUnreadNotifications={hasUnreadNotifications}
-                            // FIX: The prop 'onCopyPlan' was passed an undefined variable 'handleCopyPlan'. Corrected to use 'handleCopyTemplatePlan'.
                             onCopyPlan={handleCopyTemplatePlan}
                             onViewSharedItem={handleViewSharedItem}
                             onViewWorkout={handleViewWorkout}
@@ -1511,6 +1630,9 @@ const App: React.FC = () => {
                             onToggleNotifications={handleToggleNotifications}
                             hasUnreadNotifications={hasUnreadNotifications}
                             onViewWorkout={handleViewWorkout}
+                            myWorkouts={myWorkouts}
+                            publicWorkouts={publicWorkouts}
+                            onCreateWorkout={handleCreateWorkout}
                         />;
             default:
                 return <CommunityPage 
@@ -1526,12 +1648,10 @@ const App: React.FC = () => {
                             onBackToCommunityHub={handleBackToCommunityHub}
                             onBackToCommunityList={handleBackToCommunityList}
                             onLeaveCommunity={handleLeaveCommunity}
-                            // FIX: The prop 'onCreatePost' was referencing an undefined variable 'onCreatePost'. Corrected to use 'handleCreatePost'.
                             onCreatePost={handleCreatePost}
                             onAddOrUpdateChatMessage={handleAddOrUpdateChatMessage}
                             onUpdateCommunity={handleUpdateCommunity}
                             onAddChannel={handleAddChannel}
-                            // FIX: The prop 'onUpdateChannel' was passed an undefined variable 'onUpdateChannel'. Corrected to use 'handleUpdateChannel'.
                             onUpdateChannel={handleUpdateChannel}
                             onAddMembers={() => setIsAddingMembers(true)}
                             onSetIsAddingMembers={setIsAddingMembers}
@@ -1539,10 +1659,8 @@ const App: React.FC = () => {
                             onCreateCommunity={handleCreateCommunity}
                             onToggleNotifications={handleToggleNotifications}
                             hasUnreadNotifications={hasUnreadNotifications}
-                            // FIX: The prop 'onCopyPlan' was passed an undefined variable 'handleCopyPlan'. Corrected to use 'handleCopyTemplatePlan'.
                             onCopyPlan={handleCopyTemplatePlan}
                             onViewSharedItem={handleViewSharedItem}
-                            // FIX: The 'onViewWorkout' prop was missing, causing a TypeScript error.
                             onViewWorkout={handleViewWorkout}
                         />;
         }
@@ -1567,6 +1685,13 @@ const App: React.FC = () => {
                 onClose={() => setIsNotificationsOpen(false)}
                 onMarkAllAsRead={handleMarkAllAsRead}
             />
+            {/* Global Floating Badge */}
+            {notificationBadgeData && (
+                <FloatingNotificationBadge 
+                    communityImage={notificationBadgeData.image}
+                    onClick={handleBadgeClick}
+                />
+            )}
             <main className="flex-grow min-h-0">
                 {renderPage()}
             </main>

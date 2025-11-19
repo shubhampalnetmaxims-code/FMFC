@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import PostCard from '../components/PostCard';
 import { USERS_DATA } from '../constants';
 import type { User, Community, Post, ChatMessage, Channel, ChannelType, NutritionPlan, SharedGoal, Workout } from '../types';
@@ -38,7 +39,7 @@ interface CommunityPageProps {
     hasUnreadNotifications: boolean;
     onCopyPlan: (plan: NutritionPlan) => void;
     onViewSharedItem: (item: NutritionPlan | SharedGoal, type: 'nutrition' | 'goal', communityName: string) => void;
-    onViewWorkout: (workout: Workout) => void;
+    onViewWorkout: (workout: Workout, isMine?: boolean) => void;
 }
 
 const CommunityPage: React.FC<CommunityPageProps> = (props) => {
@@ -56,6 +57,13 @@ const CommunityPage: React.FC<CommunityPageProps> = (props) => {
     const [hasPremium, setHasPremium] = useState(false);
     const [showPremiumModal, setShowPremiumModal] = useState(false);
     const [isLoadingPurchase, setIsLoadingPurchase] = useState(false);
+
+    // Effect to switch tab when a community is selected (e.g., from notification badge)
+    useEffect(() => {
+        if (selectedCommunityId) {
+            setActiveSubTab('My Community');
+        }
+    }, [selectedCommunityId]);
 
     const userCommunities = communities.filter(c => c.members.some(m => m.id === currentUser.id));
 
